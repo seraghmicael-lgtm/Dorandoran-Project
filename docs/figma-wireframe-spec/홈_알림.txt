@@ -1,0 +1,110 @@
+Figma node: 578:1232 | name: 홈_알림 | size: 375x812
+
+- GROUP "Frame 32" 375x67
+  - GROUP "Frame 26" 91x57
+    - TEXT: "로고"
+  - GROUP "Frame 29" 67x57
+    - TEXT: "내 정보"
+- GROUP "Frame 39" 341x625
+  - GROUP "Frame 41" 341x148
+    - GROUP "Frame 38" 307x24
+      - GROUP "Frame 33" 143x24
+        - ellipse "Ellipse 2"
+        - TEXT: "귀여운양양 / 연암동"
+    - GROUP "Frame 35" 307x30
+      - TEXT: "수영 교실 등록 함께할 분"
+    - GROUP "Frame 34" 307x48
+      - GROUP "Frame 37" 307x21
+        - TEXT: "모임시간: 채팅 협의"
+        - TEXT: "예상 소요: 10분"
+        - TEXT: "참여자: 1명"
+      - TEXT: "모임 장소: 시민체육센터"
+  - GROUP "Frame 42" 341x148
+    - GROUP "Frame 38" 307x24
+      - GROUP "Frame 33" 143x24
+        - ellipse "Ellipse 2"
+        - TEXT: "귀여운양양 / 송정동"
+    - GROUP "Frame 35" 307x30
+      - TEXT: "뜨개질 같이 해요"
+    - GROUP "Frame 34" 307x48
+      - GROUP "Frame 37" 307x21
+        - TEXT: "모임시간: 13시"
+        - TEXT: "예상 소요: 1시간"
+        - TEXT: "참여자: 1명"
+      - TEXT: "모임 장소: 동사무소 시민회의실"
+  - GROUP "Frame 43" 341x148
+    - GROUP "Frame 38" 307x24
+      - GROUP "Frame 33" 143x24
+        - ellipse "Ellipse 2"
+        - TEXT: "노스탤지어 / 화봉동"
+    - GROUP "Frame 35" 307x30
+      - TEXT: "오후에 강아지 산책 합니다"
+    - GROUP "Frame 34" 307x48
+      - GROUP "Frame 37" 307x21
+        - TEXT: "모임시간: 10시"
+        - TEXT: "예상 소요: 1시간"
+        - TEXT: "참여자: 2명"
+      - TEXT: "모임 장소: 도토리마을 공원"
+  - GROUP "Frame 44" 341x148
+    - GROUP "Frame 38" 307x24
+      - GROUP "Frame 33" 106x24
+        - ellipse "Ellipse 2"
+        - TEXT: "낮잠자고싶다"
+      - TEXT: "25분 전"
+    - GROUP "Frame 35" 307x30
+      - TEXT: "반찬 나눔"
+    - GROUP "Frame 34" 307x48
+      - GROUP "Frame 37" 307x21
+        - TEXT: "시간: 16시"
+        - TEXT: "예상 소요: 5분"
+        - TEXT: "참여자: 3명"
+      - TEXT: "모임 장소: 보문 아파트 정문 앞"
+- GROUP "Frame 31" 375x67
+  - GROUP "Frame 26" 68.19999694824219x57
+    - TEXT: "홈"
+  - GROUP "Frame 30" 68.19999694824219x57
+    - TEXT: "내 동행"
+  - GROUP "Frame 29" 68.20000457763672x57
+    - TEXT: "알림"
+  - GROUP "Frame 27" 68.20000457763672x57
+    - TEXT: "채팅"
+  - GROUP "Frame 28" 68.19999694824219x57
+    - TEXT: "만들기"
+- GROUP "Frame 61" 367x76
+  - GROUP "Frame 60" 337x44
+    - TEXT: "내 모임에 동행이 1명 추가되었어요"
+    - TEXT: "동행 예정: 동그랑땡 / 호계동 (이전에 만난 적이 없는 참여자예요)"
+- GROUP "Frame 43" 697x159
+  - TEXT: "곧 시작하는 모임"
+  - GROUP "Frame 42" 697x121
+    - GROUP "Frame 36" 341x121
+      - GROUP "Frame 38" 307x24
+        - GROUP "Frame 33" 118x24
+          - ellipse "Ellipse 2"
+          - TEXT: "달토끼 / 화봉동"
+      - GROUP "Frame 35" 307x30
+        - TEXT: "모여서 대보름 부럼 까기"
+      - GROUP "Frame 34" 307x21
+        - GROUP "Frame 47" 307x21
+          - GROUP "Frame 45" 153.5x21
+            - ellipse "Ellipse 3"
+            - TEXT: "시작 시간: 13시"
+          - GROUP "Frame 47" 153.5x21
+            - ellipse "Ellipse 3"
+            - TEXT: "보고 있는 사람: 42명"
+    - GROUP "Frame 37" 341x121
+      - GROUP "Frame 38" 307x24
+        - GROUP "Frame 33" 67x24
+          - ellipse "Ellipse 2"
+          - TEXT: "달토끼"
+        - TEXT: "5분 전"
+      - GROUP "Frame 35" 307x30
+        - TEXT: "모여서 대보름 부럼 까기"
+      - GROUP "Frame 34" 307x21
+        - GROUP "Frame 47" 307x21
+          - GROUP "Frame 45" 153.5x21
+            - ellipse "Ellipse 3"
+            - TEXT: "보고 있는 사람: 42명"
+          - GROUP "Frame 46" 153.5x21
+            - ellipse "Ellipse 3"
+            - TEXT: "동네: 은평동"

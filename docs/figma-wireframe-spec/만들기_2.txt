@@ -1,0 +1,34 @@
+Figma node: 578:506 | name: 만들기_2 | size: 375x1040
+
+- BOX (Rectangle 6) 341x197
+- GROUP "Frame 32" 375x65
+  - regular-polygon "Polygon 1"
+- TEXT: "하고 싶은 활동에 대해 소개 해주세요"
+- GROUP "Frame 52" 339x62
+  - TEXT: "등록"
+- TEXT: "음성으로 입력하기"
+- TEXT: "1/2"
+- BOX (Rectangle 13) 340x112
+- BOX (Rectangle 14) 341x42
+- BOX (Rectangle 8) 86x42
+- BOX (Rectangle 9) 339x42
+- TEXT: "예상 소요 시간"
+- TEXT: "시작 시간"
+- TEXT: "00:00"
+- TEXT: "3"
+- TEXT: "최대 인원"
+- TEXT: "모임 장소"
+- TEXT: "최소 인원은 3명이어야 합니다 안전한 장소에서 만나요"
+- TEXT: "안내"
+- TEXT: "도토리마을 공원"
+- TEXT: "위치 찾기"
+- GROUP "Frame 53" 63x31
+  - TEXT: "10분"
+- GROUP "Frame 54" 63x31
+  - TEXT: "30분"
+- GROUP "Frame 55" 97x31
+  - TEXT: "1시간 이내"
+- GROUP "Frame 56" 97x31
+  - TEXT: "1시간 이상"
+- BOX (Rectangle 18) 24x6
+- boolean-operation "Union"

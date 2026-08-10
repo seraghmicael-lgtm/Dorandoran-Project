@@ -1,0 +1,27 @@
+Figma node: 581:29 | name: 홈 · 피드 | size: 375x812
+
+- TEXT: "지금 신사동에서 세 분이 같이 갈 사람을 찾고 있어요"
+- GROUP "Frame 65" 249x31
+  - GROUP "Frame 63" 66x29
+    - TEXT: "빠른 순"
+  - GROUP "Frame 64" 81x31
+    - TEXT: "가까운 순"
+  - GROUP "Frame 65" 94x31
+    - TEXT: "소요시간 순"
+- GROUP "Frame" 327x111
+  - TEXT: "오늘 3시 · 오일장 구경"
+  - TEXT: "걸어서 8분 · 1시간 이내 · 3명 중 2명"
+  - TEXT: "봄날의햇살 님"
+- GROUP "Frame" 327x111
+  - TEXT: "오늘 5시 · 식자재마트"
+  - TEXT: "걸어서 12분 · 1시간 이상 · 3명 중 1명"
+  - TEXT: "늘푸른소나무 님"
+- GROUP "Frame" 327x111
+  - TEXT: "내일 10시 · 공원 한 바퀴"
+  - TEXT: "걸어서 4분 · 30분 · 3명 모두 모였어요"
+  - TEXT: "운영자"
+- GROUP "sp" 327x191
+- GROUP "Frame" 327x53
+  - TEXT: "홈"
+  - TEXT: "내 동행"
+  - TEXT: "더보기"

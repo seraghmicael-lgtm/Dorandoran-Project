@@ -1,0 +1,19 @@
+Figma node: 578:353 | name: 만들기_1 | size: 375x812
+
+- GROUP "Frame 32" 375x68
+  - regular-polygon "Polygon 1"
+- GROUP "Frame 51" 339x62
+  - TEXT: "다음"
+- GROUP "Frame 52" 99x31
+  - TEXT: "장보러가요"
+- GROUP "Frame 53" 86x31
+  - TEXT: "김장해요"
+- GROUP "Frame 54" 115x31
+  - TEXT: "반찬 나눌게요"
+- GROUP "Frame 55" 115x31
+  - TEXT: "같이 등록해요"
+- TEXT: "모임명을 입력해주세요"
+- LINE/ICON (Vector 25) 339x0
+- TEXT: "어떤 동행을 구하시나요?"
+- TEXT: "1/2"
+- TEXT: "아니면 아래에서 선택해보세요"

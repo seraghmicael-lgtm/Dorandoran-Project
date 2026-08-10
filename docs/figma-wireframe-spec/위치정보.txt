@@ -1,0 +1,8 @@
+Figma node: 578:141 | name: 위치정보 | size: 375x812
+
+- BOX (Rectangle 5) 375x404
+- GROUP "Frame 25" 285x57
+  - TEXT: "허용"
+- GROUP "Frame 26" 285x57
+  - TEXT: "허용안함"
+- TEXT: "서비스를 이용하려면 위치 정보 권한이 필요해요"

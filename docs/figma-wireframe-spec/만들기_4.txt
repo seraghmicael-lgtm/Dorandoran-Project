@@ -1,0 +1,17 @@
+Figma node: 578:655 | name: 만들기_4 | size: 375x812
+
+- BOX (Rectangle 14) 333x562
+- GROUP "Frame 32" 375x68
+  - regular-polygon "Polygon 1"
+- GROUP "Frame 50" 154x28
+  - ellipse "Ellipse 3"
+  - GROUP "Frame 49" 133x28
+    - TEXT: "현재 내 위치: 은평동"
+- TEXT: "만나고 싶은 장소를 선택해주세요"
+- GROUP "Frame 52" 296x62
+  - TEXT: "선택"
+- GROUP "Group 3" 42.11775207519531x42.11775207519531
+- ellipse "Ellipse 3"
+- BOX (Rectangle 9) 317x42
+- ellipse "Ellipse 4"
+- TEXT: "검색할 위치를 입력하세요"

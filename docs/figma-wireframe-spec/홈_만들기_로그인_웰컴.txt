@@ -1,0 +1,6 @@
+Figma node: 575:61 | name: 홈_만들기_로그인_웰컴 | size: 375x812
+
+- TEXT: "다람쥐님 환영합니다"
+- BOX (Rectangle 1) 166x166
+- GROUP "Frame 26" 334x57
+  - TEXT: "확인"

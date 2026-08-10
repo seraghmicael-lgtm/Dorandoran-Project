@@ -1,0 +1,8 @@
+Figma node: 575:58 | name: 로그인 | size: 375x812
+
+- GROUP "Frame 25" 285x57
+  - TEXT: "그냥 둘러보기"
+- GROUP "Frame 26" 285x57
+  - TEXT: "카톡 로그인"
+- GROUP "Frame 27" 285x57
+  - TEXT: "휴대폰 번호로 시작하기"

@@ -1,0 +1,11 @@
+Figma node: 578:1162 | name: 위치정보_허용안함 | size: 375x812
+
+- BOX (Rectangle 14) 333x508
+- GROUP "Frame 32" 375x68
+  - regular-polygon "Polygon 1"
+- TEXT: "내가 위치한 곳을 선택해주세요"
+- GROUP "Frame 52" 296x62
+  - TEXT: "선택"
+- GROUP "Group 3" 42.11775207519531x42.11775207519531
+- ellipse "Ellipse 3"
+- TEXT: "직접 입력"

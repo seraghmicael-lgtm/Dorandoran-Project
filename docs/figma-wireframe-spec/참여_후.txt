@@ -1,0 +1,24 @@
+Figma node: 583:66 | name: 참여 후 | size: 375x812
+
+- TEXT: "오늘 어떠셨어요?"
+- TEXT: "고마웠던 분께 인사를 전해보세요. 한 분께만 전할 수 있어요."
+- GROUP "Frame 59" 327x185
+  - GROUP "Frame 57" 327x85
+    - GROUP "Frame" 156x85
+      - TEXT: "A 님"
+      - TEXT: "오늘 함께하신 분"
+    - GROUP "Frame" 156x85
+      - TEXT: "B 님"
+      - TEXT: "오늘 함께하신 분"
+  - GROUP "Frame 58" 327x85
+    - GROUP "Frame" 156x85
+      - TEXT: "C 님"
+      - TEXT: "오늘 함께하신 분"
+    - GROUP "Frame" 156x85
+      - TEXT: "D 님"
+      - TEXT: "오늘 함께하신 분"
+- GROUP "Frame 48" 327x134
+  - GROUP "Frame" 327x60
+    - TEXT: "고마웠어요 전하기"
+  - GROUP "Frame" 327x60
+    - TEXT: "건너뛰기"
