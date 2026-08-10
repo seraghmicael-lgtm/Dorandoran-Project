@@ -1,7 +1,13 @@
 import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
 
-export default function LocationPermissionPage() {
+export default async function LocationPermissionPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
+  const { next } = await searchParams;
+
   return (
     <WireframeLayout className="p-6 flex flex-col justify-between">
       <div className="flex-1 flex flex-col justify-center gap-4 py-12">
@@ -15,7 +21,7 @@ export default function LocationPermissionPage() {
 
       <div className="pb-8">
         <Link
-          href="/home"
+          href={next ?? "/home"}
           className="w-full h-[60px] bg-black text-white flex items-center justify-center rounded text-base font-medium"
         >
           위치 허용하기

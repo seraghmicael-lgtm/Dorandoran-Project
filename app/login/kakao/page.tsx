@@ -1,7 +1,16 @@
 import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
 
-export default function KakaoLoginPage() {
+export default async function KakaoLoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
+  const { next } = await searchParams;
+  const continueHref = next
+    ? `/location-permission?next=${encodeURIComponent(next)}`
+    : "/location-permission";
+
   return (
     <WireframeLayout className="p-6 flex flex-col justify-between">
       <div className="flex-1 flex flex-col justify-center gap-4 py-12">
@@ -15,7 +24,7 @@ export default function KakaoLoginPage() {
 
       <div className="flex flex-col gap-3 pb-8">
         <Link
-          href="/location-permission"
+          href={continueHref}
           className="w-full h-[60px] bg-black text-white flex items-center justify-center rounded text-base font-medium"
         >
           카카오로 3초 만에 시작하기

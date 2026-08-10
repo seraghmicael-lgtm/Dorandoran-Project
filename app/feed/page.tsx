@@ -24,7 +24,7 @@ export default function FeedPage() {
 
         <div className="flex flex-col gap-3">
           <Link
-            href="/meetup/1"
+            href="/meetup/1?from=/feed"
             className="p-3 border border-gray-200 rounded flex flex-col gap-1 bg-white hover:bg-gray-50"
           >
             <div className="font-bold text-sm text-black">오늘 3시 · 오일장 구경</div>
@@ -33,7 +33,7 @@ export default function FeedPage() {
           </Link>
 
           <Link
-            href="/meetup/2"
+            href="/meetup/2?from=/feed"
             className="p-3 border border-gray-200 rounded flex flex-col gap-1 bg-white hover:bg-gray-50"
           >
             <div className="font-bold text-sm text-black">오늘 5시 · 식자재마트</div>
@@ -42,7 +42,7 @@ export default function FeedPage() {
           </Link>
 
           <Link
-            href="/meetup/3"
+            href="/meetup/3?from=/feed"
             className="p-3 border border-gray-200 rounded flex flex-col gap-1 bg-white hover:bg-gray-50"
           >
             <div className="font-bold text-sm text-black">내일 10시 · 공원 한 바퀴</div>

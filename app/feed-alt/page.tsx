@@ -13,7 +13,7 @@ export default function FeedAltPage() {
         <div className="flex flex-col gap-3">
           {/* Card 1 variant */}
           <Link
-            href="/meetup/1"
+            href="/meetup/1?from=/feed-alt"
             className="p-3 border border-gray-200 rounded flex flex-col gap-2 bg-white hover:bg-gray-50"
           >
             <div className="flex justify-between items-center text-xs">
@@ -28,7 +28,7 @@ export default function FeedAltPage() {
 
           {/* Card 2 */}
           <Link
-            href="/meetup/2"
+            href="/meetup/2?from=/feed-alt"
             className="p-3 border border-gray-200 rounded flex flex-col gap-1 bg-white hover:bg-gray-50"
           >
             <div className="font-bold text-sm text-black">오늘 5시 · 식자재마트</div>
@@ -38,7 +38,7 @@ export default function FeedAltPage() {
 
           {/* Card 3 */}
           <Link
-            href="/meetup/3"
+            href="/meetup/3?from=/feed-alt"
             className="p-3 border border-gray-200 rounded flex flex-col gap-1 bg-white hover:bg-gray-50"
           >
             <div className="font-bold text-sm text-black">내일 10시 · 공원 한 바퀴</div>

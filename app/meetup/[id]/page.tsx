@@ -5,17 +5,21 @@ import PlaceholderBox from "@/components/PlaceholderBox";
 
 export default async function MeetupDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ from?: string }>;
 }) {
   const { id } = await params;
+  const { from } = await searchParams;
 
   return (
     <WireframeLayout>
-      <HeaderBack backHref="/feed" />
+      <HeaderBack backHref={from ?? "/feed"} />
 
       <div className="p-4 flex-1 flex flex-col gap-4 overflow-y-auto">
-        <h1 className="text-xl font-bold text-black">{`오일장 구경 ${id ? '' : ''}`}</h1>
+        {/* ponytail: 상세 화면은 Figma에 "오일장 구경" 한 건만 명시돼 있어 id별로 다른 데이터를 지어내지 않고 고정 표시함 */}
+        <h1 className="text-xl font-bold text-black">오일장 구경</h1>
 
         <div className="border-t border-b border-gray-200 divide-y divide-gray-200">
           <div className="py-3 flex justify-between items-center text-sm">

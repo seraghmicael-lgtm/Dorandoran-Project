@@ -57,7 +57,7 @@ export default function CreateStep3Page() {
               <div className="flex items-center justify-between p-3 border border-gray-300 rounded bg-white">
                 <span className="text-sm text-black">도토리마을 공원</span>
                 <Link
-                  href="/create/step-4"
+                  href="/create/step-4?from=/create/step-3"
                   className="px-3 py-1 bg-black text-white text-xs rounded"
                 >
                   위치 찾기

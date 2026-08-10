@@ -57,7 +57,7 @@ export default function CreateStep2Page() {
               <div className="flex items-center justify-between p-3 border border-gray-300 rounded bg-white">
                 <span className="text-sm text-black">도토리마을 공원</span>
                 <Link
-                  href="/create/step-4"
+                  href="/create/step-4?from=/create/step-2"
                   className="px-3 py-1 bg-black text-white text-xs rounded"
                 >
                   위치 찾기
@@ -74,8 +74,9 @@ export default function CreateStep2Page() {
         </div>
 
         <div className="pb-4">
+          {/* ponytail: Figma의 만들기_2/만들기_3은 내용이 동일한 화면이라(원본 확인됨) 같은 폼을 두 번 채우게 만들지 않고 바로 완료 처리 */}
           <Link
-            href="/create/step-3"
+            href="/home"
             className="w-full h-[62px] bg-black text-white flex items-center justify-center rounded text-base font-medium"
           >
             등록

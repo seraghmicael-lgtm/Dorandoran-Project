@@ -11,7 +11,7 @@ export default function CreatePage() {
 
         <div className="w-full flex flex-col gap-3">
           <Link
-            href="/login/kakao"
+            href="/login/kakao?next=/create/welcome"
             className="w-full h-[57px] bg-black text-white flex items-center justify-center rounded text-base font-medium"
           >
             카톡 로그인

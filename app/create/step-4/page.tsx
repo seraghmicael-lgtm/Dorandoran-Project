@@ -3,10 +3,17 @@ import WireframeLayout from "@/components/WireframeLayout";
 import HeaderBack from "@/components/HeaderBack";
 import PlaceholderBox from "@/components/PlaceholderBox";
 
-export default function CreateStep4Page() {
+export default async function CreateStep4Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string }>;
+}) {
+  const { from } = await searchParams;
+  const backHref = from === "/create/step-3" ? "/create/step-3" : "/create/step-2";
+
   return (
     <WireframeLayout>
-      <HeaderBack backHref="/create/step-2" />
+      <HeaderBack backHref={backHref} />
 
       <div className="p-4 flex-1 flex flex-col justify-between gap-4 overflow-y-auto">
         <div className="flex flex-col gap-3">
@@ -33,7 +40,7 @@ export default function CreateStep4Page() {
 
         <div className="pb-4 flex justify-center">
           <Link
-            href="/create/step-2"
+            href={backHref}
             className="w-[296px] h-[62px] bg-black text-white flex items-center justify-center rounded text-base font-medium"
           >
             선택
