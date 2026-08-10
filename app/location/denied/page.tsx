@@ -19,7 +19,7 @@ export default function LocationDeniedPage() {
             <span className="text-gray-700">직접 입력</span>
           </div>
 
-          <PlaceholderBox height="h-[350px]" className="rounded">
+          <PlaceholderBox height="h-[508px]" className="rounded">
             지도 위치 선택 영역 (333x508)
           </PlaceholderBox>
         </div>

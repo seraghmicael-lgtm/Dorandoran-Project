@@ -6,7 +6,7 @@ import PlaceholderBox from "@/components/PlaceholderBox";
 export default async function CreateStep4Page({
   searchParams,
 }: {
-  searchParams: Promise<{ from?: string }>;
+  searchParams: Promise<{ from?: string | string[] }>;
 }) {
   const { from } = await searchParams;
   const backHref = from === "/create/step-3" ? "/create/step-3" : "/create/step-2";

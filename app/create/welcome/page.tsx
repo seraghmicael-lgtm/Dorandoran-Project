@@ -4,7 +4,7 @@ import PlaceholderBox from "@/components/PlaceholderBox";
 
 export default function CreateWelcomePage() {
   return (
-    <WireframeLayout className="p-6 flex flex-col justify-between items-center text-center">
+    <WireframeLayout className="p-6 flex flex-col text-center" items="center">
       <div className="flex-1 flex flex-col justify-center items-center gap-6 py-12">
         <h1 className="text-xl font-bold text-black">다람쥐님 환영합니다</h1>
         <PlaceholderBox width="w-[166px]" height="h-[166px]" className="rounded">

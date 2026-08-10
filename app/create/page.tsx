@@ -3,7 +3,7 @@ import WireframeLayout from "@/components/WireframeLayout";
 
 export default function CreatePage() {
   return (
-    <WireframeLayout className="p-6 flex flex-col justify-center items-center">
+    <WireframeLayout className="p-6 flex flex-col" justify="center" items="center">
       <div className="w-full max-w-[285px] flex flex-col gap-6 items-center">
         <p className="text-center text-sm font-medium text-black">
           이웃을 만나려면 로그인이 필요해요
