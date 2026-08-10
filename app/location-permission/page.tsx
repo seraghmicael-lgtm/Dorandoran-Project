@@ -1,12 +1,14 @@
 import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
+import { safeInternalPath } from "@/lib/safePath";
 
 export default async function LocationPermissionPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string }>;
+  searchParams: Promise<{ next?: string | string[] }>;
 }) {
   const { next } = await searchParams;
+  const nextHref = safeInternalPath(next, "/home");
 
   return (
     <WireframeLayout className="p-6 flex flex-col justify-between">
@@ -21,7 +23,7 @@ export default async function LocationPermissionPage({
 
       <div className="pb-8">
         <Link
-          href={next ?? "/home"}
+          href={nextHref}
           className="w-full h-[60px] bg-black text-white flex items-center justify-center rounded text-base font-medium"
         >
           위치 허용하기

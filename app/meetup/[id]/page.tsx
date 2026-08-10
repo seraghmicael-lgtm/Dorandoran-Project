@@ -2,20 +2,22 @@ import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
 import HeaderBack from "@/components/HeaderBack";
 import PlaceholderBox from "@/components/PlaceholderBox";
+import { safeInternalPath } from "@/lib/safePath";
 
 export default async function MeetupDetailPage({
   params,
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ from?: string }>;
+  searchParams: Promise<{ from?: string | string[] }>;
 }) {
   const { id } = await params;
   const { from } = await searchParams;
+  const backHref = safeInternalPath(from, "/feed");
 
   return (
     <WireframeLayout>
-      <HeaderBack backHref={from ?? "/feed"} />
+      <HeaderBack backHref={backHref} />
 
       <div className="p-4 flex-1 flex flex-col gap-4 overflow-y-auto">
         {/* ponytail: 상세 화면은 Figma에 "오일장 구경" 한 건만 명시돼 있어 id별로 다른 데이터를 지어내지 않고 고정 표시함 */}

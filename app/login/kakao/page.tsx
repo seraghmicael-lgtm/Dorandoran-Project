@@ -1,14 +1,16 @@
 import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
+import { safeInternalPath } from "@/lib/safePath";
 
 export default async function KakaoLoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string }>;
+  searchParams: Promise<{ next?: string | string[] }>;
 }) {
   const { next } = await searchParams;
-  const continueHref = next
-    ? `/location-permission?next=${encodeURIComponent(next)}`
+  const safeNext = safeInternalPath(next, "");
+  const continueHref = safeNext
+    ? `/location-permission?next=${encodeURIComponent(safeNext)}`
     : "/location-permission";
 
   return (
