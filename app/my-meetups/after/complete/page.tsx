@@ -13,7 +13,7 @@ export default function AfterCompletePage() {
 
       <div className="pb-8">
         <Link
-          href="/feed"
+          href="/my-meetups"
           className="w-full h-[60px] bg-black text-white flex items-center justify-center rounded text-base font-medium"
         >
           확인
