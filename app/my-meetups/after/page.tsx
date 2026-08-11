@@ -28,9 +28,12 @@ export default function AfterMeetupPage() {
             <button
               key={idx}
               type="button"
+              aria-pressed={selected === idx}
               onClick={() => setSelected(idx)}
-              className={`p-4 border rounded flex flex-col gap-1 text-left bg-white ${
-                selected === idx ? "border-black border-2" : "border-gray-300 hover:border-black"
+              className={`p-4 rounded flex flex-col gap-1 text-left bg-white ${
+                selected === idx
+                  ? "border-2 border-black"
+                  : "border border-gray-300 hover:border-black"
               }`}
             >
               <span className="font-bold text-sm text-black">{member.name}</span>
@@ -49,7 +52,10 @@ export default function AfterMeetupPage() {
             고마웠어요 전하기
           </Link>
         ) : (
-          <span className="w-full h-[60px] bg-gray-200 text-gray-400 flex items-center justify-center rounded text-base font-medium cursor-not-allowed">
+          <span
+            aria-disabled="true"
+            className="w-full h-[60px] bg-gray-200 text-gray-400 flex items-center justify-center rounded text-base font-medium cursor-not-allowed"
+          >
             고마웠어요 전하기
           </span>
         )}
