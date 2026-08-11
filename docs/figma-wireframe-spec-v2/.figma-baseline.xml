@@ -1,0 +1,937 @@
+<canvas id="575:2" name="3_와이어프레임-ing" x="0" y="0" width="0" height="0">
+  <frame id="581:3" name="스플래시 &amp; 진입" x="1431" y="908" width="375" height="812">
+    <text id="581:5" name="오늘 같이할 사람 찾기" x="24" y="298" width="327" height="64" />
+    <text id="581:6" name="장 보러, 산책하러, 커피 한 잔 우리 동네에서 한두 시간" x="24" y="376" width="327" height="46" />
+    <frame id="579:71" name="Frame 48" x="24" y="654" width="327" height="134">
+      <frame id="581:13" name="Frame" x="0" y="0" width="327" height="60">
+        <text id="581:14" name="카카오로 시작하기" x="0" y="17" width="327" height="26" />
+      </frame>
+      <frame id="581:15" name="Frame" x="0" y="74" width="327" height="60">
+        <text id="581:16" name="그냥 둘러보기" x="0" y="17" width="327" height="26" />
+      </frame>
+    </frame>
+  </frame>
+  <frame id="595:2109" name="스플래시 &amp; 진입" x="1431" y="-96" width="375" height="812">
+    <text id="595:2110" name="오늘 같이할 사람 찾기" x="24" y="298" width="327" height="64" />
+    <text id="595:2111" name="장 보러, 산책하러, 커피 한 잔 우리 동네에서 한두 시간" x="24" y="376" width="327" height="46" />
+    <frame id="595:2112" name="Frame 48" x="24" y="654" width="327" height="134">
+      <frame id="595:2113" name="Frame" x="0" y="0" width="327" height="60">
+        <text id="595:2114" name="카카오로 시작하기" x="0" y="17" width="327" height="26" />
+      </frame>
+      <frame id="595:2115" name="Frame" x="0" y="74" width="327" height="60">
+        <text id="595:2116" name="그냥 둘러보기" x="0" y="17" width="327" height="26" />
+      </frame>
+    </frame>
+  </frame>
+  <frame id="581:19" name="위치 권한" x="1876" y="908" width="375" height="812">
+    <text id="581:20" name="가까운 것만 보여드릴게요" x="24" y="298" width="327" height="64" />
+    <text id="581:21" name="걸어서 갈 수 있는 곳만 보여드리려고 위치를 확인해요. 위치는 저장하지 않아요." x="24" y="376" width="327" height="69" />
+    <frame id="579:91" name="Frame 48" x="24" y="728" width="327" height="60">
+      <frame id="579:92" name="Frame" x="0" y="0" width="327" height="60">
+        <text id="579:93" name="위치 허용하기" x="0" y="17" width="327" height="26" />
+      </frame>
+    </frame>
+  </frame>
+  <frame id="595:2117" name="위치 권한" x="1876" y="-96" width="375" height="812">
+    <text id="595:2118" name="가까운 것만 보여드릴게요" x="24" y="298" width="327" height="64" />
+    <text id="595:2119" name="걸어서 갈 수 있는 곳만 보여드리려고 위치를 확인해요. 위치는 저장하지 않아요." x="24" y="376" width="327" height="69" />
+    <frame id="595:2120" name="Frame 48" x="24" y="728" width="327" height="60">
+      <frame id="595:2121" name="Frame" x="0" y="0" width="327" height="60">
+        <text id="595:2122" name="위치 허용하기" x="0" y="17" width="327" height="26" />
+      </frame>
+    </frame>
+  </frame>
+  <frame id="582:21" name="카톡 3초 로그인" x="2864" y="908" width="375" height="812">
+    <text id="582:23" name="이웃과 함께하려면 간단한 본인 확인이 필요해요" x="24" y="298" width="327" height="64" />
+    <text id="582:24" name="이름과 연락처만 확인해요. 다른 정보는 받지 않아요." x="24" y="376" width="327" height="46" />
+    <frame id="579:97" name="Frame 48" x="24" y="654" width="327" height="134">
+      <frame id="579:98" name="Frame" x="0" y="0" width="327" height="60">
+        <text id="579:99" name="카카오로 3초 만에 시작하기" x="0" y="17" width="327" height="26" />
+      </frame>
+      <frame id="579:100" name="Frame" x="0" y="74" width="327" height="60">
+        <text id="579:101" name="뒤로" x="0" y="17" width="327" height="26" />
+      </frame>
+    </frame>
+  </frame>
+  <frame id="582:32" name="상세 확인" x="3299" y="908" width="375" height="812">
+    <text id="582:33" name="오일장 구경" x="24" y="56" width="327" height="32" />
+    <frame id="579:172" name="Frame 62" x="24" y="102" width="327" height="515">
+      <frame id="582:34" name="Frame" x="0" y="0" width="327" height="47">
+        <text id="582:35" name="만드신 분" x="0" y="12" width="84" height="21" />
+        <text id="582:36" name="봄날의햇살 님" x="96" y="12" width="231" height="23" />
+      </frame>
+      <frame id="582:40" name="Frame" x="0" y="61" width="327" height="47">
+        <text id="582:41" name="시간" x="0" y="12" width="84" height="21" />
+        <text id="582:42" name="오늘 오후 3시" x="96" y="12" width="231" height="23" />
+      </frame>
+      <frame id="582:43" name="Frame" x="0" y="122" width="327" height="47">
+        <text id="582:44" name="걸리는 시간" x="0" y="12" width="84" height="21" />
+        <text id="582:45" name="1시간 이내" x="96" y="12" width="231" height="23" />
+      </frame>
+      <frame id="582:46" name="Frame" x="0" y="183" width="327" height="47">
+        <text id="582:47" name="거리" x="0" y="12" width="84" height="21" />
+        <text id="582:48" name="걸어서 8분" x="96" y="12" width="231" height="23" />
+      </frame>
+      <frame id="582:49" name="Frame" x="0" y="244" width="327" height="47">
+        <text id="582:50" name="모임인원" x="0" y="12" width="84" height="21" />
+        <text id="582:51" name="2 / 3명" x="96" y="12" width="231" height="23" />
+      </frame>
+      <frame id="582:37" name="Frame" x="0" y="305" width="327" height="47">
+        <text id="582:38" name="만나는 곳" x="0" y="12" width="84" height="21" />
+        <frame id="579:515" name="Frame 75" x="96" y="12" width="231" height="23">
+          <text id="582:39" name="신사시장 정문" x="0" y="0" width="87" height="23" />
+          <frame id="579:514" name="Frame 74" x="163" y="0" width="68" height="23">
+            <text id="579:509" name="길찾기" x="0" y="0" width="42" height="23" />
+            <symbol id="579:511" name="icon / feathericons / chevron-right" x="46" y="0.5" width="22" height="22" />
+          </frame>
+        </frame>
+      </frame>
+      <rounded-rectangle id="579:174" name="Rectangle 17" x="0" y="366" width="327" height="149" />
+    </frame>
+    <frame id="579:109" name="Frame 48" x="24" y="728" width="327" height="60">
+      <frame id="579:110" name="Frame" x="0" y="0" width="327" height="60">
+        <text id="579:111" name="참여하기" x="0" y="17" width="327" height="26" />
+      </frame>
+    </frame>
+    <text id="602:9" name="map" x="164" y="527" width="48" height="32" />
+  </frame>
+  <frame id="579:481" name="지도" x="3729" y="908" width="375" height="812">
+    <rounded-rectangle id="579:502" name="Rectangle 17" x="0" y="57" width="375" height="755" />
+    <frame id="579:506" name="Frame 48" x="24" y="728" width="327" height="60">
+      <frame id="579:507" name="Frame" x="0" y="0" width="327" height="60">
+        <frame id="579:528" name="Frame 76" x="126" y="17" width="75" height="26">
+          <symbol id="579:524" name="icon / feathericons / corner-up-right" x="0" y="3" width="20" height="20" />
+          <text id="579:508" name="길찾기" x="28" y="0" width="47" height="26" />
+        </frame>
+      </frame>
+    </frame>
+    <rounded-rectangle id="579:520" name="line" x="0" y="56" width="375" height="1" />
+    <text id="579:522" name="←" x="20" y="18" width="18" height="27" />
+    <text id="602:32" name="map" x="163" y="357" width="48" height="32" />
+  </frame>
+  <frame id="582:57" name="신청 완료" x="4160" y="908" width="375" height="812">
+    <frame id="582:58" name="sp" x="24" y="56" width="327" height="221" />
+    <text id="582:59" name="신청되었습니다" x="24" y="291" width="327" height="32" />
+    <text id="582:60" name="오늘 오후 3시 신사시장 정문에서 만나요 30분 전에 알려드릴게요" x="24" y="337" width="327" height="92" />
+    <frame id="582:61" name="sp" x="24" y="443" width="327" height="221" />
+    <frame id="579:115" name="Frame 48" x="24" y="728" width="327" height="60">
+      <frame id="579:116" name="Frame" x="0" y="0" width="327" height="60">
+        <text id="579:117" name="확인" x="0" y="17" width="327" height="26" />
+      </frame>
+    </frame>
+  </frame>
+  <frame id="583:3" name="내 동행" x="4605" y="908" width="375" height="812">
+    <text id="583:4" name="오늘 나가실 동행" x="24" y="56" width="327" height="32" />
+    <frame id="583:5" name="Frame" x="24" y="102" width="327" height="177">
+      <text id="583:6" name="오늘 3시 · 오일장 구경" x="16" y="16" width="295" height="26" />
+      <text id="583:7" name="신사시장 정문 · 걸어서 8분" x="16" y="48" width="295" height="21" />
+      <text id="583:8" name="3명 중 2명 · 한 분 더" x="16" y="75" width="295" height="20" />
+      <frame id="583:9" name="Frame" x="16" y="101" width="295" height="60">
+        <text id="583:10" name="동행 취소하기" x="0" y="17" width="295" height="26" />
+      </frame>
+    </frame>
+    <frame id="583:11" name="sp" x="24" y="293" width="327" height="452" />
+    <frame id="583:12" name="Frame" x="24" y="759" width="327" height="53">
+      <text id="583:13" name="홈" x="0" y="16" width="109" height="21" />
+      <text id="583:14" name="내 동행" x="109" y="16" width="109" height="21" />
+      <text id="583:15" name="더보기" x="218" y="16" width="109" height="21" />
+    </frame>
+  </frame>
+  <frame id="596:101" name="내 동행" x="6325" y="-96" width="375" height="812">
+    <text id="596:102" name="오늘 약속된 동행" x="24" y="81" width="327" height="25" />
+    <text id="596:142" name="지금 모집중인 추천 동행" x="24" y="324" width="327" height="25" />
+    <frame id="596:103" name="Frame" x="24" y="118" width="327" height="165">
+      <text id="596:104" name="수영 교실 등록 함께할 분" x="16" y="16" width="295" height="26" />
+      <text id="596:114" name="모임시간: 채팅 협의 예상 소요: 10분 참여자: 1 / 3" x="16" y="48" width="295" height="17" />
+      <text id="596:115" name="모임 장소: 시민체육센터" x="16" y="71" width="295" height="17" />
+      <frame id="596:120" name="Frame 79" x="16" y="94" width="295" height="55">
+        <frame id="596:107" name="Frame" x="0" y="0" width="141.50001525878906" height="55">
+          <text id="596:108" name="시간 미루기" x="36.75000762939453" y="17" width="68" height="21" />
+        </frame>
+        <frame id="596:117" name="Frame" x="153.50001525878906" y="0" width="141.50001525878906" height="55">
+          <text id="596:118" name="동행 모임 취소하기" x="15.750007629394531" y="17" width="110" height="21" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="596:143" name="Frame" x="24" y="361" width="327" height="104">
+      <frame id="596:210" name="Frame 80" x="16" y="16" width="295" height="26">
+        <text id="596:144" name="오후에 강아지 산책 합니다" x="0" y="0" width="259" height="26" />
+        <ellipse id="596:211" name="Ellipse" x="269" y="0" width="26" height="26" />
+      </frame>
+      <text id="596:145" name="모임시간: 채팅 협의 예상 소요: 1시간 이상 참여자: 2 / 3" x="16" y="48" width="295" height="17" />
+      <text id="596:146" name="모임 장소: 도토리마을 공원 (걸어서 8분)" x="16" y="71" width="295" height="17" />
+    </frame>
+    <frame id="596:206" name="Frame" x="24" y="479" width="327" height="104">
+      <frame id="596:213" name="Frame 81" x="16" y="16" width="295" height="26">
+        <text id="596:207" name="수변공원 축제 구경가서 맛있는거 먹어요" x="0" y="0" width="259" height="26" />
+        <ellipse id="596:214" name="Ellipse" x="269" y="0" width="26" height="26" />
+      </frame>
+      <text id="596:208" name="모임시간: 채팅 협의 예상 소요: 1시간 이상 참여자: 1 / 5" x="16" y="48" width="295" height="17" />
+      <text id="596:209" name="모임 장소: 수변공원 (걸어서 20분)" x="16" y="71" width="295" height="17" />
+    </frame>
+    <frame id="596:121" name="탭바" x="0" y="752" width="375" height="60">
+      <frame id="596:122" name="tab/홈" x="0" y="0" width="93.75" height="60">
+        <text id="596:123" name="홈" x="40.875" y="21" width="12" height="18" />
+      </frame>
+      <frame id="596:124" name="tab/내 동행" x="93.75" y="0" width="93.75" height="60">
+        <text id="596:125" name="내 동행" x="28.875" y="21" width="36" height="18" />
+      </frame>
+      <frame id="596:126" name="tab/알림" x="187.5" y="0" width="93.75" height="60">
+        <text id="596:127" name="동네소식" x="24.375" y="21" width="45" height="18" />
+      </frame>
+      <frame id="596:130" name="tab/만들기" x="281.25" y="0" width="93.75" height="60">
+        <text id="596:131" name="만들기" x="29.875" y="21" width="34" height="18" />
+      </frame>
+    </frame>
+    <text id="596:1129" name="로고" x="20" y="17" width="28" height="23" />
+    <text id="596:1130" name="내 정보" x="316" y="19" width="39" height="20" />
+    <text id="596:1131" name="알림" x="263" y="19" width="24" height="20" />
+    <rounded-rectangle id="596:1132" name="divider" x="0" y="56" width="375" height="1" />
+  </frame>
+  <frame id="596:1134" name="내 동행" x="6753" y="-96" width="375" height="812">
+    <frame id="596:1158" name="탭바" x="0" y="752" width="375" height="60">
+      <frame id="596:1159" name="tab/홈" x="0" y="0" width="93.75" height="60">
+        <text id="596:1160" name="홈" x="40.875" y="21" width="12" height="18" />
+      </frame>
+      <frame id="596:1161" name="tab/내 동행" x="93.75" y="0" width="93.75" height="60">
+        <text id="596:1162" name="내 동행" x="28.875" y="21" width="36" height="18" />
+      </frame>
+      <frame id="596:1163" name="tab/알림" x="187.5" y="0" width="93.75" height="60">
+        <text id="596:1164" name="동네소식" x="24.375" y="21" width="45" height="18" />
+      </frame>
+      <frame id="596:1167" name="tab/만들기" x="281.25" y="0" width="93.75" height="60">
+        <text id="596:1168" name="만들기" x="29.875" y="21" width="34" height="18" />
+      </frame>
+    </frame>
+    <text id="596:1169" name="로고" x="20" y="17" width="28" height="23" />
+    <text id="596:1170" name="내 정보" x="316" y="19" width="39" height="20" />
+    <text id="596:1171" name="알림" x="263" y="19" width="24" height="20" />
+    <rounded-rectangle id="596:1172" name="divider" x="0" y="56" width="375" height="1" />
+    <frame id="596:1173" name="Frame" x="25" y="97" width="288" height="49">
+      <text id="596:1177" name="방금 큰 소리 나지 않았어요?" x="16" y="16" width="256" height="17" />
+    </frame>
+    <frame id="596:1181" name="Frame" x="25" y="269" width="288" height="49">
+      <text id="596:1182" name="3단지 정전 났습니다 ㅠㅠ" x="16" y="16" width="256" height="17" />
+    </frame>
+    <frame id="596:1183" name="Frame" x="25" y="355" width="288" height="49">
+      <text id="596:1184" name="언제 복구 될까요?" x="16" y="16" width="256" height="17" />
+    </frame>
+    <frame id="596:1185" name="Frame" x="25" y="441" width="288" height="49">
+      <text id="596:1186" name="관리실에 확인해보심이..." x="16" y="16" width="256" height="17" />
+    </frame>
+    <frame id="596:1179" name="Frame" x="63" y="183" width="288" height="49">
+      <text id="596:1180" name="아까 사거리에서 사고 났다는거 같아요" x="16" y="16" width="256" height="17" />
+    </frame>
+    <text id="596:1187" name="즐거운다람쥐" x="289" y="162" width="61" height="17" />
+    <text id="596:1188" name="쿠킹쿠킹" x="25" y="74" width="41" height="17" />
+    <text id="596:1189" name="요리하는엄마" x="25" y="249" width="61" height="17" />
+    <text id="596:1190" name="뚜벅이" x="25" y="334" width="31" height="17" />
+    <text id="596:1191" name="한가로이" x="25" y="420" width="41" height="17" />
+    <rounded-rectangle id="596:1192" name="Rectangle 18" x="0" y="703" width="375" height="49" />
+    <rounded-rectangle id="596:1199" name="Rectangle 19" x="10" y="712" width="311" height="32" />
+    <frame id="601:9" name="mic" x="338" y="716" width="24" height="24" />
+  </frame>
+  <frame id="583:18" name="참여 취소" x="5053" y="908" width="375" height="812">
+    <text id="583:20" name="못 가시는군요" x="24" y="291" width="327" height="32" />
+    <text id="583:21" name="다른 분들께는 &quot;한 분이 못 오시게 됐어요&quot;만 전해요." x="24" y="337" width="327" height="46" />
+    <frame id="579:121" name="Frame 48" x="24" y="654" width="327" height="134">
+      <frame id="579:122" name="Frame" x="0" y="0" width="327" height="60">
+        <text id="579:123" name="못 간다고 알리기" x="0" y="17" width="327" height="26" />
+      </frame>
+      <frame id="579:124" name="Frame" x="0" y="74" width="327" height="60">
+        <text id="579:125" name="취소" x="0" y="17" width="327" height="26" />
+      </frame>
+    </frame>
+  </frame>
+  <frame id="583:29" name="처리 완료" x="5475" y="908" width="375" height="812">
+    <text id="583:31" name="전해드렸어요" x="24" y="291" width="327" height="32" />
+    <text id="583:32" name="신뢰 온도는 그대로예요. 다음에 또 나오시면 됩니다." x="24" y="337" width="327" height="46" />
+    <frame id="583:34" name="Frame" x="24" y="728" width="327" height="60">
+      <text id="583:35" name="확인" x="0" y="17" width="327" height="26" />
+    </frame>
+  </frame>
+  <frame id="583:66" name="참여 후" x="5897" y="908" width="375" height="812">
+    <text id="583:68" name="오늘 어떠셨어요?" x="24" y="47" width="327" height="32" />
+    <text id="583:69" name="고마웠던 분께 인사를 전해보세요. 한 분께만 전할 수 있어요." x="24" y="93" width="327" height="46" />
+    <frame id="579:150" name="Frame 59" x="24" y="209" width="327" height="185">
+      <frame id="579:130" name="Frame 57" x="0" y="0" width="327" height="85">
+        <frame id="583:70" name="Frame" x="0" y="0" width="156" height="85">
+          <text id="583:71" name="A 님" x="16" y="16" width="124" height="26" />
+          <text id="583:72" name="오늘 함께하신 분" x="16" y="48" width="124" height="21" />
+        </frame>
+        <frame id="579:127" name="Frame" x="171" y="0" width="156" height="85">
+          <text id="579:128" name="B 님" x="16" y="16" width="124" height="26" />
+          <text id="579:129" name="오늘 함께하신 분" x="16" y="48" width="124" height="21" />
+        </frame>
+      </frame>
+      <frame id="579:143" name="Frame 58" x="0" y="100" width="327" height="85">
+        <frame id="579:144" name="Frame" x="0" y="0" width="156" height="85">
+          <text id="579:145" name="C 님" x="16" y="16" width="124" height="26" />
+          <text id="579:146" name="오늘 함께하신 분" x="16" y="48" width="124" height="21" />
+        </frame>
+        <frame id="579:147" name="Frame" x="171" y="0" width="156" height="85">
+          <text id="579:148" name="D 님" x="16" y="16" width="124" height="26" />
+          <text id="579:149" name="오늘 함께하신 분" x="16" y="48" width="124" height="21" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="579:137" name="Frame 48" x="16" y="654" width="327" height="134">
+      <frame id="579:138" name="Frame" x="0" y="0" width="327" height="60">
+        <text id="579:139" name="고마웠어요 전하기" x="0" y="17" width="327" height="26" />
+      </frame>
+      <frame id="579:140" name="Frame" x="0" y="74" width="327" height="60">
+        <text id="579:141" name="건너뛰기" x="0" y="17" width="327" height="26" />
+      </frame>
+    </frame>
+  </frame>
+  <frame id="583:79" name="전달 완료" x="6325" y="908" width="375" height="812">
+    <text id="583:81" name="전해드렸어요" x="24" y="351" width="327" height="32" />
+    <text id="583:82" name="고양고양 님도 오늘 인사를 받으셨어요." x="24" y="397" width="327" height="46" />
+    <frame id="579:154" name="Frame" x="24" y="728" width="327" height="60">
+      <text id="579:155" name="확인" x="0" y="17" width="327" height="26" />
+    </frame>
+  </frame>
+  <frame id="595:1629" name="03_내 위치 직접 선택" x="2331" y="-96" width="375" height="812" hidden="true">
+    <text id="595:1630" name="←" x="20" y="18" width="18" height="27" />
+    <rounded-rectangle id="595:1631" name="divider" x="0" y="56" width="375" height="1" />
+    <frame id="595:1632" name="Frame" x="0" y="80" width="375" height="582">
+      <text id="595:1633" name="내가 위치한 동네를 선택해주세요" x="24" y="0" width="327" height="60" />
+      <text id="595:1634" name="직접 입력" x="24" y="76" width="51" height="20" />
+      <frame id="595:1635" name="지도 영역" x="24" y="112" width="327" height="470">
+        <regular-polygon id="595:1636" name="현재 위치 핀" x="150" y="185" width="26" height="26" />
+        <ellipse id="595:1637" name="내 위치로" x="272" y="326" width="38" height="38" />
+        <frame id="595:1638" name="btn/선택" x="12" y="406" width="303" height="48">
+          <text id="595:1639" name="선택" x="137.5" y="12.5" width="28" height="23" />
+        </frame>
+      </frame>
+    </frame>
+  </frame>
+  <frame id="595:1912" name="04_홈 (둘러보기)" x="2321" y="908" width="375" height="812">
+    <text id="595:1913" name="로고" x="20" y="17" width="28" height="23" />
+    <text id="595:1914" name="내 정보" x="316" y="19" width="39" height="20" />
+    <text id="596:1127" name="알림" x="266" y="19" width="24" height="20" />
+    <rounded-rectangle id="595:1915" name="divider" x="0" y="56" width="375" height="1" />
+    <text id="595:1916" name="곧 시작하는 모임" x="20" y="76" width="118" height="26" />
+    <frame id="595:1917" name="곧 시작하는 모임 캐러셀" x="0" y="114" width="375" height="120">
+      <frame id="595:1918" name="Frame" x="20" y="0" width="612" height="98">
+        <frame id="595:1919" name="카드/모여서 대보름 부럼 까기" x="0" y="0" width="300" height="98">
+          <frame id="595:1920" name="Frame" x="14" y="14" width="90" height="17">
+            <ellipse id="595:1921" name="Ellipse" x="0" y="1.5" width="14" height="14" />
+            <text id="595:1922" name="달토끼 / 화봉동" x="20" y="0" width="70" height="17" />
+          </frame>
+          <text id="595:1923" name="모여서 대보름 호두 까기" x="14" y="37" width="272" height="24" />
+          <text id="595:1924" name="시작 시간: 13시 보고 있는 사람: 42명" x="14" y="67" width="272" height="17" />
+        </frame>
+        <frame id="595:1925" name="카드/수영 교실 등록 함께할 분" x="312" y="0" width="300" height="98">
+          <frame id="595:1926" name="Frame" x="14" y="14" width="111" height="17">
+            <ellipse id="595:1927" name="Ellipse" x="0" y="1.5" width="14" height="14" />
+            <text id="595:1928" name="귀여운양양 / 송정동" x="20" y="0" width="91" height="17" />
+          </frame>
+          <text id="595:1929" name="수영 교실 등록 함께할 분" x="14" y="37" width="272" height="24" />
+          <text id="595:1930" name="모임시간: 채팅 협의 참여자: 1 / 3" x="14" y="67" width="272" height="17" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="595:1931" name="Frame" x="20" y="282" width="335" height="380">
+      <frame id="595:1932" name="카드/뜨개질 같이 해요" x="0" y="0" width="335" height="120">
+        <text id="595:1936" name="뜨개질 같이 해요" x="14" y="14" width="307" height="23" />
+        <text id="595:1937" name="모임시간: 13시 예상 소요: 1시간 이상 참여자: 1 / 5" x="14" y="43" width="307" height="17" />
+        <text id="595:1938" name="모임 장소: 동사무소 시민회의실 (걸어서 8분)" x="14" y="66" width="307" height="17" />
+        <frame id="595:1933" name="Frame" x="14" y="89" width="111" height="17">
+          <ellipse id="595:1934" name="Ellipse" x="0" y="1.5" width="14" height="14" />
+          <text id="595:1935" name="귀여운양양 / 송정동" x="20" y="0" width="91" height="17" />
+        </frame>
+      </frame>
+      <frame id="595:1939" name="카드/오후에 강아지 산책 합니다" x="0" y="130" width="335" height="120">
+        <text id="595:1943" name="오후에 강아지 산책 합니다" x="14" y="14" width="307" height="23" />
+        <text id="595:1944" name="모임시간: 10시 예상 소요: 1시간 이상 참여자: 2 / 3" x="14" y="43" width="307" height="17" />
+        <text id="595:1945" name="모임 장소: 도토리마을 공원 (걸어서 8분)" x="14" y="66" width="307" height="17" />
+        <frame id="595:1940" name="Frame" x="14" y="89" width="111" height="17">
+          <ellipse id="595:1941" name="Ellipse" x="0" y="1.5" width="14" height="14" />
+          <text id="595:1942" name="노스탤지어 / 화봉동" x="20" y="0" width="91" height="17" />
+        </frame>
+      </frame>
+      <frame id="595:1946" name="카드/반찬 나눔" x="0" y="260" width="335" height="120">
+        <text id="595:1950" name="반찬 나눔" x="14" y="14" width="307" height="23" />
+        <text id="595:1951" name="모임시간: 16시 예상 소요: 1시간 이상 참여자: 6 / 6" x="14" y="43" width="307" height="17" />
+        <text id="595:1952" name="모임 장소: 보문 아파트 정문 앞 (걸어서 8분)" x="14" y="66" width="307" height="17" />
+        <frame id="595:1947" name="Frame" x="14" y="89" width="121" height="17">
+          <ellipse id="595:1948" name="Ellipse" x="0" y="1.5" width="14" height="14" />
+          <text id="595:1949" name="낮잠자고싶다 / 연암동" x="20" y="0" width="101" height="17" />
+        </frame>
+        <frame id="595:1973" name="Frame 72" x="259" y="11" width="62" height="21">
+          <text id="595:1974" name="모집완료" x="5" y="0" width="52" height="21" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="595:1953" name="탭바" x="0" y="752" width="375" height="60">
+      <frame id="595:1954" name="tab/홈" x="0" y="0" width="93.75" height="60">
+        <text id="595:1955" name="홈" x="40.875" y="21" width="12" height="18" />
+      </frame>
+      <frame id="595:1956" name="tab/내 동행" x="93.75" y="0" width="93.75" height="60">
+        <text id="595:1957" name="내 동행" x="28.875" y="21" width="36" height="18" />
+      </frame>
+      <frame id="595:1958" name="tab/알림" x="187.5" y="0" width="93.75" height="60">
+        <text id="595:1959" name="동네소식" x="24.375" y="21" width="45" height="18" />
+      </frame>
+      <frame id="595:1962" name="tab/만들기" x="281.25" y="0" width="93.75" height="60">
+        <text id="595:1963" name="만들기" x="29.875" y="21" width="34" height="18" />
+      </frame>
+    </frame>
+    <rounded-rectangle id="595:1964" name="divider" x="0" y="752" width="375" height="1" />
+    <frame id="595:1965" name="Frame 65" x="24" y="234" width="275" height="31">
+      <frame id="595:1966" name="Frame 63" x="0" y="1" width="92" height="29">
+        <text id="595:1967" name="시작시간 순" x="12" y="4" width="68" height="21" />
+      </frame>
+      <frame id="595:1968" name="Frame 64" x="96" y="0" width="81" height="31">
+        <text id="595:1969" name="가까운 순" x="13" y="5" width="55" height="21" />
+      </frame>
+      <frame id="595:1970" name="Frame 65" x="181" y="0" width="94" height="31">
+        <text id="595:1971" name="소요시간 순" x="13" y="5" width="68" height="21" />
+      </frame>
+    </frame>
+  </frame>
+  <frame id="595:1977" name="04_홈 (둘러보기)" x="2321" y="-96" width="375" height="812">
+    <text id="595:1978" name="로고" x="20" y="17" width="28" height="23" />
+    <text id="595:1979" name="내 정보" x="316" y="19" width="39" height="20" />
+    <text id="596:1126" name="알림" x="260" y="19" width="24" height="20" />
+    <rounded-rectangle id="595:1980" name="divider" x="0" y="56" width="375" height="1" />
+    <text id="595:1981" name="모집중인 추천 동행" x="20" y="76" width="133" height="26" />
+    <frame id="595:1982" name="곧 시작하는 모임 캐러셀" x="0" y="114" width="375" height="120">
+      <frame id="595:1983" name="Frame" x="20" y="0" width="612" height="98">
+        <frame id="595:1984" name="카드/모여서 대보름 부럼 까기" x="0" y="0" width="300" height="98">
+          <frame id="595:1985" name="Frame" x="14" y="14" width="90" height="17">
+            <ellipse id="595:1986" name="Ellipse" x="0" y="1.5" width="14" height="14" />
+            <text id="595:1987" name="달토끼 / 화봉동" x="20" y="0" width="70" height="17" />
+          </frame>
+          <text id="595:1988" name="모여서 대보름 호두 까기" x="14" y="37" width="272" height="24" />
+          <text id="595:1989" name="시작 시간: 13시 보고 있는 사람: 42명" x="14" y="67" width="272" height="17" />
+        </frame>
+        <frame id="595:1990" name="카드/수영 교실 등록 함께할 분" x="312" y="0" width="300" height="98">
+          <frame id="595:1991" name="Frame" x="14" y="14" width="111" height="17">
+            <ellipse id="595:1992" name="Ellipse" x="0" y="1.5" width="14" height="14" />
+            <text id="595:1993" name="귀여운양양 / 송정동" x="20" y="0" width="91" height="17" />
+          </frame>
+          <text id="595:1994" name="수영 교실 등록 함께할 분" x="14" y="37" width="272" height="24" />
+          <text id="595:1995" name="모임시간: 채팅 협의 참여자: 1 / 3" x="14" y="67" width="272" height="17" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="595:1996" name="Frame" x="20" y="282" width="335" height="380">
+      <frame id="595:1997" name="카드/뜨개질 같이 해요" x="0" y="0" width="335" height="120">
+        <text id="595:1998" name="뜨개질 같이 해요" x="14" y="14" width="307" height="23" />
+        <text id="595:1999" name="모임시간: 13시 예상 소요: 1시간 이상 참여자: 1 / 5" x="14" y="43" width="307" height="17" />
+        <text id="595:2000" name="모임 장소: 동사무소 시민회의실 (걸어서 8분)" x="14" y="66" width="307" height="17" />
+        <frame id="595:2001" name="Frame" x="14" y="89" width="111" height="17">
+          <ellipse id="595:2002" name="Ellipse" x="0" y="1.5" width="14" height="14" />
+          <text id="595:2003" name="귀여운양양 / 송정동" x="20" y="0" width="91" height="17" />
+        </frame>
+      </frame>
+      <frame id="595:2004" name="카드/오후에 강아지 산책 합니다" x="0" y="130" width="335" height="120">
+        <text id="595:2005" name="오후에 강아지 산책 합니다" x="14" y="14" width="307" height="23" />
+        <text id="595:2006" name="모임시간: 10시 예상 소요: 1시간 이상 참여자: 2 / 3" x="14" y="43" width="307" height="17" />
+        <text id="595:2007" name="모임 장소: 도토리마을 공원 (걸어서 8분)" x="14" y="66" width="307" height="17" />
+        <frame id="595:2008" name="Frame" x="14" y="89" width="111" height="17">
+          <ellipse id="595:2009" name="Ellipse" x="0" y="1.5" width="14" height="14" />
+          <text id="595:2010" name="노스탤지어 / 화봉동" x="20" y="0" width="91" height="17" />
+        </frame>
+      </frame>
+      <frame id="595:2011" name="카드/반찬 나눔" x="0" y="260" width="335" height="120">
+        <text id="595:2012" name="반찬 나눔 깻잎, 장아찌" x="14" y="14" width="307" height="23" />
+        <text id="595:2013" name="모임시간: 16시 예상 소요: 1시간 이상 참여자: 6 / 6" x="14" y="43" width="307" height="17" />
+        <text id="595:2014" name="모임 장소: 보문 아파트 정문 앞 (걸어서 8분)" x="14" y="66" width="307" height="17" />
+        <frame id="595:2015" name="Frame" x="14" y="89" width="121" height="17">
+          <ellipse id="595:2016" name="Ellipse" x="0" y="1.5" width="14" height="14" />
+          <text id="595:2017" name="낮잠자고싶다 / 연암동" x="20" y="0" width="101" height="17" />
+        </frame>
+        <frame id="595:2018" name="Frame 72" x="259" y="16" width="62" height="21">
+          <text id="595:2019" name="모집완료" x="5" y="0" width="52" height="21" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="595:2020" name="탭바" x="0" y="752" width="375" height="60">
+      <frame id="595:2021" name="tab/홈" x="0" y="0" width="93.75" height="60">
+        <text id="595:2022" name="홈" x="40.875" y="21" width="12" height="18" />
+      </frame>
+      <frame id="595:2023" name="tab/내 동행" x="93.75" y="0" width="93.75" height="60">
+        <text id="595:2024" name="내 동행" x="28.875" y="21" width="36" height="18" />
+      </frame>
+      <frame id="595:2025" name="tab/알림" x="187.5" y="0" width="93.75" height="60">
+        <text id="595:2026" name="동네소식" x="24.375" y="21" width="45" height="18" />
+      </frame>
+      <frame id="595:2029" name="tab/만들기" x="281.25" y="0" width="93.75" height="60">
+        <text id="595:2030" name="만들기" x="29.875" y="21" width="34" height="18" />
+      </frame>
+    </frame>
+    <rounded-rectangle id="595:2031" name="divider" x="0" y="752" width="375" height="1" />
+    <frame id="595:2032" name="Frame 65" x="24" y="234" width="275" height="31">
+      <frame id="595:2033" name="Frame 63" x="0" y="1" width="92" height="29">
+        <text id="595:2034" name="시작시간 순" x="12" y="4" width="68" height="21" />
+      </frame>
+      <frame id="595:2035" name="Frame 64" x="96" y="0" width="81" height="31">
+        <text id="595:2036" name="가까운 순" x="13" y="5" width="55" height="21" />
+      </frame>
+      <frame id="595:2037" name="Frame 65" x="181" y="0" width="94" height="31">
+        <text id="595:2038" name="소요시간 순" x="13" y="5" width="68" height="21" />
+      </frame>
+    </frame>
+  </frame>
+  <frame id="595:2039" name="04_홈 (둘러보기)" x="5897" y="-96" width="375" height="812">
+    <text id="595:2040" name="로고" x="20" y="17" width="28" height="23" />
+    <text id="595:2041" name="내 정보" x="316" y="19" width="39" height="20" />
+    <rounded-rectangle id="595:2042" name="divider" x="0" y="56" width="375" height="1" />
+    <text id="595:2043" name="모집중인 추천 동행" x="20" y="76" width="133" height="26" />
+    <frame id="595:2044" name="곧 시작하는 모임 캐러셀" x="0" y="114" width="375" height="120">
+      <frame id="595:2045" name="Frame" x="20" y="0" width="612" height="98">
+        <frame id="595:2046" name="카드/모여서 대보름 부럼 까기" x="0" y="0" width="300" height="98">
+          <frame id="595:2047" name="Frame" x="14" y="14" width="90" height="17">
+            <ellipse id="595:2048" name="Ellipse" x="0" y="1.5" width="14" height="14" />
+            <text id="595:2049" name="달토끼 / 화봉동" x="20" y="0" width="70" height="17" />
+          </frame>
+          <text id="595:2050" name="모여서 대보름 호두 까기" x="14" y="37" width="272" height="24" />
+          <text id="595:2051" name="시작 시간: 13시 보고 있는 사람: 42명" x="14" y="67" width="272" height="17" />
+        </frame>
+        <frame id="595:2052" name="카드/수영 교실 등록 함께할 분" x="312" y="0" width="300" height="98">
+          <frame id="595:2053" name="Frame" x="14" y="14" width="111" height="17">
+            <ellipse id="595:2054" name="Ellipse" x="0" y="1.5" width="14" height="14" />
+            <text id="595:2055" name="귀여운양양 / 송정동" x="20" y="0" width="91" height="17" />
+          </frame>
+          <text id="595:2056" name="수영 교실 등록 함께할 분" x="14" y="37" width="272" height="24" />
+          <text id="595:2057" name="모임시간: 채팅 협의 참여자: 1 / 3" x="14" y="67" width="272" height="17" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="595:2058" name="Frame" x="20" y="282" width="335" height="510">
+      <frame id="596:8" name="카드/수영 교실 등록 함께할 분" x="0" y="0" width="335" height="120">
+        <frame id="596:9" name="Frame" x="14" y="14" width="111" height="17">
+          <ellipse id="596:10" name="Ellipse" x="0" y="1.5" width="14" height="14" />
+          <text id="596:11" name="귀여운양양 / 연암동" x="20" y="0" width="91" height="17" />
+        </frame>
+        <text id="596:12" name="수영 교실 등록 함께할 분" x="14" y="37" width="307" height="23" />
+        <text id="596:13" name="모임시간: 채팅 협의 예상 소요: 10분 참여자: 1 / 3" x="14" y="66" width="307" height="17" />
+        <text id="596:14" name="모임 장소: 시민체육센터" x="14" y="89" width="307" height="17" />
+      </frame>
+      <frame id="595:2059" name="카드/뜨개질 같이 해요" x="0" y="130" width="335" height="120">
+        <text id="595:2060" name="뜨개질 같이 해요" x="14" y="14" width="307" height="23" />
+        <text id="595:2061" name="모임시간: 13시 예상 소요: 1시간 이상 참여자: 1 / 5" x="14" y="43" width="307" height="17" />
+        <text id="595:2062" name="모임 장소: 동사무소 시민회의실 (걸어서 8분)" x="14" y="66" width="307" height="17" />
+        <frame id="595:2063" name="Frame" x="14" y="89" width="111" height="17">
+          <ellipse id="595:2064" name="Ellipse" x="0" y="1.5" width="14" height="14" />
+          <text id="595:2065" name="귀여운양양 / 송정동" x="20" y="0" width="91" height="17" />
+        </frame>
+      </frame>
+      <frame id="595:2066" name="카드/오후에 강아지 산책 합니다" x="0" y="260" width="335" height="120">
+        <text id="595:2067" name="오후에 강아지 산책 합니다" x="14" y="14" width="307" height="23" />
+        <text id="595:2068" name="모임시간: 10시 예상 소요: 1시간 이상 참여자: 2 / 3" x="14" y="43" width="307" height="17" />
+        <text id="595:2069" name="모임 장소: 도토리마을 공원 (걸어서 8분)" x="14" y="66" width="307" height="17" />
+        <frame id="595:2070" name="Frame" x="14" y="89" width="111" height="17">
+          <ellipse id="595:2071" name="Ellipse" x="0" y="1.5" width="14" height="14" />
+          <text id="595:2072" name="노스탤지어 / 화봉동" x="20" y="0" width="91" height="17" />
+        </frame>
+      </frame>
+      <frame id="595:2073" name="카드/반찬 나눔" x="0" y="390" width="335" height="120">
+        <text id="595:2074" name="반찬 나눔 깻잎, 장아찌" x="14" y="14" width="307" height="23" />
+        <text id="595:2075" name="모임시간: 16시 예상 소요: 1시간 이상 참여자: 6 / 6" x="14" y="43" width="307" height="17" />
+        <text id="595:2076" name="모임 장소: 보문 아파트 정문 앞 (걸어서 8분)" x="14" y="66" width="307" height="17" />
+        <frame id="595:2077" name="Frame" x="14" y="89" width="121" height="17">
+          <ellipse id="595:2078" name="Ellipse" x="0" y="1.5" width="14" height="14" />
+          <text id="595:2079" name="낮잠자고싶다 / 연암동" x="20" y="0" width="101" height="17" />
+        </frame>
+        <frame id="595:2080" name="Frame 72" x="259" y="11" width="62" height="21">
+          <text id="595:2081" name="모집완료" x="5" y="0" width="52" height="21" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="595:2082" name="탭바" x="0" y="752" width="375" height="60">
+      <frame id="595:2083" name="tab/홈" x="0" y="0" width="93.75" height="60">
+        <text id="595:2084" name="홈" x="40.875" y="21" width="12" height="18" />
+      </frame>
+      <frame id="595:2085" name="tab/내 동행" x="93.75" y="0" width="93.75" height="60">
+        <text id="595:2086" name="내 동행" x="28.875" y="21" width="36" height="18" />
+      </frame>
+      <frame id="595:2087" name="tab/알림" x="187.5" y="0" width="93.75" height="60">
+        <text id="595:2088" name="동네소식" x="24.375" y="21" width="45" height="18" />
+      </frame>
+      <frame id="595:2091" name="tab/만들기" x="281.25" y="0" width="93.75" height="60">
+        <text id="595:2092" name="만들기" x="29.875" y="21" width="34" height="18" />
+      </frame>
+    </frame>
+    <rounded-rectangle id="595:2093" name="divider" x="0" y="752" width="375" height="1" />
+    <frame id="595:2094" name="Frame 65" x="24" y="234" width="249" height="31">
+      <frame id="595:2095" name="Frame 63" x="0" y="1" width="66" height="29">
+        <text id="595:2096" name="빠른 순" x="12" y="4" width="42" height="21" />
+      </frame>
+      <frame id="595:2097" name="Frame 64" x="70" y="0" width="81" height="31">
+        <text id="595:2098" name="가까운 순" x="13" y="5" width="55" height="21" />
+      </frame>
+      <frame id="595:2099" name="Frame 65" x="155" y="0" width="94" height="31">
+        <text id="595:2100" name="소요시간 순" x="13" y="5" width="68" height="21" />
+      </frame>
+    </frame>
+    <frame id="595:2105" name="알림 배너" x="8" y="10" width="359" height="65">
+      <text id="595:2106" name="내 모임에 동행이 1명 추가되었어요" x="14" y="12" width="187" height="20" />
+      <text id="595:2107" name="동행 예정: 동그랑땡 / 호계동 · 이전에 만난 적이 없는 참여자예요" x="14" y="36" width="331" height="17" />
+    </frame>
+  </frame>
+  <frame id="596:26" name="04_홈 (둘러보기)" x="5475" y="-96" width="375" height="812">
+    <text id="596:27" name="로고" x="20" y="17" width="28" height="23" />
+    <text id="596:28" name="내 정보" x="316" y="19" width="39" height="20" />
+    <text id="596:1128" name="알림" x="263" y="19" width="24" height="20" />
+    <rounded-rectangle id="596:29" name="divider" x="0" y="56" width="375" height="1" />
+    <text id="596:30" name="모집중인 추천 동행" x="20" y="76" width="133" height="26" />
+    <frame id="596:31" name="곧 시작하는 모임 캐러셀" x="0" y="114" width="375" height="120">
+      <frame id="596:32" name="Frame" x="20" y="0" width="612" height="98">
+        <frame id="596:33" name="카드/모여서 대보름 부럼 까기" x="0" y="0" width="300" height="98">
+          <frame id="596:34" name="Frame" x="14" y="14" width="90" height="17">
+            <ellipse id="596:35" name="Ellipse" x="0" y="1.5" width="14" height="14" />
+            <text id="596:36" name="달토끼 / 화봉동" x="20" y="0" width="70" height="17" />
+          </frame>
+          <text id="596:37" name="모여서 대보름 호두 까기" x="14" y="37" width="272" height="24" />
+          <text id="596:38" name="시작 시간: 13시 보고 있는 사람: 42명" x="14" y="67" width="272" height="17" />
+        </frame>
+        <frame id="596:39" name="카드/수영 교실 등록 함께할 분" x="312" y="0" width="300" height="98">
+          <frame id="596:40" name="Frame" x="14" y="14" width="111" height="17">
+            <ellipse id="596:41" name="Ellipse" x="0" y="1.5" width="14" height="14" />
+            <text id="596:42" name="귀여운양양 / 송정동" x="20" y="0" width="91" height="17" />
+          </frame>
+          <text id="596:43" name="수영 교실 등록 함께할 분" x="14" y="37" width="272" height="24" />
+          <text id="596:44" name="모임시간: 채팅 협의 참여자: 1 / 3" x="14" y="67" width="272" height="17" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="596:45" name="Frame" x="20" y="282" width="335" height="510">
+      <frame id="596:46" name="카드/수영 교실 등록 함께할 분" x="0" y="0" width="335" height="120">
+        <frame id="596:47" name="Frame" x="14" y="14" width="111" height="17">
+          <ellipse id="596:48" name="Ellipse" x="0" y="1.5" width="14" height="14" />
+          <text id="596:49" name="귀여운양양 / 연암동" x="20" y="0" width="91" height="17" />
+        </frame>
+        <text id="596:50" name="수영 교실 등록 함께할 분" x="14" y="37" width="307" height="23" />
+        <text id="596:51" name="모임시간: 채팅 협의 예상 소요: 10분 참여자: 1 / 3" x="14" y="66" width="307" height="17" />
+        <text id="596:52" name="모임 장소: 시민체육센터" x="14" y="89" width="307" height="17" />
+      </frame>
+      <frame id="596:53" name="카드/뜨개질 같이 해요" x="0" y="130" width="335" height="120">
+        <text id="596:54" name="뜨개질 같이 해요" x="14" y="14" width="307" height="23" />
+        <text id="596:55" name="모임시간: 13시 예상 소요: 1시간 이상 참여자: 1 / 5" x="14" y="43" width="307" height="17" />
+        <text id="596:56" name="모임 장소: 동사무소 시민회의실 (걸어서 8분)" x="14" y="66" width="307" height="17" />
+        <frame id="596:57" name="Frame" x="14" y="89" width="111" height="17">
+          <ellipse id="596:58" name="Ellipse" x="0" y="1.5" width="14" height="14" />
+          <text id="596:59" name="귀여운양양 / 송정동" x="20" y="0" width="91" height="17" />
+        </frame>
+      </frame>
+      <frame id="596:60" name="카드/오후에 강아지 산책 합니다" x="0" y="260" width="335" height="120">
+        <text id="596:61" name="오후에 강아지 산책 합니다" x="14" y="14" width="307" height="23" />
+        <text id="596:62" name="모임시간: 10시 예상 소요: 1시간 이상 참여자: 2 / 3" x="14" y="43" width="307" height="17" />
+        <text id="596:63" name="모임 장소: 도토리마을 공원 (걸어서 8분)" x="14" y="66" width="307" height="17" />
+        <frame id="596:64" name="Frame" x="14" y="89" width="111" height="17">
+          <ellipse id="596:65" name="Ellipse" x="0" y="1.5" width="14" height="14" />
+          <text id="596:66" name="노스탤지어 / 화봉동" x="20" y="0" width="91" height="17" />
+        </frame>
+      </frame>
+      <frame id="596:67" name="카드/반찬 나눔" x="0" y="390" width="335" height="120">
+        <text id="596:68" name="반찬 나눔 깻잎, 장아찌" x="14" y="14" width="307" height="23" />
+        <text id="596:69" name="모임시간: 16시 예상 소요: 1시간 이상 참여자: 6 / 6" x="14" y="43" width="307" height="17" />
+        <text id="596:70" name="모임 장소: 보문 아파트 정문 앞 (걸어서 8분)" x="14" y="66" width="307" height="17" />
+        <frame id="596:71" name="Frame" x="14" y="89" width="121" height="17">
+          <ellipse id="596:72" name="Ellipse" x="0" y="1.5" width="14" height="14" />
+          <text id="596:73" name="낮잠자고싶다 / 연암동" x="20" y="0" width="101" height="17" />
+        </frame>
+        <frame id="596:74" name="Frame 72" x="259" y="11" width="62" height="21">
+          <text id="596:75" name="모집완료" x="5" y="0" width="52" height="21" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="596:76" name="탭바" x="0" y="752" width="375" height="60">
+      <frame id="596:77" name="tab/홈" x="0" y="0" width="93.75" height="60">
+        <text id="596:78" name="홈" x="40.875" y="21" width="12" height="18" />
+      </frame>
+      <frame id="596:79" name="tab/내 동행" x="93.75" y="0" width="93.75" height="60">
+        <text id="596:80" name="내 동행" x="28.875" y="21" width="36" height="18" />
+      </frame>
+      <frame id="596:81" name="tab/알림" x="187.5" y="0" width="93.75" height="60">
+        <text id="596:82" name="동네소식" x="24.375" y="21" width="45" height="18" />
+      </frame>
+      <frame id="596:85" name="tab/만들기" x="281.25" y="0" width="93.75" height="60">
+        <text id="596:86" name="만들기" x="29.875" y="21" width="34" height="18" />
+      </frame>
+    </frame>
+    <rounded-rectangle id="596:87" name="divider" x="0" y="752" width="375" height="1" />
+    <frame id="596:88" name="Frame 65" x="24" y="234" width="249" height="31">
+      <frame id="596:89" name="Frame 63" x="0" y="1" width="66" height="29">
+        <text id="596:90" name="빠른 순" x="12" y="4" width="42" height="21" />
+      </frame>
+      <frame id="596:91" name="Frame 64" x="70" y="0" width="81" height="31">
+        <text id="596:92" name="가까운 순" x="13" y="5" width="55" height="21" />
+      </frame>
+      <frame id="596:93" name="Frame 65" x="155" y="0" width="94" height="31">
+        <text id="596:94" name="소요시간 순" x="13" y="5" width="68" height="21" />
+      </frame>
+    </frame>
+  </frame>
+  <frame id="595:1693" name="05_로그인 유도" x="2863" y="-96" width="375" height="812">
+    <text id="595:1694" name="이웃을 만나려면 로그인이 필요해요" x="24" y="340" width="327" height="48" />
+    <frame id="595:1695" name="Frame" x="0" y="440" width="375" height="51">
+      <frame id="595:1696" name="btn/카톡 로그인" x="24" y="0" width="327" height="51">
+        <text id="595:1697" name="카톡 로그인" x="127" y="14" width="73" height="23" />
+      </frame>
+    </frame>
+  </frame>
+  <frame id="595:1700" name="06_활동명 부여 (환영)" x="3299" y="-96" width="375" height="812">
+    <rounded-rectangle id="595:1701" name="캐릭터 이미지" x="122" y="290" width="130" height="130" />
+    <text id="595:1702" name="즐거운다람쥐님 환영합니다" x="24" y="456" width="327" height="54" />
+    <frame id="595:1703" name="btn/확인" x="24" y="690" width="327" height="50">
+      <text id="595:1704" name="확인" x="149.5" y="13.5" width="28" height="23" />
+    </frame>
+  </frame>
+  <frame id="595:1705" name="07_동행 만들기 (1/2)" x="3733" y="-96" width="375" height="812">
+    <text id="595:1706" name="←" x="20" y="18" width="18" height="27" />
+    <rounded-rectangle id="595:1707" name="line" x="0" y="56" width="375" height="1" />
+    <text id="595:1708" name="1/2" x="333" y="76" width="22" height="21" />
+    <frame id="595:1709" name="Frame" x="0" y="108" width="375" height="229">
+      <text id="595:1710" name="어떤 동행을 구하시나요?" x="24" y="0" width="204" height="30" />
+      <frame id="595:1711" name="Frame" x="24" y="50" width="327" height="24">
+        <text id="595:1712" name="모임명을 입력해주세요" x="0" y="0.5" width="142" height="23" />
+        <frame id="596:1206" name="mic" x="303" y="0" width="24" height="24" />
+      </frame>
+      <rounded-rectangle id="595:1714" name="line" x="24" y="94" width="327" height="1" />
+      <text id="595:1715" name="아니면 아래에서 선택해보세요" x="24" y="115" width="149" height="18" />
+      <frame id="595:1716" name="Frame" x="24" y="153" width="327" height="76">
+        <frame id="595:1717" name="chip/장보러가요" x="0" y="0" width="84" height="34">
+          <text id="595:1718" name="장보러가요" x="14" y="8" width="56" height="18" />
+        </frame>
+        <frame id="595:1719" name="chip/김장해요" x="92" y="0" width="73" height="34">
+          <text id="595:1720" name="김장해요" x="14" y="8" width="45" height="18" />
+        </frame>
+        <frame id="595:1721" name="chip/반찬 나눌게요" x="173" y="0" width="97" height="34">
+          <text id="595:1722" name="반찬 나눌게요" x="14" y="8" width="69" height="18" />
+        </frame>
+        <frame id="595:1723" name="chip/같이 등록해요" x="0" y="42" width="97" height="34">
+          <text id="595:1724" name="같이 등록해요" x="14" y="8" width="69" height="18" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="595:1725" name="btn/다음" x="24" y="690" width="327" height="50">
+      <text id="595:1726" name="다음" x="149.5" y="13.5" width="28" height="23" />
+    </frame>
+  </frame>
+  <frame id="595:1727" name="08_동행 만들기 (2/2)" x="4169" y="-96" width="375" height="812">
+    <text id="595:1728" name="←" x="20" y="18" width="18" height="27" />
+    <rounded-rectangle id="595:1729" name="line" x="0" y="56" width="375" height="1" />
+    <text id="595:1730" name="2/2" x="333" y="76" width="22" height="21" />
+    <frame id="595:1731" name="Frame" x="0" y="104" width="375" height="673">
+      <text id="595:1732" name="하고 싶은 활동에 대해 소개해주세요" x="24" y="0" width="327" height="60" />
+      <frame id="595:1733" name="소개 입력" x="24" y="78" width="327" height="132">
+        <frame id="596:1200" name="mic" x="287" y="93" width="24" height="24" />
+      </frame>
+      <frame id="595:1735" name="group/시작 시간" x="24" y="228" width="327" height="72">
+        <text id="595:1736" name="시작 시간" x="0" y="0" width="47" height="18" />
+        <frame id="595:1737" name="field" x="0" y="26" width="327" height="46">
+          <text id="595:1738" name="00:00" x="12" y="13" width="33" height="20" />
+        </frame>
+      </frame>
+      <frame id="595:1739" name="group/예상 소요 시간" x="24" y="318" width="327" height="59">
+        <text id="595:1740" name="예상 소요 시간" x="0" y="0" width="72" height="18" />
+        <frame id="595:1741" name="Frame" x="0" y="26" width="327" height="33">
+          <frame id="595:1742" name="chip/30분 이내" x="0" y="0" width="64" height="33">
+            <text id="595:1743" name="30분 이내" x="9" y="8" width="46" height="17" />
+          </frame>
+          <frame id="595:1744" name="chip/1시간 이내" x="70" y="0" width="68" height="33">
+            <text id="595:1745" name="1시간 이내" x="9" y="8" width="50" height="17" />
+          </frame>
+          <frame id="595:1746" name="chip/2시간 이내" x="144" y="0" width="68" height="33">
+            <text id="595:1747" name="2시간 이내" x="9" y="8" width="50" height="17" />
+          </frame>
+          <frame id="595:1748" name="chip/2시간 이상" x="218" y="0" width="68" height="33">
+            <text id="595:1749" name="2시간 이상" x="9" y="8" width="50" height="17" />
+          </frame>
+        </frame>
+      </frame>
+      <frame id="595:1750" name="최대 인원" x="24" y="395" width="327" height="38">
+        <text id="595:1751" name="최대 인원" x="0" y="10" width="47" height="18" />
+        <frame id="595:1752" name="Frame" x="213" y="0" width="114" height="38">
+          <text id="595:1753" name="−" x="0" y="5.5" width="11" height="27" />
+          <frame id="595:1754" name="Frame" x="25" y="0" width="64" height="38">
+            <text id="595:1755" name="3" x="28" y="8.5" width="8" height="21" />
+          </frame>
+          <text id="595:1756" name="+" x="103" y="5.5" width="11" height="27" />
+        </frame>
+      </frame>
+      <frame id="595:1757" name="group/모임 장소" x="24" y="451" width="327" height="72">
+        <text id="595:1758" name="모임 장소" x="0" y="0" width="47" height="18" />
+        <frame id="595:1759" name="field" x="0" y="26" width="327" height="46">
+          <text id="595:1760" name="도토리마을 공원" x="12" y="13" width="87" height="20" />
+          <text id="595:1761" name="위치 찾기" x="268" y="14" width="47" height="18" />
+        </frame>
+      </frame>
+      <frame id="595:1762" name="안내" x="24" y="541" width="327" height="64">
+        <text id="595:1763" name="• 최소 인원은 3명이어야 합니다" x="14" y="12" width="142" height="17" />
+        <text id="595:1764" name="• 안전한 장소에서 만나요" x="14" y="35" width="113" height="17" />
+      </frame>
+      <frame id="595:1765" name="btn/등록" x="24" y="623" width="327" height="50">
+        <text id="595:1766" name="등록" x="149.5" y="13.5" width="28" height="23" />
+      </frame>
+    </frame>
+  </frame>
+  <frame id="595:1767" name="09_모임 장소 선택" x="4603" y="-96" width="375" height="812">
+    <text id="595:1768" name="←" x="20" y="18" width="18" height="27" />
+    <rounded-rectangle id="595:1769" name="line" x="0" y="56" width="375" height="1" />
+    <frame id="595:1770" name="Frame" x="0" y="80" width="375" height="620">
+      <text id="595:1771" name="만나고 싶은 장소를 선택해주세요" x="24" y="0" width="327" height="60" />
+      <frame id="595:1772" name="Frame" x="24" y="76" width="131" height="20">
+        <ellipse id="595:1773" name="Ellipse" x="0" y="3" width="14" height="14" />
+        <text id="595:1774" name="현재 내 위치: 은평동" x="22" y="0" width="109" height="20" />
+      </frame>
+      <frame id="595:1775" name="field" x="24" y="112" width="327" height="46">
+        <text id="595:1776" name="검색할 위치를 입력하세요" x="12" y="13" width="138" height="20" />
+      </frame>
+      <frame id="595:1777" name="지도 영역" x="24" y="174" width="327" height="380">
+        <regular-polygon id="595:1778" name="선택 위치 핀" x="150" y="150" width="26" height="26" />
+        <ellipse id="595:1779" name="내 위치로" x="272" y="320" width="38" height="38" />
+      </frame>
+      <frame id="595:1780" name="btn/선택" x="24" y="570" width="327" height="50">
+        <text id="595:1781" name="선택" x="149.5" y="13.5" width="28" height="23" />
+      </frame>
+    </frame>
+  </frame>
+  <frame id="596:1213" name="09_모임 장소 선택" x="5047" y="-96" width="375" height="812">
+    <rounded-rectangle id="596:1238" name="Rectangle 20" x="24" y="524" width="321" height="72" />
+    <text id="596:1214" name="←" x="20" y="18" width="18" height="27" />
+    <rounded-rectangle id="596:1215" name="line" x="0" y="56" width="375" height="1" />
+    <text id="596:1217" name="수영 교실 등록 함께할 분" x="24" y="80" width="327" height="30" />
+    <text id="596:1220" name="시작 시간: 14시 00분" x="24" y="190" width="122" height="21" />
+    <text id="596:1228" name="예상 소요 시간: 30분 이내" x="24" y="224" width="148" height="21" />
+    <text id="596:1229" name="최대 인원: 3명" x="24" y="258" width="83" height="21" />
+    <text id="596:1230" name="모임 장소: 도토리마을 공원" x="24" y="292" width="155" height="21" />
+    <text id="596:1239" name="현재 참여 인원: 1/3" x="24" y="121" width="112" height="21" />
+    <text id="596:1233" name="게시자" x="24" y="498" width="39" height="21" />
+    <frame id="596:1237" name="Frame 82" x="37" y="538" width="133" height="45">
+      <ellipse id="596:1231" name="내 위치로" x="0" y="0" width="45" height="45" />
+      <frame id="596:1236" name="Group 2" x="54" y="0" width="79" height="45">
+        <text id="596:1234" name="즐거운다람쥐" x="54" y="0" width="78" height="21" />
+        <text id="596:1235" name="동행 참여 3회" x="54" y="24" width="79" height="21" />
+      </frame>
+    </frame>
+    <vector id="596:1256" name="Vector 3" x="0" y="629" width="375" height="0.00003278354120084259" />
+    <vector id="596:1241" name="Vector 2" x="24" y="164" width="317" height="0" />
+    <text id="596:1242" name="지금 모집중인 추천 동행" x="24" y="662" width="327" height="25" />
+    <frame id="596:1243" name="Frame" x="24" y="699" width="327" height="104">
+      <frame id="596:1244" name="Frame 80" x="16" y="16" width="295" height="26">
+        <text id="596:1245" name="오후에 강아지 산책 합니다" x="0" y="0" width="259" height="26" />
+        <ellipse id="596:1246" name="Ellipse" x="269" y="0" width="26" height="26" />
+      </frame>
+      <text id="596:1247" name="모임시간: 채팅 협의 예상 소요: 1시간 이상 참여자: 2 / 3" x="16" y="48" width="295" height="17" />
+      <text id="596:1248" name="모임 장소: 도토리마을 공원 (걸어서 8분)" x="16" y="71" width="295" height="17" />
+    </frame>
+    <frame id="596:1249" name="Frame" x="24" y="817" width="327" height="104">
+      <frame id="596:1250" name="Frame 81" x="16" y="16" width="295" height="26">
+        <text id="596:1251" name="수변공원 축제 구경가서 맛있는거 먹어요" x="0" y="0" width="259" height="26" />
+        <ellipse id="596:1252" name="Ellipse" x="269" y="0" width="26" height="26" />
+      </frame>
+      <text id="596:1253" name="모임시간: 채팅 협의 예상 소요: 1시간 이상 참여자: 1 / 5" x="16" y="48" width="295" height="17" />
+      <text id="596:1254" name="모임 장소: 수변공원 (걸어서 20분)" x="16" y="71" width="295" height="17" />
+    </frame>
+    <rounded-rectangle id="596:1257" name="Rectangle 17" x="24" y="322" width="321" height="149" />
+  </frame>
+  <frame id="595:1976" name="Group 1" x="2436" y="908" width="848" height="812" hidden="true">
+    <frame id="581:29" name="홈 · 피드" x="2474" y="908" width="375" height="812">
+      <text id="581:30" name="지금 신사동에서 같이 갈 사람을 찾고 있어요" x="24" y="56" width="327" height="64" />
+      <frame id="579:350" name="Frame 65" x="24" y="134" width="249" height="31">
+        <frame id="579:351" name="Frame 63" x="0" y="1" width="66" height="29">
+          <text id="579:352" name="빠른 순" x="12" y="4" width="42" height="21" />
+        </frame>
+        <frame id="579:353" name="Frame 64" x="70" y="0" width="81" height="31">
+          <text id="579:354" name="가까운 순" x="13" y="5" width="55" height="21" />
+        </frame>
+        <frame id="579:355" name="Frame 65" x="155" y="0" width="94" height="31">
+          <text id="579:356" name="소요시간 순" x="13" y="5" width="68" height="21" />
+        </frame>
+      </frame>
+      <frame id="581:31" name="Frame" x="24" y="179" width="327" height="111">
+        <text id="581:32" name="오늘 3시 · 오일장 구경" x="16" y="16" width="295" height="26" />
+        <text id="581:33" name="걸어서 8분 · 1시간 이내 · 3명 중 2명" x="16" y="48" width="295" height="21" />
+        <text id="581:34" name="봄날의햇살 님" x="16" y="75" width="295" height="20" />
+      </frame>
+      <frame id="581:35" name="Frame" x="24" y="304" width="327" height="111">
+        <text id="581:36" name="오늘 5시 · 식자재마트" x="16" y="16" width="295" height="26" />
+        <text id="581:37" name="걸어서 12분 · 1시간 이상 · 3명 중 1명" x="16" y="48" width="295" height="21" />
+        <text id="581:38" name="늘푸른소나무 님" x="16" y="75" width="295" height="20" />
+      </frame>
+      <frame id="581:39" name="Frame" x="24" y="429" width="327" height="111">
+        <text id="581:40" name="내일 10시 · 공원 한 바퀴" x="16" y="16" width="295" height="26" />
+        <text id="581:41" name="걸어서 4분 · 30분 · 3명 모두 모였어요" x="16" y="48" width="295" height="21" />
+        <text id="581:42" name="운영자" x="16" y="75" width="295" height="20" />
+      </frame>
+      <frame id="581:43" name="sp" x="24" y="554" width="327" height="191" />
+      <frame id="581:44" name="Frame" x="24" y="759" width="327" height="53">
+        <text id="581:45" name="홈" x="0" y="16" width="109" height="21" />
+        <text id="581:46" name="내 동행" x="109" y="16" width="109" height="21" />
+        <text id="581:47" name="더보기" x="218" y="16" width="109" height="21" />
+      </frame>
+    </frame>
+    <frame id="579:358" name="홈 · 피드" x="2909" y="908" width="375" height="812">
+      <text id="579:359" name="지금 신사동에서 같이 갈 사람을 찾고 있어요" x="24" y="56" width="327" height="64" />
+      <frame id="579:367" name="Frame" x="24" y="134" width="327" height="90">
+        <frame id="579:391" name="Frame 67" x="16" y="16" width="295" height="26">
+          <frame id="579:402" name="Frame 68" x="0" y="0" width="87" height="26">
+            <instance id="579:413" name="icon / heroicons / Outline / clock" x="0" y="3" width="20" height="20" />
+            <text id="579:393" name="오늘 3시" x="26" y="0" width="61" height="26" />
+          </frame>
+          <text id="579:400" name="2 / 5명" x="245" y="0" width="50" height="26" />
+        </frame>
+        <frame id="579:406" name="Frame 68" x="16" y="48" width="295" height="26">
+          <frame id="579:407" name="Frame 68" x="0" y="0" width="202" height="26">
+            <instance id="579:408" name="icon / heroicons / Outline / chat-alt" x="0" y="3" width="20" height="20" />
+            <text id="579:409" name="오일장 구경 (1시간 이내)" x="26" y="0" width="176" height="26" />
+          </frame>
+        </frame>
+      </frame>
+      <frame id="579:420" name="Frame" x="24" y="238" width="327" height="90">
+        <frame id="579:421" name="Frame 67" x="16" y="16" width="295" height="26">
+          <frame id="579:422" name="Frame 68" x="0" y="0" width="87" height="26">
+            <instance id="579:448" name="icon / heroicons / Outline / clock" x="0" y="3" width="20" height="20" />
+            <text id="579:424" name="오늘 5시" x="26" y="0" width="61" height="26" />
+          </frame>
+          <text id="579:425" name="1 / 3명" x="245" y="0" width="50" height="26" />
+        </frame>
+        <frame id="579:426" name="Frame 68" x="16" y="48" width="295" height="26">
+          <frame id="579:427" name="Frame 68" x="0" y="0" width="202" height="26">
+            <instance id="579:451" name="icon / heroicons / Outline / chat-alt" x="0" y="3" width="20" height="20" />
+            <text id="579:429" name="식자재 마트 (1시간 이내)" x="26" y="0" width="176" height="26" />
+          </frame>
+        </frame>
+      </frame>
+      <frame id="579:434" name="Frame" x="24" y="342" width="327" height="90">
+        <frame id="579:435" name="Frame 67" x="16" y="16" width="295" height="26">
+          <frame id="579:436" name="Frame 68" x="0" y="0" width="97" height="26">
+            <instance id="579:454" name="icon / heroicons / Outline / clock" x="0" y="3" width="20" height="20" />
+            <text id="579:438" name="내일 10시" x="26" y="0" width="71" height="26" />
+          </frame>
+          <frame id="579:480" name="Frame 73" x="175" y="2.5" width="120" height="21">
+            <frame id="579:479" name="Frame 72" x="0" y="0" width="62" height="21">
+              <text id="579:439" name="모집완료" x="5" y="0" width="52" height="21" />
+            </frame>
+            <text id="579:477" name="3 / 3명" x="70" y="0.5" width="50" height="20" />
+          </frame>
+        </frame>
+        <frame id="579:440" name="Frame 68" x="16" y="48" width="295" height="26">
+          <frame id="579:441" name="Frame 68" x="0" y="0" width="206" height="26">
+            <instance id="579:457" name="icon / heroicons / Outline / chat-alt" x="0" y="3" width="20" height="20" />
+            <text id="579:443" name="공원 한 바퀴 (1시간 이내)" x="26" y="0" width="180" height="26" />
+          </frame>
+        </frame>
+      </frame>
+      <frame id="579:379" name="sp" x="24" y="446" width="327" height="299" />
+      <frame id="579:380" name="Frame" x="24" y="759" width="327" height="53">
+        <text id="579:381" name="홈" x="0" y="16" width="109" height="21" />
+        <text id="579:382" name="내 동행" x="109" y="16" width="109" height="21" />
+        <text id="579:383" name="더보기" x="218" y="16" width="109" height="21" />
+      </frame>
+    </frame>
+    <star id="595:1893" name="Star 2" x="2436" y="1017" width="75" height="75" />
+  </frame>
+  <frame id="579:538" name="Frame 77" x="1005" y="244" width="192" height="82">
+    <text id="579:537" name="동행 만들기" x="16" y="16" width="160" height="50" />
+  </frame>
+  <frame id="579:539" name="Frame 78" x="990" y="1232" width="222" height="82">
+    <text id="579:540" name="동행 참여하기" x="16" y="16" width="190" height="50" />
+  </frame>
+</canvas>
