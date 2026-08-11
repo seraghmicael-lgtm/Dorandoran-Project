@@ -1,4 +1,4 @@
-Figma node: 596:1213 | name: 09_모임 장소 선택 | size: 375x812
+Figma node: 596:1213 | name: 등록완료 (구 "09_모임 장소 선택", 2026-08-11 갱신 — "참여도 90점" 추가) | size: 375x812
 
 - BOX (Rectangle 20) 321x72
 - TEXT: "←"
@@ -15,6 +15,7 @@ Figma node: 596:1213 | name: 09_모임 장소 선택 | size: 375x812
   - GROUP "Group 2" 79x45
     - TEXT: "즐거운다람쥐"
     - TEXT: "동행 참여 3회"
+- TEXT: "참여도 90점"
 - LINE/ICON (Vector 3) 375x0.00003278354120084259
 - LINE/ICON (Vector 2) 317x0
 - TEXT: "지금 모집중인 추천 동행"

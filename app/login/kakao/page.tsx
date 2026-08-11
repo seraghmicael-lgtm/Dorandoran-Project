@@ -11,7 +11,7 @@ export default async function KakaoLoginPage({
   const continueHref = safeInternalPath(next, "/start/welcome");
 
   return (
-    <WireframeLayout className="p-6 flex flex-col justify-between">
+    <WireframeLayout justify="between" className="p-6">
       <div className="flex-1 flex flex-col justify-center gap-4 py-12">
         <h1 className="text-xl font-bold text-black leading-tight">
           이웃과 함께하려면 간단한 본인 확인이 필요해요
@@ -26,7 +26,13 @@ export default async function KakaoLoginPage({
           href={continueHref}
           className="w-full h-[60px] bg-black text-white flex items-center justify-center rounded text-base font-medium"
         >
-          카카오로 3초 만에 시작하기
+          카카오로 시작하기
+        </Link>
+        <Link
+          href={continueHref}
+          className="w-full h-[60px] bg-white text-black border border-black flex items-center justify-center rounded text-base font-medium"
+        >
+          휴대폰 번호로 시작하기
         </Link>
         <Link
           href="/splash"

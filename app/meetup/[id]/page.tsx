@@ -15,7 +15,7 @@ export default async function MeetupDetailPage({
   const backHref = safeInternalPath(from, "/home");
 
   return (
-    <WireframeLayout className="p-4 flex flex-col justify-between">
+    <WireframeLayout justify="between" className="p-4">
       <div className="flex flex-col gap-4 overflow-y-auto pb-4">
         {/* Header */}
         <div className="flex items-center pb-2 border-b border-gray-200">
@@ -53,6 +53,7 @@ export default async function MeetupDetailPage({
             <div className="flex flex-col">
               <span className="text-sm font-bold text-black">즐거운다람쥐</span>
               <span className="text-xs text-gray-500">동행 참여 3회</span>
+              <span className="text-xs text-gray-500">참여도 90점</span>
             </div>
           </div>
         </div>

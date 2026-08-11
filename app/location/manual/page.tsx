@@ -1,10 +1,18 @@
 import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
 import PlaceholderBox from "@/components/PlaceholderBox";
+import { safeInternalPath } from "@/lib/safePath";
 
-export default function LocationManualPage() {
+export default async function LocationManualPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string | string[] }>;
+}) {
+  const { next } = await searchParams;
+  const nextHref = safeInternalPath(next, "/home");
+
   return (
-    <WireframeLayout className="p-4 flex flex-col justify-between">
+    <WireframeLayout justify="between" className="p-4">
       <div className="flex flex-col gap-4">
         {/* Header */}
         <div className="flex items-center gap-2 py-2 border-b border-gray-200">
@@ -39,7 +47,7 @@ export default function LocationManualPage() {
       {/* Select Button */}
       <div className="py-4">
         <Link
-          href="/home"
+          href={`/notification-permission?next=${encodeURIComponent(nextHref)}`}
           className="w-full h-[48px] bg-black text-white flex items-center justify-center rounded text-base font-medium"
         >
           선택
