@@ -48,7 +48,7 @@ export default function MyMeetupsPage() {
             </h2>
 
             <Link
-              href="/meetup/3"
+              href="/meetup/3?from=/my-meetups"
               className="p-3 border border-gray-200 rounded flex flex-col gap-1 bg-white"
             >
               <div className="flex items-center justify-between">
@@ -66,7 +66,7 @@ export default function MyMeetupsPage() {
             </Link>
 
             <Link
-              href="/meetup/5"
+              href="/meetup/5?from=/my-meetups"
               className="p-3 border border-gray-200 rounded flex flex-col gap-1 bg-white"
             >
               <div className="flex items-center justify-between">

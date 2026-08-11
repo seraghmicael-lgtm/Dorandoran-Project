@@ -39,7 +39,7 @@ export default async function MeetupDetailPage({
         </div>
 
         {/* Map Placeholder */}
-        <Link href={`/meetup/${id}/map`}>
+        <Link href={`/meetup/${id}/map?from=${encodeURIComponent(backHref)}`}>
           <PlaceholderBox height="h-[120px]" className="rounded cursor-pointer hover:border-black">
             <span className="text-xs text-gray-500">지도 영역 (탭하여 크게 보기)</span>
           </PlaceholderBox>
@@ -64,7 +64,7 @@ export default async function MeetupDetailPage({
           </h2>
 
           <Link
-            href="/meetup/3"
+            href={`/meetup/3?from=${encodeURIComponent(backHref)}`}
             className="p-3 border border-gray-200 rounded flex flex-col gap-1 bg-white"
           >
             <div className="flex items-center justify-between">
@@ -82,7 +82,7 @@ export default async function MeetupDetailPage({
           </Link>
 
           <Link
-            href="/meetup/5"
+            href={`/meetup/5?from=${encodeURIComponent(backHref)}`}
             className="p-3 border border-gray-200 rounded flex flex-col gap-1 bg-white"
           >
             <div className="flex items-center justify-between">

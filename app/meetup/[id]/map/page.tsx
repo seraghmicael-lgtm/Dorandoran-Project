@@ -1,20 +1,29 @@
 import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
 import PlaceholderBox from "@/components/PlaceholderBox";
+import { safeInternalPath } from "@/lib/safePath";
 
 export default async function MeetupMapPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ from?: string | string[] }>;
 }) {
   const { id } = await params;
+  const { from } = await searchParams;
+  // from is re-validated by /meetup/[id] itself; here we just carry it through unchanged.
+  const detailHref =
+    typeof from === "string" && from
+      ? `/meetup/${id}?from=${encodeURIComponent(from)}`
+      : `/meetup/${id}`;
 
   return (
     <WireframeLayout className="p-4 flex flex-col justify-between">
       <div className="flex flex-col gap-4">
         {/* Header */}
         <div className="flex items-center pb-2 border-b border-gray-200">
-          <Link href={`/meetup/${id}`} className="text-lg font-bold text-black px-1">
+          <Link href={detailHref} className="text-lg font-bold text-black px-1">
             ←
           </Link>
         </div>
