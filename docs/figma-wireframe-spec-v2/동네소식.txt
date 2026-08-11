@@ -1,0 +1,33 @@
+Figma node: 596:1134 | name: 내 동행 | size: 375x812
+
+- GROUP "탭바" 375x60
+  - GROUP "tab/홈" 93.75x60
+    - TEXT: "홈"
+  - GROUP "tab/내 동행" 93.75x60
+    - TEXT: "내 동행"
+  - GROUP "tab/알림" 93.75x60
+    - TEXT: "동네소식"
+  - GROUP "tab/만들기" 93.75x60
+    - TEXT: "만들기"
+- TEXT: "로고"
+- TEXT: "내 정보"
+- TEXT: "알림"
+- BOX (divider) 375x1
+- GROUP "Frame" 288x49
+  - TEXT: "방금 큰 소리 나지 않았어요?"
+- GROUP "Frame" 288x49
+  - TEXT: "3단지 정전 났습니다 ㅠㅠ"
+- GROUP "Frame" 288x49
+  - TEXT: "언제 복구 될까요?"
+- GROUP "Frame" 288x49
+  - TEXT: "관리실에 확인해보심이..."
+- GROUP "Frame" 288x49
+  - TEXT: "아까 사거리에서 사고 났다는거 같아요"
+- TEXT: "즐거운다람쥐"
+- TEXT: "쿠킹쿠킹"
+- TEXT: "요리하는엄마"
+- TEXT: "뚜벅이"
+- TEXT: "한가로이"
+- BOX (Rectangle 18) 375x49
+- BOX (Rectangle 19) 311x32
+- GROUP "mic" 24x24

@@ -60,7 +60,7 @@ export default function AfterMeetupPage() {
           </span>
         )}
         <Link
-          href="/feed"
+          href="/home"
           className="w-full h-[60px] bg-white text-black border border-black flex items-center justify-center rounded text-base font-medium"
         >
           건너뛰기

@@ -1,0 +1,11 @@
+Figma node: 579:481 | name: 지도 | size: 375x812
+
+- BOX (Rectangle 17) 375x755
+- GROUP "Frame 48" 327x60
+  - GROUP "Frame" 327x60
+    - GROUP "Frame 76" 75x26
+      - GROUP "icon / feathericons / corner-up-right" 20x20
+      - TEXT: "길찾기"
+- BOX (line) 375x1
+- TEXT: "←"
+- TEXT: "map"

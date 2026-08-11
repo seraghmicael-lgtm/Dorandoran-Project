@@ -3,37 +3,33 @@ import WireframeLayout from "@/components/WireframeLayout";
 
 export default function RouteIndexPage() {
   const routes = [
-    { href: "/splash", label: "/splash (스플래시_진입)" },
-    { href: "/location-permission", label: "/location-permission (위치_권한)" },
-    { href: "/feed", label: "/feed (홈_피드_A)" },
-    { href: "/feed-alt", label: "/feed-alt (홈_피드_B)" },
-    { href: "/login", label: "/login (로그인)" },
-    { href: "/login/kakao", label: "/login/kakao (카톡_3초_로그인)" },
-    { href: "/meetup/1", label: "/meetup/[id] (상세_확인)" },
-    { href: "/meetup/1/complete", label: "/meetup/[id]/complete (신청_완료)" },
-    { href: "/my-meetups", label: "/my-meetups (내_동행)" },
-    { href: "/my-meetups/cancel", label: "/my-meetups/cancel (참여_취소)" },
-    { href: "/my-meetups/cancel/complete", label: "/my-meetups/cancel/complete (처리_완료)" },
-    { href: "/my-meetups/after", label: "/my-meetups/after (참여_후)" },
-    { href: "/my-meetups/after/complete", label: "/my-meetups/after/complete (전달_완료)" },
-    { href: "/location", label: "/location (위치정보)" },
-    { href: "/location/denied", label: "/location/denied (위치정보_허용안함)" },
-    { href: "/home", label: "/home (홈_A)" },
-    { href: "/home-alt", label: "/home-alt (홈_B)" },
-    { href: "/home/notifications", label: "/home/notifications (홈_알림)" },
-    { href: "/create", label: "/create (홈_만들기)" },
-    { href: "/create/welcome", label: "/create/welcome (홈_만들기_로그인_웰컴)" },
-    { href: "/create/step-1", label: "/create/step-1 (만들기_1)" },
-    { href: "/create/step-2", label: "/create/step-2 (만들기_2)" },
-    { href: "/create/step-3", label: "/create/step-3 (만들기_3)" },
-    { href: "/create/step-4", label: "/create/step-4 (만들기_4)" },
+    { href: "/splash", label: "/splash (스플래시 & 진입)" },
+    { href: "/location-permission", label: "/location-permission (위치 권한)" },
+    { href: "/location/manual", label: "/location/manual (03_내 위치 직접 선택)" },
+    { href: "/home", label: "/home (04_홈 둘러보기)" },
+    { href: "/start", label: "/start (05_로그인 유도)" },
+    { href: "/login/kakao", label: "/login/kakao (카톡 3초 로그인)" },
+    { href: "/start/welcome", label: "/start/welcome (06_활동명 부여 환영)" },
+    { href: "/start/choose", label: "/start/choose (선택: 만들기 / 참여하기)" },
+    { href: "/create/step-1", label: "/create/step-1 (07_동행 만들기 1/2)" },
+    { href: "/create/step-2", label: "/create/step-2 (08_동행 만들기 2/2)" },
+    { href: "/create/step-4", label: "/create/step-4 (09_모임 장소 선택)" },
+    { href: "/meetup/1", label: "/meetup/[id] (동행 상세 참여하기)" },
+    { href: "/meetup/1/complete", label: "/meetup/[id]/complete (신청 완료)" },
+    { href: "/my-meetups", label: "/my-meetups (내 동행)" },
+    { href: "/my-meetups/cancel", label: "/my-meetups/cancel (참여 취소)" },
+    { href: "/my-meetups/cancel/complete", label: "/my-meetups/cancel/complete (처리 완료)" },
+    { href: "/my-meetups/after", label: "/my-meetups/after (참여 후)" },
+    { href: "/my-meetups/after/complete", label: "/my-meetups/after/complete (전달 완료)" },
+    { href: "/community", label: "/community (동네소식)" },
+    { href: "/meetup/1/map", label: "/meetup/[id]/map (지도 전체화면)" },
   ];
 
   return (
     <WireframeLayout className="p-4">
       <div className="flex-1 flex flex-col gap-4 py-4 overflow-y-auto">
         <h1 className="text-lg font-bold text-black border-b border-gray-200 pb-2">
-          도란도란 와이어프레임 라우트 목록
+          도란도란 v2 와이어프레임 라우트 목록
         </h1>
         <div className="flex flex-col gap-1.5">
           {routes.map((r, i) => (

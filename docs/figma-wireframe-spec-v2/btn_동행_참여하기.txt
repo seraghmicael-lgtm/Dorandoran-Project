@@ -1,0 +1,3 @@
+Figma node: 579:539 | name: Frame 78 | size: 222x82
+
+- TEXT: "동행 참여하기"

@@ -1,0 +1,23 @@
+Figma node: 595:1705 | name: 07_동행 만들기 (1/2) | size: 375x812
+
+- TEXT: "←"
+- BOX (line) 375x1
+- TEXT: "1/2"
+- GROUP "Frame" 375x229
+  - TEXT: "어떤 동행을 구하시나요?"
+  - GROUP "Frame" 327x24
+    - TEXT: "모임명을 입력해주세요"
+    - GROUP "mic" 24x24
+  - BOX (line) 327x1
+  - TEXT: "아니면 아래에서 선택해보세요"
+  - GROUP "Frame" 327x76
+    - GROUP "chip/장보러가요" 84x34
+      - TEXT: "장보러가요"
+    - GROUP "chip/김장해요" 73x34
+      - TEXT: "김장해요"
+    - GROUP "chip/반찬 나눌게요" 97x34
+      - TEXT: "반찬 나눌게요"
+    - GROUP "chip/같이 등록해요" 97x34
+      - TEXT: "같이 등록해요"
+- GROUP "btn/다음" 327x50
+  - TEXT: "다음"

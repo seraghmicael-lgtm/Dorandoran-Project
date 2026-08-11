@@ -7,8 +7,9 @@ export default function HeaderNav() {
       <Link href="/home" className="text-base font-medium text-black">
         로고
       </Link>
-      <div className="text-sm text-gray-700">
-        내 정보
+      <div className="flex items-center gap-3 text-sm text-gray-700">
+        <span>알림</span>
+        <span>내 정보</span>
       </div>
     </header>
   );

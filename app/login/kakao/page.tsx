@@ -8,10 +8,7 @@ export default async function KakaoLoginPage({
   searchParams: Promise<{ next?: string | string[] }>;
 }) {
   const { next } = await searchParams;
-  const safeNext = safeInternalPath(next, "");
-  const continueHref = safeNext
-    ? `/location-permission?next=${encodeURIComponent(safeNext)}`
-    : "/location-permission";
+  const continueHref = safeInternalPath(next, "/start/welcome");
 
   return (
     <WireframeLayout className="p-6 flex flex-col justify-between">
@@ -32,7 +29,7 @@ export default async function KakaoLoginPage({
           카카오로 3초 만에 시작하기
         </Link>
         <Link
-          href="/login"
+          href="/splash"
           className="w-full h-[60px] bg-white text-black border border-black flex items-center justify-center rounded text-base font-medium"
         >
           뒤로

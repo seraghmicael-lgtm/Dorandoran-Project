@@ -1,0 +1,41 @@
+Figma node: 595:1727 | name: 08_동행 만들기 (2/2) | size: 375x812
+
+- TEXT: "←"
+- BOX (line) 375x1
+- TEXT: "2/2"
+- GROUP "Frame" 375x673
+  - TEXT: "하고 싶은 활동에 대해 소개해주세요"
+  - GROUP "소개 입력" 327x132
+    - GROUP "mic" 24x24
+  - GROUP "group/시작 시간" 327x72
+    - TEXT: "시작 시간"
+    - GROUP "field" 327x46
+      - TEXT: "00:00"
+  - GROUP "group/예상 소요 시간" 327x59
+    - TEXT: "예상 소요 시간"
+    - GROUP "Frame" 327x33
+      - GROUP "chip/30분 이내" 64x33
+        - TEXT: "30분 이내"
+      - GROUP "chip/1시간 이내" 68x33
+        - TEXT: "1시간 이내"
+      - GROUP "chip/2시간 이내" 68x33
+        - TEXT: "2시간 이내"
+      - GROUP "chip/2시간 이상" 68x33
+        - TEXT: "2시간 이상"
+  - GROUP "최대 인원" 327x38
+    - TEXT: "최대 인원"
+    - GROUP "Frame" 114x38
+      - TEXT: "−"
+      - GROUP "Frame" 64x38
+        - TEXT: "3"
+      - TEXT: "+"
+  - GROUP "group/모임 장소" 327x72
+    - TEXT: "모임 장소"
+    - GROUP "field" 327x46
+      - TEXT: "도토리마을 공원"
+      - TEXT: "위치 찾기"
+  - GROUP "안내" 327x64
+    - TEXT: "• 최소 인원은 3명이어야 합니다"
+    - TEXT: "• 안전한 장소에서 만나요"
+  - GROUP "btn/등록" 327x50
+    - TEXT: "등록"

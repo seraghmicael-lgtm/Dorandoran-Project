@@ -1,0 +1,9 @@
+Figma node: 581:3 | name: 스플래시 & 진입 | size: 375x812
+
+- TEXT: "오늘 같이할 사람 찾기"
+- TEXT: "장 보러, 산책하러, 커피 한 잔 우리 동네에서 한두 시간"
+- GROUP "Frame 48" 327x134
+  - GROUP "Frame" 327x60
+    - TEXT: "카카오로 시작하기"
+  - GROUP "Frame" 327x60
+    - TEXT: "그냥 둘러보기"

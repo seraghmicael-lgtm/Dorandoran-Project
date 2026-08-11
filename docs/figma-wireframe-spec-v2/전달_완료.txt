@@ -1,0 +1,6 @@
+Figma node: 583:79 | name: 전달 완료 | size: 375x812
+
+- TEXT: "전해드렸어요"
+- TEXT: "고양고양 님도 오늘 인사를 받으셨어요."
+- GROUP "Frame" 327x60
+  - TEXT: "확인"

@@ -1,0 +1,6 @@
+Figma node: 595:1693 | name: 05_로그인 유도 | size: 375x812
+
+- TEXT: "이웃을 만나려면 로그인이 필요해요"
+- GROUP "Frame" 375x51
+  - GROUP "btn/카톡 로그인" 327x51
+    - TEXT: "카톡 로그인"

@@ -1,0 +1,16 @@
+Figma node: 595:1767 | name: 09_모임 장소 선택 | size: 375x812
+
+- TEXT: "←"
+- BOX (line) 375x1
+- GROUP "Frame" 375x620
+  - TEXT: "만나고 싶은 장소를 선택해주세요"
+  - GROUP "Frame" 131x20
+    - ellipse "Ellipse"
+    - TEXT: "현재 내 위치: 은평동"
+  - GROUP "field" 327x46
+    - TEXT: "검색할 위치를 입력하세요"
+  - GROUP "지도 영역" 327x380
+    - regular-polygon "선택 위치 핀"
+    - ellipse "내 위치로"
+  - GROUP "btn/선택" 327x50
+    - TEXT: "선택"

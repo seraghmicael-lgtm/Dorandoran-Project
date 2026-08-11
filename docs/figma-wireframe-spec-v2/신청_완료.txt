@@ -1,0 +1,9 @@
+Figma node: 582:57 | name: 신청 완료 | size: 375x812
+
+- GROUP "sp" 327x221
+- TEXT: "신청되었습니다"
+- TEXT: "오늘 오후 3시 신사시장 정문에서 만나요 30분 전에 알려드릴게요"
+- GROUP "sp" 327x221
+- GROUP "Frame 48" 327x60
+  - GROUP "Frame" 327x60
+    - TEXT: "확인"
