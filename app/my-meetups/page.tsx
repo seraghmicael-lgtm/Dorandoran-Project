@@ -1,7 +1,6 @@
 import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
 import HeaderNav from "@/components/HeaderNav";
-import BottomNavFive from "@/components/BottomNavFive";
 
 export default function MyMeetupsPage() {
   return (
@@ -85,8 +84,6 @@ export default function MyMeetupsPage() {
           </div>
         </div>
       </div>
-
-      <BottomNavFive active="my-meetups" />
     </WireframeLayout>
   );
 }

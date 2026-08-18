@@ -1,7 +1,6 @@
 import React from "react";
 import WireframeLayout from "@/components/WireframeLayout";
 import HeaderNav from "@/components/HeaderNav";
-import BottomNavFive from "@/components/BottomNavFive";
 
 export default function CommunityPage() {
   return (
@@ -55,18 +54,14 @@ export default function CommunityPage() {
         </div>
       </div>
 
-      <div className="flex flex-col">
-        {/* Input box */}
-        <div className="p-3 border-t border-gray-200 bg-white flex items-center gap-2">
-          <div className="flex-1 p-2 border border-gray-300 rounded text-xs text-gray-400">
-            메시지를 입력하세요
-          </div>
-          <div className="w-8 h-8 rounded-full border border-gray-400 bg-gray-100 flex items-center justify-center text-xs text-gray-500 flex-shrink-0">
-            mic
-          </div>
+      {/* Input box */}
+      <div className="p-3 border-t border-gray-200 bg-white flex items-center gap-2">
+        <div className="flex-1 p-2 border border-gray-300 rounded text-xs text-gray-400">
+          메시지를 입력하세요
         </div>
-
-        <BottomNavFive active="community" />
+        <div className="w-8 h-8 rounded-full border border-gray-400 bg-gray-100 flex items-center justify-center text-xs text-gray-500 flex-shrink-0">
+          mic
+        </div>
       </div>
     </WireframeLayout>
   );

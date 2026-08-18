@@ -1,7 +1,6 @@
 import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
 import HeaderNav from "@/components/HeaderNav";
-import BottomNavFive from "@/components/BottomNavFive";
 
 export default function HomePage() {
   return (
@@ -151,8 +150,6 @@ export default function HomePage() {
           </div>
         </div>
       </div>
-
-      <BottomNavFive active="home" />
     </WireframeLayout>
   );
 }

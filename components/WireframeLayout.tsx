@@ -1,4 +1,8 @@
+"use client";
+
 import React from "react";
+import { usePathname } from "next/navigation";
+import BottomNavFive from "./BottomNavFive";
 
 interface WireframeLayoutProps {
   children: React.ReactNode;
@@ -17,18 +21,30 @@ interface WireframeLayoutProps {
 const JUSTIFY = { between: "justify-between", center: "justify-center" };
 const ITEMS = { start: "", center: "items-center" };
 
+function activeTabFor(pathname: string): "home" | "my-meetups" | "community" | "create" | undefined {
+  if (pathname.startsWith("/home")) return "home";
+  if (pathname.startsWith("/my-meetups")) return "my-meetups";
+  if (pathname.startsWith("/community")) return "community";
+  if (pathname.startsWith("/create") || pathname === "/start/choose") return "create";
+  return undefined;
+}
+
 export default function WireframeLayout({
   children,
   className = "",
   justify = "between",
   items = "start",
 }: WireframeLayoutProps) {
+  const pathname = usePathname();
+
   return (
     <div className="min-h-screen bg-gray-100 text-black flex justify-center items-start">
-      <div
-        className={`w-full max-w-[375px] min-h-screen bg-white border-x border-gray-200 flex flex-col ${JUSTIFY[justify]} ${ITEMS[items]} relative shadow-none font-sans text-sm ${className}`}
-      >
-        {children}
+      <div className="w-full max-w-[375px] min-h-screen bg-white border-x border-gray-200 flex flex-col relative shadow-none font-sans text-sm">
+        <div className={`flex-1 flex flex-col ${JUSTIFY[justify]} ${ITEMS[items]} ${className}`}>
+          {children}
+        </div>
+        {/* 사용자 요청(2026-08-18): 로그인 화면 포함 모든 화면에서 하단 탭 항상 유지 */}
+        <BottomNavFive active={activeTabFor(pathname)} />
       </div>
     </div>
   );
