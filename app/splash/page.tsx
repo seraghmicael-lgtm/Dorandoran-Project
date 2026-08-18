@@ -22,6 +22,12 @@ export default function SplashPage() {
         </Link>
         <Link
           href="/login/kakao?next=/start/welcome"
+          className="w-full h-[60px] bg-black text-white flex items-center justify-center rounded text-base font-medium"
+        >
+          휴대폰 번호로 시작하기
+        </Link>
+        <Link
+          href="/login/kakao?next=/start/welcome"
           className="w-full h-[60px] bg-white text-black border border-black flex items-center justify-center rounded text-base font-medium"
         >
           그냥 둘러보기
