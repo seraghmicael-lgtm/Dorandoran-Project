@@ -4,112 +4,58 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import WireframeLayout from "@/components/WireframeLayout";
 import HeaderBack from "@/components/HeaderBack";
+import { listenOnce, ListenHandle } from "@/lib/voice";
 
-type Phase = "starting" | "recording" | "transcribing" | "mic-error" | "transcribe-error";
+type Phase = "starting" | "recording" | "transcribing" | "mic-error" | "voice-error";
 
 export default function CreateListeningPage() {
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>("starting");
+  const handleRef = useRef<ListenHandle | null>(null);
+  const unmountedRef = useRef(false);
 
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
-  const streamRef = useRef<MediaStream | null>(null);
-  const finishRequestedRef = useRef(false);
+  const startListen = () => {
+    setPhase("starting");
+    const handle = listenOnce({
+      onTranscribing: () => {
+        if (!unmountedRef.current) setPhase("transcribing");
+      },
+    });
+    handleRef.current = handle;
+    setPhase("recording");
 
-  const startRecording = async () => {
-    try {
-      audioChunksRef.current = [];
-      finishRequestedRef.current = false;
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      streamRef.current = stream;
-
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      };
-
-      mediaRecorder.onstop = async () => {
-        if (streamRef.current) {
-          streamRef.current.getTracks().forEach((track) => track.stop());
-          streamRef.current = null;
-        }
-        if (!finishRequestedRef.current) return; // unmount cleanup
-
-        const audioBlob = new Blob(audioChunksRef.current, {
-          type: mediaRecorder.mimeType || "audio/webm",
-        });
-        if (audioBlob.size === 0) {
-          setPhase("transcribe-error");
-          return;
-        }
-
-        setPhase("transcribing");
-        try {
-          const formData = new FormData();
-          formData.append("file", audioBlob, "recording");
-
-          const res = await fetch("/api/transcribe", { method: "POST", body: formData });
-          if (!res.ok) throw new Error("Transcription failed");
-
-          const data = await res.json();
-          if (data.transcript && data.transcript.trim()) {
-            sessionStorage.setItem("dorandoran_transcript", data.transcript.trim());
-            router.push("/create/confirm");
-          } else {
-            throw new Error("Empty transcript");
-          }
-        } catch (err) {
-          console.error("Transcription error:", err);
-          setPhase("transcribe-error");
-        }
-      };
-
-      mediaRecorder.start();
-      setPhase("recording");
-
-      if (finishRequestedRef.current) {
-        mediaRecorder.stop();
+    handle.promise.then(({ transcript, micDenied }) => {
+      if (unmountedRef.current) return;
+      if (transcript) {
+        sessionStorage.setItem("dorandoran_transcript", transcript);
+        router.push("/create/confirm");
+      } else {
+        setPhase(micDenied ? "mic-error" : "voice-error");
       }
-    } catch (err) {
-      console.error("Microphone access failed:", err);
-      setPhase("mic-error");
-    }
+    });
   };
 
   useEffect(() => {
-    startRecording();
+    unmountedRef.current = false;
+    startListen();
     return () => {
-      finishRequestedRef.current = false;
-      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
-        mediaRecorderRef.current.stop();
-      }
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
-        streamRef.current = null;
-      }
+      unmountedRef.current = true;
+      handleRef.current?.cancel();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleFinish = () => {
     if (phase === "transcribing") return;
-    if (phase === "mic-error" || phase === "transcribe-error") {
-      // 실패 상태에서 다시 누르면 처음부터 다시 녹음
-      setPhase("starting");
-      startRecording();
+    if (phase === "mic-error" || phase === "voice-error") {
+      startListen();
       return;
     }
-    finishRequestedRef.current = true;
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
-      mediaRecorderRef.current.stop();
-    }
+    handleRef.current?.finish();
   };
 
   const handleWriteClick = () => {
+    handleRef.current?.cancel();
     router.push("/create/write");
   };
 
@@ -151,7 +97,7 @@ export default function CreateListeningPage() {
             쓸래요&apos; 버튼으로 직접 작성하실 수 있어요.
           </div>
         )}
-        {phase === "transcribe-error" && (
+        {phase === "voice-error" && (
           <div className="w-full p-3 border border-gray-300 rounded bg-gray-100 text-xs text-gray-700 text-left">
             말씀을 알아듣지 못했어요. &apos;다 말했어요&apos; 버튼을 눌러 다시
             말씀해주시거나, 아래 &apos;손으로 쓸래요&apos; 버튼으로 직접 작성하실 수

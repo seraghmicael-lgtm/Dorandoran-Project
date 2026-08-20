@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
 import HeaderBack from "@/components/HeaderBack";
+import { listenOnce, ListenHandle } from "@/lib/voice";
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export default function CreateConfirmPage() {
   const router = useRouter();
@@ -18,9 +21,12 @@ export default function CreateConfirmPage() {
   const [followUpQuestion, setFollowUpQuestion] = useState<string | null>(null);
 
   const [isParsing, setIsParsing] = useState(false);
+  // 파싱 결과가 새로 도착할 때마다 +1 — 음성대화 턴(질문 말하기→듣기)의 트리거
+  const [parseNonce, setParseNonce] = useState(0);
 
-  // Voice recording & transcription states for follow-up questions
-  const [isRecording, setIsRecording] = useState(false);
+  // Voice conversation states
+  const [autoListening, setAutoListening] = useState(false);
+  const [isRecording, setIsRecording] = useState(false); // 수동(누르고 말하기)
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [textInput, setTextInput] = useState("");
 
@@ -32,78 +38,75 @@ export default function CreateConfirmPage() {
   const [inputLocation, setInputLocation] = useState("");
   const [inputActivity, setInputActivity] = useState("");
 
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
-  const streamRef = useRef<MediaStream | null>(null);
-  const stopRequestedRef = useRef(false);
+  // Conversation orchestration refs
+  const autoHandleRef = useRef<ListenHandle | null>(null);
+  const manualHandleRef = useRef<ListenHandle | null>(null);
+  const turnTokenRef = useRef(0);
+  const autoDisabledRef = useRef(false);
+  const emptyCountRef = useRef(0);
+  const unmountedRef = useRef(false);
 
-  // TTS audio playback states & refs
+  // TTS audio playback refs
   const ttsAudioRef = useRef<HTMLAudioElement | null>(null);
   const currentTtsUrlRef = useRef<string | null>(null);
-  const lastSpokenQuestionRef = useRef<string | null>(null);
 
   const activeQuestion = missingField
     ? missingField === "time"
       ? followUpQuestion || "언제 만나고 싶으세요?"
       : missingField === "location"
       ? followUpQuestion || "어디서 만나고 싶으세요?"
-      : missingField === "activity"
-      ? followUpQuestion || "무엇을 하고 싶으세요?"
-      : null
+      : followUpQuestion || "무엇을 하고 싶으세요?"
     : null;
 
-  const speakQuestion = async (questionText: string) => {
-    if (!questionText) return;
+  /** 질문을 음성으로 재생하고 끝날 때까지 기다린다. 재생 성공 여부 반환. */
+  const speakQuestion = async (questionText: string): Promise<boolean> => {
+    if (!questionText) return false;
     try {
       const res = await fetch("/api/tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: questionText }),
       });
-      if (!res.ok) return;
+      if (!res.ok) return false;
 
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
-
-      if (currentTtsUrlRef.current) {
-        URL.revokeObjectURL(currentTtsUrlRef.current);
-      }
+      if (currentTtsUrlRef.current) URL.revokeObjectURL(currentTtsUrlRef.current);
       currentTtsUrlRef.current = url;
 
-      if (ttsAudioRef.current) {
-        ttsAudioRef.current.src = url;
-        ttsAudioRef.current.play().catch((err) => {
-          console.warn("TTS autoplay blocked or failed:", err);
+      const audio = ttsAudioRef.current;
+      if (!audio) return false;
+      audio.src = url;
+
+      return await new Promise<boolean>((resolve) => {
+        const onEnded = () => {
+          cleanup();
+          resolve(true);
+        };
+        const onError = () => {
+          cleanup();
+          resolve(false);
+        };
+        const cleanup = () => {
+          audio.removeEventListener("ended", onEnded);
+          audio.removeEventListener("error", onError);
+        };
+        audio.addEventListener("ended", onEnded);
+        audio.addEventListener("error", onError);
+        audio.play().catch(() => {
+          cleanup();
+          resolve(false);
         });
-      }
-    } catch (err) {
-      console.warn("TTS fetch error:", err);
+      });
+    } catch {
+      return false;
     }
   };
-
-  useEffect(() => {
-    if (activeQuestion && activeQuestion !== lastSpokenQuestionRef.current) {
-      lastSpokenQuestionRef.current = activeQuestion;
-      speakQuestion(activeQuestion);
-    } else if (!activeQuestion) {
-      lastSpokenQuestionRef.current = null;
-    }
-  }, [activeQuestion]);
-
-  useEffect(() => {
-    return () => {
-      if (currentTtsUrlRef.current) {
-        URL.revokeObjectURL(currentTtsUrlRef.current);
-      }
-    };
-  }, []);
 
   const handleReplayTts = () => {
     if (ttsAudioRef.current && ttsAudioRef.current.src) {
       ttsAudioRef.current.currentTime = 0;
-      ttsAudioRef.current.play().catch((err) => {
-        console.warn("Replay TTS blocked or failed:", err);
-      });
+      ttsAudioRef.current.play().catch(() => {});
     } else if (activeQuestion) {
       speakQuestion(activeQuestion);
     }
@@ -116,6 +119,7 @@ export default function CreateConfirmPage() {
     setActivity(data.activity ?? null);
     setMissingField(data.missingField ?? null);
     setFollowUpQuestion(data.followUpQuestion ?? null);
+    setParseNonce((n) => n + 1);
   };
 
   const parseTranscript = async (
@@ -148,6 +152,7 @@ export default function CreateConfirmPage() {
   };
 
   useEffect(() => {
+    unmountedRef.current = false;
     const savedTranscript = sessionStorage.getItem("dorandoran_transcript");
     if (savedTranscript && savedTranscript.trim()) {
       setTranscript(savedTranscript);
@@ -155,6 +160,15 @@ export default function CreateConfirmPage() {
     } else {
       parseTranscript("세 시에 오일장 구경 같이해요", { time: null, location: null, activity: null });
     }
+    return () => {
+      unmountedRef.current = true;
+      turnTokenRef.current++;
+      autoHandleRef.current?.cancel();
+      manualHandleRef.current?.cancel();
+      if (ttsAudioRef.current) ttsAudioRef.current.pause();
+      if (currentTtsUrlRef.current) URL.revokeObjectURL(currentTtsUrlRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleAnswerSubmit = (answerText: string) => {
@@ -163,80 +177,88 @@ export default function CreateConfirmPage() {
     parseTranscript(answerText.trim());
   };
 
-  const startAnswerRecording = async () => {
-    try {
-      stopRequestedRef.current = false;
-      audioChunksRef.current = [];
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      streamRef.current = stream;
+  /** 자동 듣기 한 회 — 침묵이 감지되면 알아서 끝나고 답을 제출한다 */
+  const autoListen = async (token: number) => {
+    setAutoListening(true);
+    const handle = listenOnce({
+      onTranscribing: () => setIsTranscribing(true),
+    });
+    autoHandleRef.current = handle;
+    const { transcript: answer, noVad, micDenied } = await handle.promise;
+    autoHandleRef.current = null;
+    setAutoListening(false);
+    setIsTranscribing(false);
 
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      };
-
-      mediaRecorder.onstop = async () => {
-        setIsRecording(false);
-        if (streamRef.current) {
-          streamRef.current.getTracks().forEach((track) => track.stop());
-          streamRef.current = null;
-        }
-
-        const audioBlob = new Blob(audioChunksRef.current, {
-          type: mediaRecorder.mimeType || "audio/webm",
-        });
-        if (audioBlob.size === 0) return;
-
-        setIsTranscribing(true);
-        try {
-          const formData = new FormData();
-          formData.append("file", audioBlob, "answer.webm");
-
-          const res = await fetch("/api/transcribe", {
-            method: "POST",
-            body: formData,
-          });
-
-          if (!res.ok) throw new Error("Transcribe failed");
-
-          const data = await res.json();
-          if (data.transcript && data.transcript.trim()) {
-            handleAnswerSubmit(data.transcript.trim());
-          }
-        } catch (err) {
-          console.error("Answer transcription error:", err);
-        } finally {
-          setIsTranscribing(false);
-        }
-      };
-
-      mediaRecorder.start();
-      setIsRecording(true);
-
-      if (stopRequestedRef.current) {
-        mediaRecorder.stop();
+    if (token !== turnTokenRef.current || unmountedRef.current) return;
+    if (noVad || micDenied) {
+      // 이 기기에선 자동 듣기가 불가능 — 누르고 말하기/글자 입력으로 조용히 폴백
+      autoDisabledRef.current = true;
+      return;
+    }
+    if (answer) {
+      emptyCountRef.current = 0;
+      handleAnswerSubmit(answer);
+    } else {
+      emptyCountRef.current++;
+      if (emptyCountRef.current < 2) {
+        await autoListen(token); // 못 알아들었으면 한 번만 더 귀 기울인다
       }
-    } catch (err) {
-      console.error("Microphone access failed for answer recording:", err);
     }
   };
 
-  const stopAnswerRecording = () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
-      mediaRecorderRef.current.stop();
-    } else {
-      stopRequestedRef.current = true;
-    }
+  /** 대화 턴: 질문을 말하고, 끝나면 자동으로 듣는다 */
+  const runTurn = async (question: string) => {
+    const token = ++turnTokenRef.current;
+    const played = await speakQuestion(question);
+    if (token !== turnTokenRef.current || unmountedRef.current) return;
+    if (autoDisabledRef.current) return;
+    if (!played) await sleep(600); // 자동재생이 막혔으면 질문을 읽을 시간을 준다
+    await autoListen(token);
+  };
+
+  useEffect(() => {
+    if (parseNonce === 0) return;
+    if (!activeQuestion) return;
+    runTurn(activeQuestion);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [parseNonce]);
+
+  /** 수동 개입(누르고 말하기·글자 입력) 시 진행 중인 자동 듣기를 중단 */
+  const interruptAuto = () => {
+    turnTokenRef.current++;
+    autoHandleRef.current?.cancel();
+    autoHandleRef.current = null;
+    setAutoListening(false);
+    if (ttsAudioRef.current) ttsAudioRef.current.pause();
+  };
+
+  const startManualRecording = () => {
+    interruptAuto();
+    const handle = listenOnce({
+      silenceMs: 600000, // 수동 모드: 손을 뗄 때까지 듣는다
+      onTranscribing: () => setIsTranscribing(true),
+    });
+    manualHandleRef.current = handle;
+    setIsRecording(true);
+    handle.promise.then(({ transcript: answer }) => {
+      manualHandleRef.current = null;
+      if (unmountedRef.current) return;
+      setIsRecording(false);
+      setIsTranscribing(false);
+      if (answer) handleAnswerSubmit(answer);
+    });
+  };
+
+  const stopManualRecording = () => {
+    setIsRecording(false);
+    manualHandleRef.current?.finish();
   };
 
   const isFormComplete = Boolean(time && location && activity);
 
   const handlePost = () => {
     if (!isFormComplete) return;
+    interruptAuto();
     const draftData = {
       transcript,
       time: time!,
@@ -247,18 +269,26 @@ export default function CreateConfirmPage() {
     router.push("/create/duration");
   };
 
+  const micLabel = isRecording
+    ? "녹음 중"
+    : isTranscribing
+    ? "변환 중"
+    : autoListening
+    ? "듣는 중"
+    : "말하기";
+
   const renderFollowUpInput = () => (
     <div className="flex flex-col gap-2 pt-1">
       <div className="flex items-center gap-3">
-        {/* Mic button (scaled-down "누르고 말하기" style) */}
+        {/* Mic button — 자동 듣기 중엔 저절로 켜져 있고, 눌러서 말할 수도 있다 */}
         <button
           type="button"
-          onPointerDown={startAnswerRecording}
-          onPointerUp={stopAnswerRecording}
-          onPointerLeave={isRecording ? stopAnswerRecording : undefined}
+          onPointerDown={startManualRecording}
+          onPointerUp={stopManualRecording}
+          onPointerLeave={isRecording ? stopManualRecording : undefined}
           disabled={isTranscribing || isParsing}
           className={`w-12 h-12 rounded-full border-2 transition-all flex flex-col items-center justify-center gap-0.5 select-none touch-none shrink-0 ${
-            isRecording
+            isRecording || autoListening
               ? "border-red-500 bg-red-50 scale-105"
               : isTranscribing || isParsing
               ? "border-gray-300 bg-gray-100 opacity-60 cursor-not-allowed"
@@ -267,18 +297,19 @@ export default function CreateConfirmPage() {
         >
           <div
             className={`w-3 h-3 rounded-full border ${
-              isRecording ? "bg-red-500 border-red-600 animate-ping" : "bg-gray-300 border-gray-400"
+              isRecording || autoListening
+                ? "bg-red-500 border-red-600 animate-ping"
+                : "bg-gray-300 border-gray-400"
             }`}
           />
-          <span className="text-[9px] font-bold text-black leading-tight">
-            {isRecording ? "녹음 중" : isTranscribing ? "변환 중" : "말하기"}
-          </span>
+          <span className="text-[9px] font-bold text-black leading-tight">{micLabel}</span>
         </button>
 
         {/* Text input fallback */}
         <form
           onSubmit={(e) => {
             e.preventDefault();
+            interruptAuto();
             handleAnswerSubmit(textInput);
           }}
           className="flex-1 flex items-center gap-1.5"
@@ -287,6 +318,7 @@ export default function CreateConfirmPage() {
             type="text"
             value={textInput}
             onChange={(e) => setTextInput(e.target.value)}
+            onFocus={interruptAuto}
             placeholder="글자로 입력하셔도 돼요"
             disabled={isRecording || isTranscribing || isParsing}
             className="w-full px-2.5 py-1.5 border border-gray-300 rounded text-xs focus:outline-none focus:border-black bg-white"
@@ -410,7 +442,6 @@ export default function CreateConfirmPage() {
               )}
             </div>
 
-            {/* Follow-up question UI if time is missing */}
             {!time && missingField === "time" && (
               <div className="mt-1 p-3 bg-amber-50 border border-amber-200 rounded-lg flex flex-col gap-2">
                 {renderQuestionHeader(followUpQuestion || "언제 만나고 싶으세요?")}
@@ -478,7 +509,6 @@ export default function CreateConfirmPage() {
               )}
             </div>
 
-            {/* Follow-up question UI if location is missing */}
             {!location && missingField === "location" && (
               <div className="mt-1 p-3 bg-amber-50 border border-amber-200 rounded-lg flex flex-col gap-2">
                 {renderQuestionHeader(followUpQuestion || "어디서 만나고 싶으세요?")}
@@ -546,7 +576,6 @@ export default function CreateConfirmPage() {
               )}
             </div>
 
-            {/* Follow-up question UI if activity is missing */}
             {!activity && missingField === "activity" && (
               <div className="mt-1 p-3 bg-amber-50 border border-amber-200 rounded-lg flex flex-col gap-2">
                 {renderQuestionHeader(followUpQuestion || "무엇을 하고 싶으세요?")}
