@@ -10,7 +10,7 @@ export default function BottomNavFive({ active }: BottomNavFiveProps) {
     { label: "홈", href: "/home", key: "home" },
     { label: "내 동행", href: "/my-meetups", key: "my-meetups" },
     { label: "내정보", href: null, key: "my-info" },
-    { label: "만들기", href: "/signup", key: "create" },
+    { label: "만들기", href: "/create/speak", key: "create" },
   ];
 
   return (
