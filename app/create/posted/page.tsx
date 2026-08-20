@@ -17,19 +17,22 @@ const DEFAULT_MEETUP: MeetupData = {
   locationName: "송정 오일장 · 걸어서 12분",
 };
 
-function buildPayload(draft: { time?: string; location?: string; activity?: string }) {
+function buildPayload(draft: {
+  time?: string;
+  location?: string;
+  activity?: string;
+  startTime?: string;
+  maxPeople?: number;
+}) {
   const rawTime = draft.time || "오후 3시";
   const rawActivity = draft.activity || "오일장 구경";
   const rawLocation = draft.location || "송정 오일장";
 
-  // ponytail: 종료 시각을 계산할 실제 소요시간 데이터가 없어 "~ 4시"를 지어낼 수 없다.
-  // Figma 예시값(오후 3시 ~ 4시)과 일치할 때만 그 문구를 그대로 쓰고, 그 외엔 시작 시각만 보여준다.
+  // 04_얼마나 걸릴까요 화면이 계산해둔 startTime("오늘 오후 3시 ~ 5시")을 그대로 쓴다.
+  // 그 화면을 안 거친 경로(01_타이핑 등)는 시작 시각만 표기 — 종료 시각을 지어내지 않는다.
   const dayPrefix = rawTime.includes("오늘") || rawTime.includes("내일") ? "" : "오늘 ";
-  const startTime = rawTime.includes("~")
-    ? rawTime
-    : rawTime.includes("3시")
-    ? `${dayPrefix}${rawTime} ~ 4시`
-    : `${dayPrefix}${rawTime}`;
+  const startTime =
+    draft.startTime || (rawTime.includes("~") ? rawTime : `${dayPrefix}${rawTime}`);
 
   const activity = rawActivity.includes("같이 하실 분")
     ? rawActivity
@@ -39,15 +42,30 @@ function buildPayload(draft: { time?: string; location?: string; activity?: stri
     ? rawLocation
     : `${rawLocation} · 걸어서 12분`;
 
-  return { startTime, activity, locationName };
+  return {
+    startTime,
+    activity,
+    locationName,
+    ...(typeof draft.maxPeople === "number" ? { maxPeople: draft.maxPeople } : {}),
+  };
 }
 
 export default function CreatePostedPage() {
   const [meetup, setMeetup] = useState<MeetupData>(DEFAULT_MEETUP);
   const [status, setStatus] = useState<"idle" | "posting" | "success" | "error">("idle");
-  const [payload, setPayload] = useState<{ startTime: string; activity: string; locationName: string } | null>(null);
+  const [payload, setPayload] = useState<{
+    startTime: string;
+    activity: string;
+    locationName: string;
+    maxPeople?: number;
+  } | null>(null);
 
-  const submit = (body: { startTime: string; activity: string; locationName: string }) => {
+  const submit = (body: {
+    startTime: string;
+    activity: string;
+    locationName: string;
+    maxPeople?: number;
+  }) => {
     setStatus("posting");
     fetch("/api/meetups", {
       method: "POST",

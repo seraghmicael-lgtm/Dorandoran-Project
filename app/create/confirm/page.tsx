@@ -244,7 +244,7 @@ export default function CreateConfirmPage() {
       activity: activity!,
     };
     sessionStorage.setItem("dorandoran_meetup_draft", JSON.stringify(draftData));
-    router.push("/create/posted");
+    router.push("/create/duration");
   };
 
   const renderFollowUpInput = () => (
