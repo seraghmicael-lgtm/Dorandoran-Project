@@ -15,6 +15,8 @@ interface GoogleMapProps {
   width?: string;
   height?: string;
   className?: string;
+  /** 서버 컴포넌트가 런타임 env에서 읽어 내려주는 키. 빌드타임 인라인에 의존하지 않는다. */
+  apiKey?: string;
 }
 
 let scriptPromise: Promise<void> | null = null;
@@ -55,12 +57,13 @@ export default function GoogleMap({
   width = "w-full",
   height = "h-[149px]",
   className = "rounded",
+  apiKey: apiKeyProp,
 }: GoogleMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const [mapError, setMapError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  const apiKey = apiKeyProp || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
   useEffect(() => {
     if (!apiKey || lat == null || lng == null) {

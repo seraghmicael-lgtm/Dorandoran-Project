@@ -21,11 +21,21 @@ export async function POST(request: Request) {
       );
     }
 
+    // 확장자는 실제 MIME 타입에서 유도한다 — iOS Safari는 audio/mp4로 녹음하는데
+    // 무조건 .webm으로 이름 붙이면 Whisper가 포맷 불일치로 거부한다.
+    const mime = file.type || "audio/webm";
+    const ext = mime.includes("mp4") || mime.includes("m4a") || mime.includes("aac")
+      ? "m4a"
+      : mime.includes("mpeg") || mime.includes("mp3")
+      ? "mp3"
+      : mime.includes("ogg")
+      ? "ogg"
+      : mime.includes("wav")
+      ? "wav"
+      : "webm";
+
     const openAiFormData = new FormData();
-    const audioFile =
-      file instanceof File
-        ? file
-        : new File([file], "recording.webm", { type: file.type || "audio/webm" });
+    const audioFile = new File([file], `recording.${ext}`, { type: mime });
 
     openAiFormData.append("file", audioFile);
     openAiFormData.append("model", "whisper-1");

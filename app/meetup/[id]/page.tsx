@@ -49,7 +49,13 @@ export default async function MeetupDetailPage({
 
         {/* Map placeholder */}
         {/* ponytail: 나중에 Geocoding API로 교체 */}
-        <GoogleMap lat={37.38} lng={127.12} height="h-[149px]" className="rounded" />
+        <GoogleMap
+          lat={37.38}
+          lng={127.12}
+          height="h-[149px]"
+          className="rounded"
+          apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
+        />
       </div>
 
       {/* Action Buttons */}
