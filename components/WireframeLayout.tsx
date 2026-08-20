@@ -17,7 +17,7 @@ const JUSTIFY = { between: "justify-between", center: "justify-center", start: "
 const ITEMS = { start: "", center: "items-center" };
 
 function activeTabFiveFor(pathname: string): "home" | "my-meetups" | "my-info" | "create" | undefined {
-  if (pathname.startsWith("/home")) return "home";
+  if (pathname.startsWith("/home") || pathname.startsWith("/meetup")) return "home";
   if (pathname.startsWith("/my-meetups")) return "my-meetups";
   if (pathname.startsWith("/create")) return "create";
   return undefined;
@@ -38,7 +38,7 @@ export default function WireframeLayout({
 }: WireframeLayoutProps) {
   const pathname = usePathname();
 
-  const effectiveNav = bottomNav ?? (pathname.startsWith("/my-meetups") ? "three" : "five");
+  const effectiveNav = bottomNav ?? "five";
 
   return (
     <div className="min-h-screen bg-gray-100 text-black flex justify-center items-start">

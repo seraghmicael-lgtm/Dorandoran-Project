@@ -3,7 +3,7 @@ import WireframeLayout from "@/components/WireframeLayout";
 
 export default function SplashPage() {
   return (
-    <WireframeLayout className="p-6 flex flex-col justify-between">
+    <WireframeLayout bottomNav="none" className="p-6 flex flex-col justify-between">
       <div className="flex-1 flex flex-col justify-center gap-4 py-12">
         <h1 className="text-2xl font-bold text-black leading-tight">
           오늘 같이할 사람 찾기

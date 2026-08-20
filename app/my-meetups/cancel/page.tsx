@@ -3,7 +3,7 @@ import WireframeLayout from "@/components/WireframeLayout";
 
 export default function CancelMeetupPage() {
   return (
-    <WireframeLayout className="p-6 flex flex-col justify-between">
+    <WireframeLayout bottomNav="none" className="p-6 flex flex-col justify-between">
       <div className="flex-1 flex flex-col justify-center gap-4 py-12">
         <h1 className="text-xl font-bold text-black leading-tight">
           못 가시는군요

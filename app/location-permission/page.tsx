@@ -51,7 +51,7 @@ function LocationPermissionContent() {
   };
 
   return (
-    <WireframeLayout justify="between" className="p-6">
+    <WireframeLayout justify="between" bottomNav="none" className="p-6">
       <div className="flex-1 flex flex-col justify-center gap-4 py-12">
         <h1 className="text-xl font-bold text-black leading-tight">
           가까운 것만 보여드릴게요

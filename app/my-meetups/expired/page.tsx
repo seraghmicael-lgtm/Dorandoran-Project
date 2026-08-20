@@ -4,7 +4,7 @@ import HeaderBack from "@/components/HeaderBack";
 
 export default function ExpiredNotificationPage() {
   return (
-    <WireframeLayout justify="start" className="flex flex-col">
+    <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
       <HeaderBack title="알림" backHref="/my-meetups" />
 
       <div className="p-4 flex flex-col gap-6">
