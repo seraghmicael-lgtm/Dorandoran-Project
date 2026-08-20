@@ -22,6 +22,7 @@ export default function CreateListeningPage() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
+  const stopRequestedRef = useRef(false);
 
   // TTS Ref for fallback instruction
   const ttsAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -89,6 +90,7 @@ export default function CreateListeningPage() {
 
   const startFallbackRecording = async () => {
     try {
+      stopRequestedRef.current = false;
       setFallbackFailed(false);
       audioChunksRef.current = [];
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -148,6 +150,10 @@ export default function CreateListeningPage() {
 
       mediaRecorder.start();
       setIsRecording(true);
+
+      if (stopRequestedRef.current) {
+        mediaRecorder.stop();
+      }
     } catch (err) {
       console.error("Failed to access microphone for fallback recording:", err);
       setFallbackFailed(true);
@@ -157,6 +163,8 @@ export default function CreateListeningPage() {
   const stopFallbackRecording = () => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
       mediaRecorderRef.current.stop();
+    } else {
+      stopRequestedRef.current = true;
     }
   };
 

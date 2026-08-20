@@ -65,7 +65,10 @@ Instructions:
 1. Parse the user's input transcript for time, location, or activity.
 2. If an existing field is already provided and not null, keep it UNLESS the transcript explicitly provides a new value for that field.
 3. Return ONLY a JSON object with these exact five keys:
-   - "time": string or null (e.g. "오후 3시", "오늘 15시", "내일 오전 10시")
+   - "time": string or null — a time-of-day only, WITHOUT any day word (no "오늘"/"내일"/etc).
+     The screen that displays this always prefixes it with a fixed "오늘" label, so including a day
+     word here would duplicate or contradict it. e.g. "오후 3시", "저녁 6시", "오전 10시".
+     If the user mentions a different day (e.g. "내일"), still extract only the time-of-day part.
    - "location": string or null (e.g. "송정 오일장", "우리 아파트 앞")
    - "activity": string or null (e.g. "오일장 구경", "산책")
    - "missingField": "time" | "location" | "activity" | null

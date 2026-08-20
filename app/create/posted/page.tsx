@@ -22,11 +22,14 @@ function buildPayload(draft: { time?: string; location?: string; activity?: stri
   const rawActivity = draft.activity || "오일장 구경";
   const rawLocation = draft.location || "송정 오일장";
 
+  // ponytail: 종료 시각을 계산할 실제 소요시간 데이터가 없어 "~ 4시"를 지어낼 수 없다.
+  // Figma 예시값(오후 3시 ~ 4시)과 일치할 때만 그 문구를 그대로 쓰고, 그 외엔 시작 시각만 보여준다.
+  const dayPrefix = rawTime.includes("오늘") || rawTime.includes("내일") ? "" : "오늘 ";
   const startTime = rawTime.includes("~")
     ? rawTime
-    : rawTime.includes("오늘") || rawTime.includes("내일")
-    ? `${rawTime} ~ 4시`
-    : `오늘 ${rawTime} ~ 4시`;
+    : rawTime.includes("3시")
+    ? `${dayPrefix}${rawTime} ~ 4시`
+    : `${dayPrefix}${rawTime}`;
 
   const activity = rawActivity.includes("같이 하실 분")
     ? rawActivity
@@ -84,6 +87,7 @@ export default function CreatePostedPage() {
       submit(body);
     } catch (e) {
       console.error("Invalid meetup draft JSON:", e);
+      setStatus("error");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -156,7 +160,7 @@ export default function CreatePostedPage() {
         {/* Action buttons */}
         <div className="w-full flex flex-col gap-3 pt-2">
           <Link
-            href="/my-meetups"
+            href="/my-meetups/created"
             className="w-full h-[53px] bg-black text-white flex items-center justify-center rounded text-sm font-medium"
           >
             내 동행 보기

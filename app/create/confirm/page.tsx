@@ -35,6 +35,7 @@ export default function CreateConfirmPage() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
+  const stopRequestedRef = useRef(false);
 
   // TTS audio playback states & refs
   const ttsAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -133,6 +134,10 @@ export default function CreateConfirmPage() {
           activity: overrideValues?.activity !== undefined ? overrideValues.activity : activity,
         }),
       });
+      if (!res.ok) {
+        console.error("parse-meetup returned an error status:", res.status);
+        return;
+      }
       const data = await res.json();
       applyParsedData(data);
     } catch (err) {
@@ -160,6 +165,7 @@ export default function CreateConfirmPage() {
 
   const startAnswerRecording = async () => {
     try {
+      stopRequestedRef.current = false;
       audioChunksRef.current = [];
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
@@ -210,6 +216,10 @@ export default function CreateConfirmPage() {
 
       mediaRecorder.start();
       setIsRecording(true);
+
+      if (stopRequestedRef.current) {
+        mediaRecorder.stop();
+      }
     } catch (err) {
       console.error("Microphone access failed for answer recording:", err);
     }
@@ -218,6 +228,8 @@ export default function CreateConfirmPage() {
   const stopAnswerRecording = () => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
       mediaRecorderRef.current.stop();
+    } else {
+      stopRequestedRef.current = true;
     }
   };
 
