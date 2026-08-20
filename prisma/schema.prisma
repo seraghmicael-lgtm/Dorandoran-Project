@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  nickname     String
+  lat          Float?
+  lng          Float?
+  neighborhood String?
+  createdAt    DateTime @default(now())
+
+  meetups       Meetup[]       @relation("CreatedMeetups")
+  participation Participant[]
+}
+
+model Meetup {
+  id            String   @id @default(cuid())
+  activity      String
+  startTime     String
+  locationName  String?
+  lat           Float?
+  lng           Float?
+  maxPeople     Int      @default(3)
+  status        String   @default("open") // open | matched | expired | cancelled
+  createdAt     DateTime @default(now())
+
+  creatorId String
+  creator   User   @relation("CreatedMeetups", fields: [creatorId], references: [id])
+
+  participants Participant[]
+}
+
+model Participant {
+  id       String   @id @default(cuid())
+  meetupId String
+  userId   String
+  joinedAt DateTime @default(now())
+
+  meetup Meetup @relation(fields: [meetupId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([meetupId, userId])
+}
