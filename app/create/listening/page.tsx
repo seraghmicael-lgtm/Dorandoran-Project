@@ -4,19 +4,24 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import WireframeLayout from "@/components/WireframeLayout";
 import HeaderBack from "@/components/HeaderBack";
-import { listenOnce, ListenHandle } from "@/lib/voice";
+import { listenOnce, unlockAudio, ListenHandle } from "@/lib/voice";
 
 type Phase = "starting" | "recording" | "transcribing" | "mic-error" | "voice-error";
 
 export default function CreateListeningPage() {
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>("starting");
+  const [liveText, setLiveText] = useState("");
   const handleRef = useRef<ListenHandle | null>(null);
   const unmountedRef = useRef(false);
 
   const startListen = () => {
     setPhase("starting");
+    setLiveText("");
     const handle = listenOnce({
+      onPartial: (text) => {
+        if (!unmountedRef.current) setLiveText(text);
+      },
       onTranscribing: () => {
         if (!unmountedRef.current) setPhase("transcribing");
       },
@@ -46,6 +51,7 @@ export default function CreateListeningPage() {
   }, []);
 
   const handleFinish = () => {
+    unlockAudio();
     if (phase === "transcribing") return;
     if (phase === "mic-error" || phase === "voice-error") {
       startListen();
@@ -85,7 +91,9 @@ export default function CreateListeningPage() {
             말씀하신 대로 적고 있어요
           </span>
           <p className="text-sm font-bold text-black">
-            {phase === "transcribing" ? "말씀을 글로 옮기고 있어요..." : "세 시에 오일장 구경 같이"}
+            {phase === "transcribing"
+              ? "말씀을 글로 옮기고 있어요..."
+              : liveText || "세 시에 오일장 구경 같이"}
           </p>
           <p className="text-sm text-gray-400">…</p>
         </div>

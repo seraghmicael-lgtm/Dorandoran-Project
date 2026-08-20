@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
 import HeaderBack from "@/components/HeaderBack";
-import { listenOnce, ListenHandle } from "@/lib/voice";
+import { listenOnce, playTts, stopTts, unlockAudio, ListenHandle } from "@/lib/voice";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -46,10 +46,6 @@ export default function CreateConfirmPage() {
   const emptyCountRef = useRef(0);
   const unmountedRef = useRef(false);
 
-  // TTS audio playback refs
-  const ttsAudioRef = useRef<HTMLAudioElement | null>(null);
-  const currentTtsUrlRef = useRef<string | null>(null);
-
   const activeQuestion = missingField
     ? missingField === "time"
       ? followUpQuestion || "언제 만나고 싶으세요?"
@@ -58,58 +54,9 @@ export default function CreateConfirmPage() {
       : followUpQuestion || "무엇을 하고 싶으세요?"
     : null;
 
-  /** 질문을 음성으로 재생하고 끝날 때까지 기다린다. 재생 성공 여부 반환. */
-  const speakQuestion = async (questionText: string): Promise<boolean> => {
-    if (!questionText) return false;
-    try {
-      const res = await fetch("/api/tts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: questionText }),
-      });
-      if (!res.ok) return false;
-
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      if (currentTtsUrlRef.current) URL.revokeObjectURL(currentTtsUrlRef.current);
-      currentTtsUrlRef.current = url;
-
-      const audio = ttsAudioRef.current;
-      if (!audio) return false;
-      audio.src = url;
-
-      return await new Promise<boolean>((resolve) => {
-        const onEnded = () => {
-          cleanup();
-          resolve(true);
-        };
-        const onError = () => {
-          cleanup();
-          resolve(false);
-        };
-        const cleanup = () => {
-          audio.removeEventListener("ended", onEnded);
-          audio.removeEventListener("error", onError);
-        };
-        audio.addEventListener("ended", onEnded);
-        audio.addEventListener("error", onError);
-        audio.play().catch(() => {
-          cleanup();
-          resolve(false);
-        });
-      });
-    } catch {
-      return false;
-    }
-  };
-
   const handleReplayTts = () => {
-    if (ttsAudioRef.current && ttsAudioRef.current.src) {
-      ttsAudioRef.current.currentTime = 0;
-      ttsAudioRef.current.play().catch(() => {});
-    } else if (activeQuestion) {
-      speakQuestion(activeQuestion);
-    }
+    unlockAudio(); // 버튼 클릭 = 제스처 — 이후 자동 낭독·감지도 함께 해금된다
+    if (activeQuestion) playTts(activeQuestion);
   };
 
   const applyParsedData = (data: any) => {
@@ -165,8 +112,7 @@ export default function CreateConfirmPage() {
       turnTokenRef.current++;
       autoHandleRef.current?.cancel();
       manualHandleRef.current?.cancel();
-      if (ttsAudioRef.current) ttsAudioRef.current.pause();
-      if (currentTtsUrlRef.current) URL.revokeObjectURL(currentTtsUrlRef.current);
+      stopTts();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -190,9 +136,14 @@ export default function CreateConfirmPage() {
     setIsTranscribing(false);
 
     if (token !== turnTokenRef.current || unmountedRef.current) return;
-    if (noVad || micDenied) {
-      // 이 기기에선 자동 듣기가 불가능 — 누르고 말하기/글자 입력으로 조용히 폴백
+    if (micDenied) {
+      // 마이크가 거부된 기기 — 누르고 말하기/글자 입력으로 조용히 폴백
       autoDisabledRef.current = true;
+      return;
+    }
+    if (noVad) {
+      // 이번엔 침묵 감지가 안 됐지만, 사용자가 버튼을 눌러 오디오가 해금되면
+      // 다음 턴에는 될 수 있으므로 영구 비활성화하지 않는다
       return;
     }
     if (answer) {
@@ -209,7 +160,8 @@ export default function CreateConfirmPage() {
   /** 대화 턴: 질문을 말하고, 끝나면 자동으로 듣는다 */
   const runTurn = async (question: string) => {
     const token = ++turnTokenRef.current;
-    const played = await speakQuestion(question);
+    emptyCountRef.current = 0; // "두 번 못 알아들으면 이번 턴 중단"은 턴마다 새로 센다
+    const played = await playTts(question);
     if (token !== turnTokenRef.current || unmountedRef.current) return;
     if (autoDisabledRef.current) return;
     if (!played) await sleep(600); // 자동재생이 막혔으면 질문을 읽을 시간을 준다
@@ -229,10 +181,11 @@ export default function CreateConfirmPage() {
     autoHandleRef.current?.cancel();
     autoHandleRef.current = null;
     setAutoListening(false);
-    if (ttsAudioRef.current) ttsAudioRef.current.pause();
+    stopTts();
   };
 
   const startManualRecording = () => {
+    unlockAudio();
     interruptAuto();
     const handle = listenOnce({
       silenceMs: 600000, // 수동 모드: 손을 뗄 때까지 듣는다
@@ -363,7 +316,6 @@ export default function CreateConfirmPage() {
   return (
     <WireframeLayout justify="start" className="flex flex-col">
       <HeaderBack title="이렇게 들었어요" backHref="/create/listening" />
-      <audio ref={ttsAudioRef} hidden />
 
       <div className="p-4 flex flex-col items-center gap-5">
         {/* User raw input */}
