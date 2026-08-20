@@ -1,0 +1,9 @@
+Figma node: 732:517 | name: 참여 취소 | size: 375x812
+
+- TEXT: "못 가시는군요"
+- TEXT: "다른 분들께는 "한 분이 못 오시게 됐어요"만 전해요."
+- GROUP "Frame 48" 327x134
+  - GROUP "Frame" 327x60
+    - TEXT: "못 간다고 알리기"
+  - GROUP "Frame" 327x60
+    - TEXT: "그냥 갈게요"

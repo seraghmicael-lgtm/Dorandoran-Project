@@ -1,16 +1,15 @@
 import React from "react";
 import Link from "next/link";
 
-interface BottomNavFiveProps {
-  active?: "home" | "my-meetups" | "my-info" | "create";
+interface BottomNavThreeProps {
+  active?: "home" | "my-meetups" | "more";
 }
 
-export default function BottomNavFive({ active }: BottomNavFiveProps) {
+export default function BottomNavThree({ active }: BottomNavThreeProps) {
   const items = [
     { label: "홈", href: "/home", key: "home" },
     { label: "내 동행", href: "/my-meetups", key: "my-meetups" },
-    { label: "내정보", href: null, key: "my-info" },
-    { label: "만들기", href: "/signup", key: "create" },
+    { label: "더보기", href: null, key: "more" },
   ];
 
   return (

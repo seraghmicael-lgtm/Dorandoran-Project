@@ -1,0 +1,14 @@
+Figma node: 732:500 | name: 내 동행 | size: 375x812
+
+- TEXT: "오늘 나가실 동행"
+- GROUP "Frame" 327x177
+  - TEXT: "오늘 3시 · 오일장 구경"
+  - TEXT: "신사시장 정문 · 걸어서 8분"
+  - TEXT: "3명 중 2명 · 한 분 더"
+  - GROUP "Frame" 295x60
+    - TEXT: "동행 취소하기"
+- GROUP "sp" 327x452
+- GROUP "Frame" 327x53
+  - TEXT: "홈"
+  - TEXT: "내 동행"
+  - TEXT: "더보기"

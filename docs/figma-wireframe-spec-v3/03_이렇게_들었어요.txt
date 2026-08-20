@@ -1,0 +1,37 @@
+Figma node: 744:16 | name: 03_이렇게 들었어요 | size: 375x812
+
+- GROUP "navbar" 375x75
+  - TEXT: "←"
+  - TEXT: "이렇게 들었어요"
+- GROUP "content" 375x737
+  - GROUP "Frame" 343x74
+    - TEXT: "말씀하신 내용"
+    - TEXT: "“세 시에 오일장 구경 같이 해요”"
+  - GROUP "sp" 343x16
+  - GROUP "Frame" 343x192
+    - GROUP "Frame" 313x41
+      - GROUP "Frame" 147x41
+        - TEXT: "오늘"
+        - GROUP "Frame" 85x41
+          - TEXT: "오후 3시"
+        - TEXT: "에"
+      - GROUP "Frame" 50x25
+        - TEXT: "고치기"
+    - GROUP "Frame" 313x55
+      - TEXT: "어디서 만날까요?"
+      - TEXT: "찾기"
+    - GROUP "Frame" 313x41
+      - GROUP "Frame" 200x41
+        - GROUP "Frame" 107x41
+          - TEXT: "오일장 구경"
+        - TEXT: "같이 하실 분"
+      - GROUP "Frame" 50x25
+        - TEXT: "고치기"
+  - GROUP "sp" 343x13
+  - GROUP "sp" 343x10
+  - GROUP "sp" 343x20
+  - GROUP "sp" 343x10
+  - GROUP "Frame" 343x53
+    - TEXT: "올리기"
+  - GROUP "Frame" 343x50
+    - TEXT: "다시 말할래요"

@@ -1,0 +1,24 @@
+Figma node: 747:213 | name: 07_불발 알림 | size: 375x812
+
+- GROUP "navbar" 375x75
+  - TEXT: "←"
+  - TEXT: "알림"
+- GROUP "content" 375x737
+  - GROUP "Frame" 343x135
+    - TEXT: "오후 3시 오일장 동행, 시간이 지나 목록에서 내렸어요"
+    - TEXT: "기록은 남기지 않았어요. 언제든 다시 열 수 있어요."
+  - GROUP "sp" 343x14
+  - GROUP "Frame" 343x49
+    - TEXT: "같은 내용으로 다시 열기"
+  - GROUP "sp" 343x24
+  - TEXT: "비슷한 시간에 열린 동행"
+  - GROUP "sp" 343x9
+  - GROUP "Frame" 343x102
+    - TEXT: "오후 4시 30분 ~ 5시"
+    - TEXT: "저녁 장보기 같이 가실 분"
+    - TEXT: "도란마트 · 걸어서 6분 · 두 자리 남았어요"
+  - GROUP "sp" 343x9
+  - GROUP "Frame" 343x102
+    - TEXT: "내일 오전 10시 ~ 11시"
+    - TEXT: "아침 산책 같이 걸어요"
+    - TEXT: "도토리마을 공원 · 걸어서 4분 · 한 자리 남았어요"

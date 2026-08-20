@@ -1,0 +1,30 @@
+Figma node: 744:15 | name: 02_듣는 중 | size: 375x812
+
+- GROUP "navbar" 375x75
+  - TEXT: "←"
+  - TEXT: "듣고 있어요"
+- GROUP "content" 375x737
+  - GROUP "sp" 343x24
+  - GROUP "Frame" 343x168
+    - GROUP "Frame" 126x126
+      - GROUP "Frame" 55x50
+        - BOX (Rectangle) 5x16
+        - BOX (Rectangle) 5x34
+        - BOX (Rectangle) 5x50
+        - BOX (Rectangle) 5x28
+        - BOX (Rectangle) 5x42
+        - BOX (Rectangle) 5x20
+    - TEXT: "듣고 있어요"
+  - GROUP "sp" 343x26
+  - GROUP "Frame" 343x121
+    - TEXT: "말씀하신 대로 적고 있어요"
+    - TEXT: "세 시에 오일장 구경 같이"
+    - TEXT: "…"
+  - GROUP "sp" 343x28
+  - GROUP "Frame" 343x53
+    - TEXT: "다 말했어요"
+  - GROUP "sp" 343x10
+  - GROUP "Frame" 343x50
+    - TEXT: "손으로 쓸래요"
+  - GROUP "sp" 343x9
+  - TEXT: "소리 내기 어려운 곳이면 손으로 쓰셔도 돼요"

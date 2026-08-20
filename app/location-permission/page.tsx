@@ -23,16 +23,10 @@ export default async function LocationPermissionPage({
 
       <div className="flex flex-col gap-3 pb-8 items-center">
         <Link
-          href={`/notification-permission?next=${encodeURIComponent(nextHref)}`}
+          href={nextHref}
           className="w-full h-[60px] bg-black text-white flex items-center justify-center rounded text-base font-medium"
         >
           위치 허용하기
-        </Link>
-        <Link
-          href="/location/manual"
-          className="text-sm text-gray-500 underline py-2"
-        >
-          직접 입력
         </Link>
       </div>
     </WireframeLayout>

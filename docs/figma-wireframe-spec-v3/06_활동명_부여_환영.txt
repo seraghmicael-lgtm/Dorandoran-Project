@@ -1,0 +1,6 @@
+Figma node: 732:530 | name: 06_활동명 부여 (환영) | size: 375x812
+
+- TEXT: "즐거운다람쥐님 환영합니다"
+- GROUP "btn/확인" 327x50
+  - TEXT: "확인"
+- GROUP "Group 6" 117x117

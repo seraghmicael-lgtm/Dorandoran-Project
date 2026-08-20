@@ -24,7 +24,7 @@ export default function CancelMeetupPage() {
           href="/my-meetups"
           className="w-full h-[60px] bg-white text-black border border-black flex items-center justify-center rounded text-base font-medium"
         >
-          취소
+          그냥 갈게요
         </Link>
       </div>
     </WireframeLayout>

@@ -11,7 +11,6 @@ export default function HeaderNav() {
       </Link>
       <div className="flex items-center gap-3 text-sm text-gray-700">
         <span>알림</span>
-        <span>내 정보</span>
       </div>
     </header>
   );

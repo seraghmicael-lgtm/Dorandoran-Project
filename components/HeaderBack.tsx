@@ -9,7 +9,7 @@ interface HeaderBackProps {
 export default function HeaderBack({ title, backHref }: HeaderBackProps) {
   const content = (
     <header className="h-[65px] px-4 flex items-center gap-2 border-b border-gray-200 bg-white">
-      <span className={`text-lg text-black ${backHref ? "cursor-pointer" : ""}`}>◄</span>
+      <span className={`text-lg text-black ${backHref ? "cursor-pointer" : ""}`}>←</span>
       {title && <span className="text-base font-medium text-black">{title}</span>}
     </header>
   );

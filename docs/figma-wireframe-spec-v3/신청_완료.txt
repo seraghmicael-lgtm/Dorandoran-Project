@@ -1,0 +1,9 @@
+Figma node: 732:492 | name: 신청 완료 | size: 375x812
+
+- GROUP "sp" 327x221
+- TEXT: "참여 완료!"
+- TEXT: "오후 3시 30분 도란마트 정문 앞에서 만나요 30분 전에 알려드릴게요"
+- GROUP "sp" 327x221
+- GROUP "Frame 48" 327x60
+  - GROUP "Frame" 327x60
+    - TEXT: "확인"

@@ -1,0 +1,11 @@
+Figma node: 732:296 | name: 회원가입 | size: 375x812
+
+- TEXT: "이웃과 함께하려면 간단한 본인 확인이 필요해요"
+- TEXT: "이름과 연락처만 확인해요. 다른 정보는 받지 않아요."
+- GROUP "Frame 48" 327x208
+  - GROUP "Frame" 327x60
+    - TEXT: "카카오로 시작하기"
+  - GROUP "Frame" 327x60
+    - TEXT: "휴대폰 번호로 시작하기"
+  - GROUP "Frame" 327x60
+    - TEXT: "뒤로"

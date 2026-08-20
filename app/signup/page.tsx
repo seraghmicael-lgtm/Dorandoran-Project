@@ -1,38 +1,36 @@
 import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
-import { safeInternalPath } from "@/lib/safePath";
 
-export default async function NotificationPermissionPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ next?: string | string[] }>;
-}) {
-  const { next } = await searchParams;
-  const nextHref = safeInternalPath(next, "/welcome");
-
+export default function SignupPage() {
   return (
     <WireframeLayout justify="between" className="p-6">
       <div className="flex-1 flex flex-col justify-center gap-4 py-12">
         <h1 className="text-xl font-bold text-black leading-tight">
-          나가실 때 알려드릴게요
+          이웃과 함께하려면 간단한 본인 확인이 필요해요
         </h1>
         <p className="text-sm text-gray-600 leading-relaxed">
-          만나기 30분 전에 알려드려요. 알림은 언제든 끄실 수 있어요.
+          이름과 연락처만 확인해요. 다른 정보는 받지 않아요.
         </p>
       </div>
 
       <div className="flex flex-col gap-3 pb-8">
         <Link
-          href={nextHref}
+          href="/notification-permission?next=/welcome"
           className="w-full h-[60px] bg-black text-white flex items-center justify-center rounded text-base font-medium"
         >
-          허용
+          카카오로 시작하기
         </Link>
         <Link
-          href={nextHref}
+          href="/notification-permission?next=/welcome"
+          className="w-full h-[60px] bg-black text-white flex items-center justify-center rounded text-base font-medium"
+        >
+          휴대폰 번호로 시작하기
+        </Link>
+        <Link
+          href="/home"
           className="w-full h-[60px] bg-white text-black border border-black flex items-center justify-center rounded text-base font-medium"
         >
-          허용 안함
+          뒤로
         </Link>
       </div>
     </WireframeLayout>

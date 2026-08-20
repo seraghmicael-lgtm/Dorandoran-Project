@@ -1,0 +1,25 @@
+Figma node: 744:18 | name: 05_올렸어요 | size: 375x812
+
+- GROUP "navbar" 375x75
+  - TEXT: "올렸어요"
+- GROUP "content" 375x737
+  - GROUP "sp" 343x30
+  - GROUP "Frame" 343x122
+    - GROUP "Frame" 74x74
+      - TEXT: "✓"
+    - TEXT: "올렸어요"
+  - GROUP "sp" 343x22
+  - GROUP "Frame" 343x108
+    - TEXT: "오늘 오후 3시 ~ 4시"
+    - TEXT: "오일장 구경 같이 하실 분"
+    - TEXT: "송정 오일장 · 걸어서 12분"
+  - GROUP "sp" 343x18
+  - GROUP "Frame" 343x72
+    - TEXT: "사람이 모이면 알려드릴게요."
+    - TEXT: "안 모이면 조용히 사라져요. 기록도 안 남아요."
+  - GROUP "sp" 343x18
+  - GROUP "Frame" 343x53
+    - TEXT: "내 동행 보기"
+  - GROUP "sp" 343x10
+  - GROUP "Frame" 343x50
+    - TEXT: "홈으로"

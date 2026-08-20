@@ -1,0 +1,35 @@
+Figma node: 732:263 | name: 상세 확인 | size: 375x812
+
+- GROUP "Frame 110" 327x68
+  - TEXT: "오후 3시 30분"
+  - TEXT: "도란마트 장보러 가요"
+- GROUP "Frame 62" 327x291
+  - GROUP "Frame 109" 327x291
+    - GROUP "Frame" 327x47
+      - TEXT: "만드신 분"
+      - GROUP "Frame 88" 231x23
+        - TEXT: "봄날의햇살 님"
+    - GROUP "Frame" 327x47
+      - TEXT: "걸리는 시간"
+      - TEXT: "1시간 이상"
+    - GROUP "Frame" 327x47
+      - TEXT: "모임인원"
+      - TEXT: "2 / 3명"
+    - GROUP "Frame" 327x47
+      - TEXT: "거리"
+      - TEXT: "걸어서 8분"
+    - GROUP "Frame" 327x47
+      - TEXT: "만나는 곳"
+      - GROUP "Frame 75" 231x23
+        - TEXT: "도란마트 정문 앞"
+        - GROUP "Frame 74" 68x23
+          - TEXT: "길찾기"
+          - GROUP "icon / feathericons / chevron-right" 22x22
+- GROUP "Group 5" 327x149
+  - BOX (Rectangle 17) 327x149
+  - TEXT: "map"
+- GROUP "Frame 111" 327x134
+  - GROUP "Frame" 327x60
+    - TEXT: "참여하기"
+  - GROUP "Frame" 327x60
+    - TEXT: "다른 동행 보기"

@@ -1,0 +1,25 @@
+Figma node: 744:14 | name: 01_말하기 | size: 375x812
+
+- GROUP "navbar" 375x75
+  - TEXT: "←"
+  - TEXT: "동행 만들기"
+- GROUP "content" 375x737
+  - TEXT: "무엇을 같이 하고 싶으세요?"
+  - GROUP "sp" 343x18
+  - GROUP "Frame" 343x87
+    - TEXT: "이렇게 말씀하시면 돼요"
+    - TEXT: "“오후 세 시에 오일장 구경같이 해요”"
+  - GROUP "sp" 343x30
+  - GROUP "Frame" 343x150
+    - GROUP "Frame" 150x150
+      - GROUP "Ellipse" 30x30
+      - TEXT: "누르고 말하기"
+  - GROUP "sp" 343x26
+  - GROUP "Frame" 343x50
+    - TEXT: "손으로 쓸래요"
+  - GROUP "sp" 343x8
+  - GROUP "sp" 343x8
+  - GROUP "sp" 343x20
+  - GROUP "Frame" 343x72
+    - TEXT: "사람이 안 모이면 조용히 사라져요."
+    - TEXT: "아무도 모르니 편하게 올려보세요."

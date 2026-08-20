@@ -1,0 +1,40 @@
+Figma node: 747:160 | name: 06_손으로 쓰기 (폴백) | size: 375x812
+
+- GROUP "navbar" 375x75
+  - TEXT: "←"
+  - TEXT: "손으로 쓰기"
+- GROUP "content" 375x737
+  - GROUP "문장 채우기" 343x230
+    - GROUP "Frame" 313x40
+      - GROUP "Frame" 149x40
+        - TEXT: "오늘"
+        - GROUP "Frame" 87x40
+          - TEXT: "오후 3시"
+        - TEXT: "에"
+      - GROUP "Frame" 50x25
+        - TEXT: "고치기"
+    - GROUP "Frame" 313x40
+      - GROUP "Frame" 167x40
+        - GROUP "Frame" 128x40
+          - TEXT: "우리 아파트 앞"
+        - TEXT: "에서"
+      - GROUP "Frame" 50x25
+        - TEXT: "고치기"
+    - GROUP "빈 칸" 313x60
+      - TEXT: "무엇을 할까요?"
+    - TEXT: "같이 하실 분"
+  - GROUP "sp" 343x22
+  - GROUP "sp" 343x9
+  - GROUP "sp" 343x16
+  - GROUP "말로 채우기" 343x44
+    - GROUP "Ellipse" 12x12
+    - TEXT: "다시 말로 할래요"
+  - GROUP "sp" 343x9
+  - TEXT: "말하기가 편하시면 언제든 위 버튼으로 돌아가세요"
+  - GROUP "sp" 343x16
+  - GROUP "안심 문구" 343x72
+    - TEXT: "사람이 안 모이면 조용히 사라져요."
+    - TEXT: "아무도 모르니 편하게 올려보세요."
+  - GROUP "sp" 343x14
+  - GROUP "올리기" 343x52
+    - TEXT: "올리기"

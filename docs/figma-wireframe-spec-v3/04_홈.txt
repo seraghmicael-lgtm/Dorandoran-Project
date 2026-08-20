@@ -1,0 +1,79 @@
+Figma node: 722:285 | name: 04_홈 | size: 375x812
+
+- TEXT: "로고"
+- TEXT: "알림"
+- BOX (divider) 375x1
+- GROUP "Frame 92" 375x817
+  - GROUP "Frame 94" 375x30
+    - TEXT: "오늘, 송정동 마실 어떠세요?"
+  - BOX (Rectangle 198) 375x8
+  - GROUP "Frame 95" 375x749
+    - GROUP "Frame" 335x749
+      - GROUP "카드/뜨개질 같이 해요" 335x151
+        - GROUP "Frame 97" 307x119
+          - GROUP "Frame 106" 307x23
+            - GROUP "Frame 108" 65x22
+              - TEXT: "오후 3시"
+            - TEXT: "2 / 3명"
+          - GROUP "Frame 111" 210x84
+            - TEXT: "뜨개질 같이 해요"
+            - TEXT: "예상 시간 : 1시간"
+            - GROUP "Frame 107" 210x23
+              - TEXT: "동사무소 시민회의실"
+              - TEXT: "ㆍ"
+              - TEXT: "걸어서 8분"
+      - GROUP "카드/뜨개질 같이 해요" 335x151
+        - GROUP "Frame 97" 307x119
+          - GROUP "Frame 106" 307x23
+            - GROUP "Frame 108" 107x22
+              - TEXT: "오후 3시 30분"
+            - TEXT: "2 / 3명"
+          - GROUP "Frame 111" 175x84
+            - TEXT: "강아지 산책하러 가요"
+            - TEXT: "예상 시간 : 1시간"
+            - GROUP "Frame 107" 151x23
+              - TEXT: "도토리공원"
+              - TEXT: "ㆍ"
+              - TEXT: "걸어서 5분"
+      - GROUP "카드/뜨개질 같이 해요" 335x151
+        - GROUP "Frame 97" 307x119
+          - GROUP "Frame 106" 307x23
+            - TEXT: "오후 3시 30분"
+            - TEXT: "2 / 3명"
+          - GROUP "Frame 111" 186x84
+            - TEXT: "도란마트 장보러 가요"
+            - TEXT: "예상 시간 : 1시간"
+            - GROUP "Frame 107" 186x23
+              - TEXT: "도란마트 정문 앞"
+              - TEXT: "ㆍ"
+              - TEXT: "걸어서 4분"
+      - GROUP "카드/반찬 나눔" 335x124
+        - TEXT: "Adㆍ동네광고"
+        - TEXT: "아픈 허리 잘 낫는 병원"
+        - BOX (Rectangle 29) 87x94
+        - TEXT: "우리동네병원 정형외과"
+      - GROUP "카드/뜨개질 같이 해요" 335x124
+        - GROUP "Frame 97" 307x92
+          - GROUP "Frame 106" 307x23
+            - GROUP "Frame 108" 139x22
+              - TEXT: "오후 5시"
+              - TEXT: "~"
+              - TEXT: "5시 30분"
+            - TEXT: "2 / 3명"
+          - GROUP "Frame 111" 139x57
+            - TEXT: "반찬나눔"
+            - GROUP "Frame 107" 139x23
+              - TEXT: "105동 앞"
+              - TEXT: "ㆍ"
+              - TEXT: "걸어서 1분"
+- GROUP "탭바" 375x60
+  - GROUP "tab/홈" 93.75x60
+    - TEXT: "홈"
+  - GROUP "tab/내 동행" 93.75x60
+    - TEXT: "내 동행"
+  - GROUP "tab/만들기" 93.75x60
+    - TEXT: "내정보"
+  - GROUP "tab/만들기" 93.75x60
+    - GROUP "Frame 112" 56x20
+      - GROUP "Frame 113" 16x16
+      - TEXT: "만들기"

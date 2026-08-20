@@ -11,9 +11,9 @@ export default async function MeetupApplyCompletePage({
   return (
     <WireframeLayout className="p-6 flex flex-col justify-between">
       <div className="flex-1 flex flex-col justify-center items-center text-center gap-4 py-12">
-        <h1 className="text-xl font-bold text-black">신청되었습니다</h1>
+        <h1 className="text-2xl font-bold text-black">참여 완료!</h1>
         <p className="text-sm text-gray-600 leading-relaxed max-w-[280px]">
-          오늘 오후 3시 신사시장 정문에서 만나요 30분 전에 알려드릴게요
+          오후 3시 30분 도란마트 정문 앞에서 만나요 30분 전에 알려드릴게요
         </p>
       </div>
 

@@ -1,0 +1,9 @@
+Figma node: 732:88 | name: 알림허용 | size: 375x812
+
+- TEXT: "나가실 때 알려드릴게요"
+- TEXT: "만나기 30분 전에 알려드려요. 알림은 언제든 끄실 수 있어요."
+- GROUP "Frame 48" 327x134
+  - GROUP "Frame" 327x60
+    - TEXT: "허용"
+  - GROUP "Frame" 327x60
+    - TEXT: "허용 안함"
