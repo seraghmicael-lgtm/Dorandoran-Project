@@ -77,9 +77,7 @@ export default function HomePage() {
               </h2>
               <p className="text-xs text-gray-500">우리동네병원 정형외과</p>
             </div>
-            <PlaceholderBox width="w-[87px]" height="h-[87px]" className="rounded">
-              이미지
-            </PlaceholderBox>
+            <PlaceholderBox width="w-[87px]" height="h-[94px]" className="rounded" />
           </div>
 
           {/* 카드 5: 반찬 나눔 */}

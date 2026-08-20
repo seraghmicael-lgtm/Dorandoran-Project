@@ -18,10 +18,13 @@ export default function MyMeetupsCreatedPage() {
       </div>
 
       <div className="p-5">
-        <div className="p-3.5 bg-gray-100 border border-gray-300 rounded flex flex-col gap-1.5">
-          <p className="text-xs font-bold text-gray-600">Adㆍ동네광고</p>
-          <p className="text-xl font-bold text-gray-600">아픈 허리 잘 낫는 병원</p>
-          <p className="text-[11px] text-gray-500">우리동네병원 정형외과</p>
+        <div className="p-3.5 bg-gray-100 border border-gray-300 rounded flex items-center justify-between gap-3">
+          <div className="flex flex-col gap-1.5">
+            <p className="text-xs font-bold text-gray-600">Adㆍ동네광고</p>
+            <p className="text-xl font-bold text-gray-600">아픈 허리 잘 낫는 병원</p>
+            <p className="text-[11px] text-gray-500">우리동네병원 정형외과</p>
+          </div>
+          <div className="w-[87px] h-[61px] bg-white shrink-0" />
         </div>
       </div>
 

@@ -14,9 +14,7 @@ export default async function WelcomePage() {
           width="w-[117px]"
           height="h-[117px]"
           className="rounded-full"
-        >
-          캐릭터
-        </PlaceholderBox>
+        />
         <h1 className="text-xl font-bold text-black">
           {nickname}님 환영합니다
         </h1>
