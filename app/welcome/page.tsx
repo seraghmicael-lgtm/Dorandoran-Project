@@ -1,8 +1,12 @@
 import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
 import PlaceholderBox from "@/components/PlaceholderBox";
+import { getCurrentUser } from "@/lib/session";
 
-export default function WelcomePage() {
+export default async function WelcomePage() {
+  const user = await getCurrentUser();
+  const nickname = user?.nickname ?? "즐거운다람쥐";
+
   return (
     <WireframeLayout className="p-6 flex flex-col justify-between items-center">
       <div className="flex-1 flex flex-col justify-center items-center gap-6 py-12 text-center w-full">
@@ -14,7 +18,7 @@ export default function WelcomePage() {
           캐릭터
         </PlaceholderBox>
         <h1 className="text-xl font-bold text-black">
-          즐거운다람쥐님 환영합니다
+          {nickname}님 환영합니다
         </h1>
       </div>
 

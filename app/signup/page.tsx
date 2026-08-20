@@ -1,7 +1,29 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import WireframeLayout from "@/components/WireframeLayout";
 
 export default function SignupPage() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
+  const handleDemoLogin = async () => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/demo", { method: "POST" });
+      if (res.ok) {
+        router.push("/notification-permission?next=/welcome");
+      } else {
+        setLoading(false);
+      }
+    } catch {
+      setLoading(false);
+    }
+  };
+
   return (
     <WireframeLayout justify="between" className="p-6">
       <div className="flex-1 flex flex-col justify-center gap-4 py-12">
@@ -14,18 +36,22 @@ export default function SignupPage() {
       </div>
 
       <div className="flex flex-col gap-3 pb-8">
-        <Link
-          href="/notification-permission?next=/welcome"
-          className="w-full h-[60px] bg-black text-white flex items-center justify-center rounded text-base font-medium"
+        <button
+          type="button"
+          onClick={handleDemoLogin}
+          disabled={loading}
+          className="w-full h-[60px] bg-black text-white flex items-center justify-center rounded text-base font-medium disabled:opacity-50"
         >
           카카오로 시작하기
-        </Link>
-        <Link
-          href="/notification-permission?next=/welcome"
-          className="w-full h-[60px] bg-black text-white flex items-center justify-center rounded text-base font-medium"
+        </button>
+        <button
+          type="button"
+          onClick={handleDemoLogin}
+          disabled={loading}
+          className="w-full h-[60px] bg-black text-white flex items-center justify-center rounded text-base font-medium disabled:opacity-50"
         >
           휴대폰 번호로 시작하기
-        </Link>
+        </button>
         <Link
           href="/home"
           className="w-full h-[60px] bg-white text-black border border-black flex items-center justify-center rounded text-base font-medium"

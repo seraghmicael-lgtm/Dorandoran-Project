@@ -1,14 +1,54 @@
-import Link from "next/link";
+"use client";
+
+import { Suspense, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import WireframeLayout from "@/components/WireframeLayout";
 import { safeInternalPath } from "@/lib/safePath";
 
-export default async function LocationPermissionPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ next?: string | string[] }>;
-}) {
-  const { next } = await searchParams;
-  const nextHref = safeInternalPath(next, "/home");
+function LocationPermissionContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
+  const nextParam = searchParams.get("next") ?? searchParams.get("from");
+  const nextHref = safeInternalPath(nextParam ?? undefined, "/home");
+
+  const handleRequestLocation = () => {
+    if (loading) return;
+    setLoading(true);
+
+    const navigateNext = () => {
+      router.push(nextHref);
+    };
+
+    if (typeof window !== "undefined" && "geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            await fetch("/api/user/location", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              }),
+            });
+          } catch {
+            // ignore error
+          } finally {
+            navigateNext();
+          }
+        },
+        () => {
+          // error / denied
+          navigateNext();
+        },
+        { timeout: 10000 }
+      );
+    } else {
+      navigateNext();
+    }
+  };
 
   return (
     <WireframeLayout justify="between" className="p-6">
@@ -22,13 +62,22 @@ export default async function LocationPermissionPage({
       </div>
 
       <div className="flex flex-col gap-3 pb-8 items-center">
-        <Link
-          href={nextHref}
-          className="w-full h-[60px] bg-black text-white flex items-center justify-center rounded text-base font-medium"
+        <button
+          type="button"
+          onClick={handleRequestLocation}
+          className="w-full h-[60px] bg-black text-white flex items-center justify-center rounded text-base font-medium cursor-pointer"
         >
           위치 허용하기
-        </Link>
+        </button>
       </div>
     </WireframeLayout>
+  );
+}
+
+export default function LocationPermissionPage() {
+  return (
+    <Suspense fallback={null}>
+      <LocationPermissionContent />
+    </Suspense>
   );
 }

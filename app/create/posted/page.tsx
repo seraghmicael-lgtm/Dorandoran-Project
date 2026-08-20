@@ -1,7 +1,83 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
 
+interface MeetupData {
+  id?: string;
+  startTime: string;
+  activity: string;
+  locationName: string;
+}
+
 export default function CreatePostedPage() {
+  const [meetup, setMeetup] = useState<MeetupData>({
+    startTime: "오늘 오후 3시 ~ 4시",
+    activity: "오일장 구경 같이 하실 분",
+    locationName: "송정 오일장 · 걸어서 12분",
+  });
+  const [isPosting, setIsPosting] = useState(false);
+
+  useEffect(() => {
+    const rawDraft = sessionStorage.getItem("dorandoran_meetup_draft");
+    if (rawDraft) {
+      try {
+        const draft = JSON.parse(rawDraft);
+        sessionStorage.removeItem("dorandoran_meetup_draft");
+
+        const rawTime = draft.time || "오후 3시";
+        const rawActivity = draft.activity || "오일장 구경";
+        const rawLocation = draft.location || "송정 오일장";
+
+        const startTime = rawTime.includes("~")
+          ? rawTime
+          : rawTime.includes("오늘")
+          ? `${rawTime} ~ 4시`
+          : `오늘 ${rawTime} ~ 4시`;
+
+        const activity = rawActivity.includes("같이 하실 분")
+          ? rawActivity
+          : `${rawActivity} 같이 하실 분`;
+
+        const locationName = rawLocation.includes("걸어서")
+          ? rawLocation
+          : `${rawLocation} · 걸어서 12분`;
+
+        setIsPosting(true);
+
+        fetch("/api/meetups", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            startTime,
+            activity,
+            locationName,
+          }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data && data.id) {
+              setMeetup({
+                id: data.id,
+                startTime: data.startTime,
+                activity: data.activity,
+                locationName: data.locationName,
+              });
+            }
+          })
+          .catch((err) => {
+            console.error("Failed to post meetup:", err);
+          })
+          .finally(() => {
+            setIsPosting(false);
+          });
+      } catch (e) {
+        console.error("Invalid meetup draft JSON:", e);
+      }
+    }
+  }, []);
+
   return (
     <WireframeLayout justify="start" className="flex flex-col">
       {/* Header without back arrow as per spec */}
@@ -21,12 +97,12 @@ export default function CreatePostedPage() {
         {/* Card info */}
         <div className="w-full p-4 border border-gray-200 rounded-lg bg-white flex flex-col gap-2 text-left">
           <span className="text-xs text-gray-500 font-medium">
-            오늘 오후 3시 ~ 4시
+            {meetup.startTime}
           </span>
           <h2 className="text-base font-bold text-black">
-            오일장 구경 같이 하실 분
+            {meetup.activity}
           </h2>
-          <p className="text-xs text-gray-600">송정 오일장 · 걸어서 12분</p>
+          <p className="text-xs text-gray-600">{meetup.locationName}</p>
         </div>
 
         {/* Notice text */}

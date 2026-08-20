@@ -1,6 +1,6 @@
 import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
-import PlaceholderBox from "@/components/PlaceholderBox";
+import GoogleMap from "@/components/GoogleMap";
 
 export default async function MeetupDetailPage({
   params,
@@ -48,9 +48,8 @@ export default async function MeetupDetailPage({
         </div>
 
         {/* Map placeholder */}
-        <PlaceholderBox height="h-[149px]" className="rounded">
-          map
-        </PlaceholderBox>
+        {/* ponytail: 나중에 Geocoding API로 교체 */}
+        <GoogleMap lat={37.38} lng={127.12} height="h-[149px]" className="rounded" />
       </div>
 
       {/* Action Buttons */}
