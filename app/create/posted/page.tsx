@@ -11,72 +11,114 @@ interface MeetupData {
   locationName: string;
 }
 
+const DEFAULT_MEETUP: MeetupData = {
+  startTime: "오늘 오후 3시 ~ 4시",
+  activity: "오일장 구경 같이 하실 분",
+  locationName: "송정 오일장 · 걸어서 12분",
+};
+
+function buildPayload(draft: { time?: string; location?: string; activity?: string }) {
+  const rawTime = draft.time || "오후 3시";
+  const rawActivity = draft.activity || "오일장 구경";
+  const rawLocation = draft.location || "송정 오일장";
+
+  const startTime = rawTime.includes("~")
+    ? rawTime
+    : rawTime.includes("오늘") || rawTime.includes("내일")
+    ? `${rawTime} ~ 4시`
+    : `오늘 ${rawTime} ~ 4시`;
+
+  const activity = rawActivity.includes("같이 하실 분")
+    ? rawActivity
+    : `${rawActivity} 같이 하실 분`;
+
+  const locationName = rawLocation.includes("걸어서")
+    ? rawLocation
+    : `${rawLocation} · 걸어서 12분`;
+
+  return { startTime, activity, locationName };
+}
+
 export default function CreatePostedPage() {
-  const [meetup, setMeetup] = useState<MeetupData>({
-    startTime: "오늘 오후 3시 ~ 4시",
-    activity: "오일장 구경 같이 하실 분",
-    locationName: "송정 오일장 · 걸어서 12분",
-  });
-  const [isPosting, setIsPosting] = useState(false);
+  const [meetup, setMeetup] = useState<MeetupData>(DEFAULT_MEETUP);
+  const [status, setStatus] = useState<"idle" | "posting" | "success" | "error">("idle");
+  const [payload, setPayload] = useState<{ startTime: string; activity: string; locationName: string } | null>(null);
+
+  const submit = (body: { startTime: string; activity: string; locationName: string }) => {
+    setStatus("posting");
+    fetch("/api/meetups", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    })
+      .then(async (res) => {
+        if (!res.ok) throw new Error("POST failed");
+        return res.json();
+      })
+      .then((data) => {
+        if (data && data.id) {
+          setMeetup({
+            id: data.id,
+            startTime: data.startTime,
+            activity: data.activity,
+            locationName: data.locationName,
+          });
+        }
+        setStatus("success");
+      })
+      .catch((err) => {
+        console.error("Failed to post meetup:", err);
+        setStatus("error");
+      });
+  };
 
   useEffect(() => {
     const rawDraft = sessionStorage.getItem("dorandoran_meetup_draft");
-    if (rawDraft) {
-      try {
-        const draft = JSON.parse(rawDraft);
-        sessionStorage.removeItem("dorandoran_meetup_draft");
+    if (!rawDraft) return;
 
-        const rawTime = draft.time || "오후 3시";
-        const rawActivity = draft.activity || "오일장 구경";
-        const rawLocation = draft.location || "송정 오일장";
-
-        const startTime = rawTime.includes("~")
-          ? rawTime
-          : rawTime.includes("오늘")
-          ? `${rawTime} ~ 4시`
-          : `오늘 ${rawTime} ~ 4시`;
-
-        const activity = rawActivity.includes("같이 하실 분")
-          ? rawActivity
-          : `${rawActivity} 같이 하실 분`;
-
-        const locationName = rawLocation.includes("걸어서")
-          ? rawLocation
-          : `${rawLocation} · 걸어서 12분`;
-
-        setIsPosting(true);
-
-        fetch("/api/meetups", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            startTime,
-            activity,
-            locationName,
-          }),
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            if (data && data.id) {
-              setMeetup({
-                id: data.id,
-                startTime: data.startTime,
-                activity: data.activity,
-                locationName: data.locationName,
-              });
-            }
-          })
-          .catch((err) => {
-            console.error("Failed to post meetup:", err);
-          })
-          .finally(() => {
-            setIsPosting(false);
-          });
-      } catch (e) {
-        console.error("Invalid meetup draft JSON:", e);
-      }
+    try {
+      const draft = JSON.parse(rawDraft);
+      sessionStorage.removeItem("dorandoran_meetup_draft");
+      const body = buildPayload(draft);
+      setPayload(body);
+      submit(body);
+    } catch (e) {
+      console.error("Invalid meetup draft JSON:", e);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  if (status === "error") {
+    return (
+      <WireframeLayout justify="start" className="flex flex-col">
+        <header className="h-[65px] px-4 flex items-center justify-center border-b border-gray-200 bg-white">
+          <span className="text-base font-medium text-black">올리는 중 문제가 생겼어요</span>
+        </header>
+
+        <div className="p-4 flex flex-col items-center gap-6 text-center">
+          <div className="w-full p-4 border border-gray-200 rounded-lg bg-gray-50 text-sm text-gray-700">
+            게시에 실패했어요. 인터넷 연결을 확인하고 다시 시도해주세요.
+          </div>
+
+          <div className="w-full flex flex-col gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => payload && submit(payload)}
+              className="w-full h-[53px] bg-black text-white flex items-center justify-center rounded text-sm font-medium"
+            >
+              다시 시도
+            </button>
+            <Link
+              href="/create/speak"
+              className="w-full h-[50px] border border-gray-300 bg-white text-black flex items-center justify-center rounded text-sm font-medium"
+            >
+              처음부터 다시
+            </Link>
+          </div>
+        </div>
+      </WireframeLayout>
+    );
+  }
 
   return (
     <WireframeLayout justify="start" className="flex flex-col">

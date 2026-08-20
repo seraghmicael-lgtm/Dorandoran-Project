@@ -18,7 +18,10 @@ export default function CreateWritePage() {
   const [inputTime, setInputTime] = useState(time);
   const [inputLocation, setInputLocation] = useState(location);
 
-  const isFormComplete = Boolean(time.trim() && location.trim() && activity.trim());
+  const isFormComplete =
+    Boolean(time.trim() && location.trim() && activity.trim()) &&
+    !editingTime &&
+    !editingLocation;
 
   const handlePost = () => {
     if (!isFormComplete) return;
