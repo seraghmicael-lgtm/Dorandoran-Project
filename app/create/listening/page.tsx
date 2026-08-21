@@ -8,6 +8,7 @@ import HeaderBack from "@/components/HeaderBack";
 import { listenOnce, playTts, stopTts, unlockAudio, ListenHandle } from "@/lib/voice";
 import {
   connectRealtimeMeetup,
+  unlockAgentAudio,
   RealtimeMeetupHandle,
   MeetupFields,
 } from "@/lib/realtimeMeetup";
@@ -51,6 +52,7 @@ export default function CreateListeningPage() {
   const [rtStatus, setRtStatus] = useState<"connecting" | "connected" | "closed" | "error">(
     "connecting"
   );
+  const [agentSpeaking, setAgentSpeaking] = useState(false);
   const handleRef = useRef<ListenHandle | null>(null);
   const turnTokenRef = useRef(0);
   const emptyCountRef = useRef(0);
@@ -100,6 +102,9 @@ export default function CreateListeningPage() {
           if (unmountedRef.current) return;
           setAgentLine(t);
           setStarted(true);
+        },
+        onAgentSpeaking: (sp) => {
+          if (!unmountedRef.current) setAgentSpeaking(sp);
         },
         onStatus: (s) => {
           if (!unmountedRef.current) setRtStatus(s);
@@ -259,7 +264,8 @@ export default function CreateListeningPage() {
   // 사용자 조작
   // =====================================================================
   const handleMicTap = () => {
-    unlockAudio(); // 제스처로 오디오 해금(도우미 목소리 재생 보장)
+    unlockAudio(); // 제스처로 오디오 해금(질문 낭독 보장)
+    unlockAgentAudio(); // 도우미 목소리(WebRTC 스트림) 재생 해금/재시도
     if (mode === "realtime") {
       if (rtStatus === "closed" || rtStatus === "error") {
         connectRealtime(); // 재연결
@@ -349,7 +355,9 @@ export default function CreateListeningPage() {
       ? rtStatus === "connecting"
         ? "연결하고 있어요..."
         : rtStatus === "connected"
-        ? "듣고 있어요 — 편하게 말씀하세요"
+        ? agentSpeaking
+          ? "도우미가 말하고 있어요"
+          : "듣고 있어요 — 편하게 말씀하세요"
         : "버튼을 누르면 다시 연결돼요"
       : listening
       ? "듣고 있어요"

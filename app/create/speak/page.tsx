@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import WireframeLayout from "@/components/WireframeLayout";
 import HeaderBack from "@/components/HeaderBack";
 import { unlockAudio } from "@/lib/voice";
+import { unlockAgentAudio } from "@/lib/realtimeMeetup";
 
 export default function CreateSpeakPage() {
   const router = useRouter();
@@ -35,6 +36,7 @@ export default function CreateSpeakPage() {
             type="button"
             onClick={() => {
               unlockAudio();
+              unlockAgentAudio();
               router.push("/create/listening");
             }}
             className="w-[150px] h-[150px] rounded-full border-2 border-black bg-white flex flex-col items-center justify-center gap-2 hover:bg-gray-50 shadow-sm cursor-pointer"

@@ -13,6 +13,7 @@ export interface RealtimeMeetupCallbacks {
   onFields: (f: MeetupFields) => void;
   onUserText: (text: string) => void;
   onAgentText: (text: string) => void;
+  onAgentSpeaking?: (speaking: boolean) => void;
   onStatus: (s: "connecting" | "connected" | "closed" | "error") => void;
   onDebug?: (msg: string) => void;
 }
@@ -20,6 +21,30 @@ export interface RealtimeMeetupCallbacks {
 export interface RealtimeMeetupHandle {
   sendText: (text: string) => void;
   disconnect: () => void;
+}
+
+// 에이전트 목소리가 나올 오디오 엘리먼트 — 우리가 만들어서 제스처로 해금해둔다.
+// (SDK 기본은 매 연결마다 새 엘리먼트를 만들어 autoplay하는데, 제스처 없이는
+// 브라우저가 재생을 차단해 "연결됐는데 아무 소리도 안 나는" 상태가 된다.)
+let agentAudioEl: HTMLAudioElement | null = null;
+const SILENT_WAV =
+  "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=";
+
+export function unlockAgentAudio() {
+  try {
+    if (!agentAudioEl) {
+      agentAudioEl = new Audio();
+      agentAudioEl.autoplay = true;
+    }
+    if (!agentAudioEl.srcObject) {
+      agentAudioEl.src = SILENT_WAV;
+      const p = agentAudioEl.play();
+      if (p) p.catch(() => {});
+    } else {
+      // 이미 세션 스트림이 붙어있으면 재생만 재시도
+      agentAudioEl.play().catch(() => {});
+    }
+  } catch {}
 }
 
 const INSTRUCTIONS = `너는 '도란도란' 앱의 음성 도우미다. 어르신이 오늘 동네에서 열 작은 모임(동행)을 말로 만들도록 돕는다.
@@ -50,7 +75,9 @@ export async function connectRealtimeMeetup(
   debug("연결 키 발급됨");
 
   // 2) SDK는 클라이언트에서만 로드
-  const { RealtimeAgent, RealtimeSession, tool } = await import("@openai/agents/realtime");
+  const { RealtimeAgent, RealtimeSession, OpenAIRealtimeWebRTC, tool } = await import(
+    "@openai/agents/realtime"
+  );
   const { z } = await import("zod");
 
   const setMeetupFields = tool({
@@ -75,7 +102,16 @@ export async function connectRealtimeMeetup(
     tools: [setMeetupFields],
   });
 
+  // 우리가 관리하는(해금 가능한) 오디오 엘리먼트를 SDK에 넘긴다
+  if (!agentAudioEl) {
+    agentAudioEl = new Audio();
+    agentAudioEl.autoplay = true;
+  }
+
+  const transport = new OpenAIRealtimeWebRTC({ audioElement: agentAudioEl });
+
   const session = new RealtimeSession(agent, {
+    transport,
     model: "gpt-realtime",
     config: {
       audio: {
@@ -85,34 +121,48 @@ export async function connectRealtimeMeetup(
     },
   });
 
-  // 대화 텍스트 추출 (자막용)
-  session.on("history_updated", (history: any[]) => {
-    try {
-      let lastUser = "";
-      let lastAgent = "";
-      for (const item of history) {
-        if (item?.type !== "message") continue;
-        const texts: string[] = [];
-        for (const c of item.content ?? []) {
-          const t = c?.transcript ?? c?.text ?? "";
-          if (t) texts.push(t);
+  // ---- 자막/진단: 공식 이벤트 직결 ----
+  let userPartial = "";
+  session.on("transport_event", (event: any) => {
+    switch (event?.type) {
+      case "input_audio_buffer.speech_started":
+        debug("서버: 음성 감지됨");
+        userPartial = "";
+        break;
+      case "conversation.item.input_audio_transcription.delta":
+        if (typeof event.delta === "string") {
+          userPartial += event.delta;
+          if (userPartial.trim()) cb.onUserText(userPartial.trim());
         }
-        const joined = texts.join(" ").trim();
-        if (!joined) continue;
-        if (item.role === "user") lastUser = joined;
-        else if (item.role === "assistant") lastAgent = joined;
+        break;
+      case "conversation.item.input_audio_transcription.completed":
+        if (typeof event.transcript === "string" && event.transcript.trim()) {
+          cb.onUserText(event.transcript.trim());
+          debug("내 말 인식: " + event.transcript.trim().slice(0, 20));
+        }
+        userPartial = "";
+        break;
+      case "error": {
+        const msg = event?.error?.message ?? JSON.stringify(event?.error ?? {});
+        debug("서버 오류: " + String(msg).slice(0, 60));
+        break;
       }
-      if (lastUser) cb.onUserText(lastUser);
-      if (lastAgent) cb.onAgentText(lastAgent);
-    } catch {}
+    }
   });
 
+  session.on("agent_end", (_ctx: any, _agent: any, text: string) => {
+    if (text && text.trim()) cb.onAgentText(text.trim());
+  });
+  session.on("audio_start", () => {
+    cb.onAgentSpeaking?.(true);
+    // 스트림이 붙은 뒤 재생이 차단돼 있으면 한 번 더 시도
+    agentAudioEl?.play().catch(() => debug("도우미 소리 차단됨 — 버튼을 한 번 눌러주세요"));
+  });
+  session.on("audio_stopped", () => cb.onAgentSpeaking?.(false));
   session.on("error", (e: any) => {
-    debug("실시간 오류: " + (e?.error?.message ?? e?.message ?? String(e)));
+    debug("실시간 오류: " + (e?.error?.message ?? e?.message ?? String(e)).slice(0, 60));
   });
-
-  const transport = session.transport as any;
-  transport?.on?.("connection_change", (status: string) => {
+  (transport as any).on?.("connection_change", (status: string) => {
     debug("연결 상태: " + status);
     if (status === "disconnected") cb.onStatus("closed");
   });
@@ -124,14 +174,14 @@ export async function connectRealtimeMeetup(
 
   // 에이전트가 먼저 인사하도록 응답 생성 트리거
   try {
-    transport?.sendEvent?.({ type: "response.create" });
+    (transport as any).sendEvent?.({ type: "response.create" });
   } catch {}
 
   return {
     sendText: (text: string) => {
       try {
         session.sendMessage(text);
-      } catch (e) {
+      } catch {
         debug("텍스트 전송 실패");
       }
     },
