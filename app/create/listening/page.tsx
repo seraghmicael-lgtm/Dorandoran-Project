@@ -89,7 +89,13 @@ export default function CreateListeningPage() {
     setStarted(true);
   };
 
-  const connectRealtime = async () => {
+  const rtAttemptsRef = useRef(0);
+  const connectingRef = useRef(false);
+
+  const connectRealtime = async (): Promise<boolean> => {
+    if (connectingRef.current) return false;
+    connectingRef.current = true;
+    rtAttemptsRef.current++;
     setRtStatus("connecting");
     try {
       const handle = await connectRealtimeMeetup({
@@ -119,18 +125,26 @@ export default function CreateListeningPage() {
       });
       if (unmountedRef.current) {
         handle.disconnect();
-        return;
+        return false;
       }
       rtRef.current = handle;
       setMicStream(handle.micStream);
       setAgentStream(handle.getAgentStream());
+      setMode("realtime");
+      return true;
     } catch (e) {
-      console.warn("realtime connect failed, falling back:", e);
-      pushDebug("실시간 연결 실패 — 기본 방식으로 전환");
-      if (unmountedRef.current) return;
-      setMode("classic");
-      const token = ++turnTokenRef.current;
-      classicListen("initial", token);
+      console.warn("realtime connect failed:", e);
+      pushDebug("실시간 연결 실패");
+      if (!unmountedRef.current) {
+        setMode("classic");
+        setRtStatus("error");
+        // 여기서 자동으로 녹음을 시작하지 않는다 — 사파리류는 제스처 밖
+        // 마이크 요청을 자동 거부하므로, 버튼 탭(제스처) 안에서 재시도한다.
+        setNeedTap(true);
+      }
+      return false;
+    } finally {
+      connectingRef.current = false;
     }
   };
 
@@ -271,7 +285,7 @@ export default function CreateListeningPage() {
   // =====================================================================
   // 사용자 조작
   // =====================================================================
-  const handleMicTap = () => {
+  const handleMicTap = async () => {
     unlockAudio(); // 제스처로 오디오 해금(질문 낭독 보장)
     unlockAgentAudio(); // 도우미 목소리(WebRTC 스트림) 재생 해금/재시도
     if (mode === "realtime") {
@@ -285,10 +299,15 @@ export default function CreateListeningPage() {
       handleRef.current?.finish();
       return;
     }
-    if (transcribing || isParsing) return;
+    if (transcribing || isParsing || connectingRef.current) return;
     micDeniedRef.current = false;
-    const token = ++turnTokenRef.current;
     stopTts();
+    // 같은 탭 제스처 안에서: 실시간을 먼저 재시도(3회까지), 안 되면 곧장 녹음으로
+    if (rtAttemptsRef.current < 3) {
+      const ok = await connectRealtime();
+      if (ok || unmountedRef.current) return;
+    }
+    const token = ++turnTokenRef.current;
     classicListen(started && activeQuestion ? "answer" : "initial", token);
   };
 

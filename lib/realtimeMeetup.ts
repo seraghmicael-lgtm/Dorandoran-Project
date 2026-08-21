@@ -64,10 +64,19 @@ const INSTRUCTIONS = `너는 '도란도란' 앱의 음성 도우미다. 어르�
 
 대화 시작: "안녕하세요. 무엇을 같이 하고 싶으세요?"라고 먼저 인사하며 물어라.`;
 
+// 한 번에 한 세션만 — 이전 세션이 살아있으면 닫고 시작한다(인사 음성 겹침 방지)
+let activeClose: (() => void) | null = null;
+
 export async function connectRealtimeMeetup(
   cb: RealtimeMeetupCallbacks
 ): Promise<RealtimeMeetupHandle> {
   const debug = (m: string) => cb.onDebug?.(m);
+  if (activeClose) {
+    try {
+      activeClose();
+    } catch {}
+    activeClose = null;
+  }
   cb.onStatus("connecting");
   debug("실시간 연결 준비");
 
@@ -113,9 +122,17 @@ export async function connectRealtimeMeetup(
   }
 
   // 마이크는 우리가 직접 연다 — 시각화(막대)와 SDK가 같은 스트림을 쓴다.
-  // (권한 팝업도 이 시점, 즉 듣기 시작 직후에 확실히 뜬다)
-  const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  // 에코캔슬 명시: 도우미 목소리가 마이크로 되돌아 들어가 이중 발화를 유발하는 것 방지.
+  const micStream = await navigator.mediaDevices.getUserMedia({
+    audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+  });
   debug("마이크 열림");
+
+  const stopMic = () => {
+    try {
+      micStream.getTracks().forEach((t) => t.stop());
+    } catch {}
+  };
 
   const transport = new OpenAIRealtimeWebRTC({
     audioElement: agentAudioEl,
@@ -179,12 +196,24 @@ export async function connectRealtimeMeetup(
     if (status === "disconnected") cb.onStatus("closed");
   });
 
-  // 3) WebRTC 연결 (마이크 권한 요청 포함)
-  await session.connect({ apiKey: ephemeralKey });
+  // 3) WebRTC 연결 — 실패하면 마이크를 반납하고 던진다(스트림 누수 방지)
+  try {
+    await session.connect({ apiKey: ephemeralKey });
+  } catch (e) {
+    stopMic();
+    throw e;
+  }
   cb.onStatus("connected");
   debug("실시간 연결됨 — 말씀하세요");
 
-  // 에이전트가 먼저 인사하도록 응답 생성 트리거
+  activeClose = () => {
+    try {
+      session.close();
+    } catch {}
+    stopMic();
+  };
+
+  // 에이전트가 먼저 인사하도록 응답 생성 트리거 (연결당 1회)
   try {
     (transport as any).sendEvent?.({ type: "response.create" });
   } catch {}
@@ -202,9 +231,8 @@ export async function connectRealtimeMeetup(
         session.close();
       } catch {}
       // SDK는 외부에서 받은 mediaStream을 멈추지 않는다 — 우리가 정리한다
-      try {
-        micStream.getTracks().forEach((t) => t.stop());
-      } catch {}
+      stopMic();
+      activeClose = null;
       cb.onStatus("closed");
     },
     micStream,
