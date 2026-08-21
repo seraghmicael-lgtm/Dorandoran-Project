@@ -1,9 +1,9 @@
 // 시리형 음성대화의 공용 빌딩블록.
-// - playTts(text): 서버 TTS(mp3)를 재생하고 끝날 때까지 기다린다. 자동재생 차단 등으로
-//   못 틀면 false — 호출부는 텍스트가 이미 보이므로 조용히 넘어가면 된다.
-// - listenOnce(): 말을 실시간 텍스트로 받아적고(onPartial), 말이 끝나면(침묵 지속)
-//   자동으로 최종 전사를 돌려준다. 브라우저 내장 SpeechRecognition(실시간 자막)을
-//   우선 쓰고, 미지원이면 MediaRecorder+Whisper로 폴백한다(자막 없이 최종 전사만).
+// - playTts(text): 서버 TTS(mp3)를 재생하고 끝날 때까지 기다린다.
+// - listenOnce(): 하이브리드 듣기 — 마이크를 열면 녹음(Whisper용)과 브라우저 내장
+//   음성인식(실시간 자막용)을 "동시에" 돌린다. 내장인식이 글자를 주면 그걸 쓰고(빠름),
+//   못 주면(Arc/Brave 등 백엔드 없는 크로미움, iOS 받아쓰기 꺼짐) 침묵 감지가 끝을
+//   잡아 녹음본을 Whisper로 변환한다. 어느 한쪽이 죽어도 인식은 동작한다.
 
 declare global {
   interface Window {
@@ -12,10 +12,9 @@ declare global {
   }
 }
 
-// 자동재생 정책 대응: 브라우저는 사용자 제스처 없이 시작된 오디오 재생과 AudioContext를
-// 차단한다. 버튼 클릭 등 제스처 핸들러 안에서 unlockAudio()를 한 번 불러 공유 오디오
-// 엘리먼트와 AudioContext를 "해금"해두면, 이후 제스처 없는 시점(질문 자동 낭독,
-// 침묵감지)에도 동작한다. SPA 소프트 내비게이션이라 모듈 스코프가 화면 간 유지된다.
+// 자동재생 정책 대응: 버튼 클릭 등 제스처 핸들러 안에서 unlockAudio()를 한 번 불러
+// 공유 오디오 엘리먼트와 AudioContext를 해금해두면, 이후 제스처 없는 시점(질문 자동
+// 낭독, 침묵감지)에도 동작한다. SPA 소프트 내비게이션이라 모듈 스코프가 유지된다.
 let sharedAudio: HTMLAudioElement | null = null;
 let sharedCtx: AudioContext | null = null;
 const SILENT_WAV =
@@ -68,7 +67,7 @@ export async function playTts(text: string): Promise<boolean> {
       audio.onended = () => done(true);
       audio.onerror = () => done(false);
       // stopTts()로 중단됐을 때도 promise가 매달리지 않게 한다.
-      // 일부 브라우저는 자연 종료 때 pause를 ended보다 먼저 쏘므로 한 틱 미룬 뒤 판정한다.
+      // 일부 브라우저는 자연 종료 때 pause를 ended보다 먼저 쏘므로 한 틱 미룬다.
       audio.onpause = () => {
         setTimeout(() => done(audio.ended), 0);
       };
@@ -81,7 +80,7 @@ export async function playTts(text: string): Promise<boolean> {
 
 export interface ListenResult {
   transcript: string;
-  /** 이 기기에서 침묵 감지가 불가능했다(자동 대화 모드 비권장 신호) */
+  /** 이 기기에서 침묵 감지가 불가능했다(자동 종료 안 됨 — 버튼 종료 필요) */
   noVad?: boolean;
   /** 마이크 자체를 못 열었다(권한 거부 등) */
   micDenied?: boolean;
@@ -104,199 +103,65 @@ interface ListenOptions {
   onPartial?: (text: string) => void;
   onSpeechStart?: () => void;
   onTranscribing?: () => void;
-  /** 진단용 — 엔진 선택·이벤트·오류 코드를 짧은 문자열로 알려준다 */
+  /** 진단용 — 엔진 이벤트·오류 코드를 짧은 문자열로 알려준다 */
   onDebug?: (msg: string) => void;
-}
-
-export function listenOnce(opts: ListenOptions = {}): ListenHandle {
-  const SR =
-    typeof window !== "undefined"
-      ? window.SpeechRecognition || window.webkitSpeechRecognition
-      : undefined;
-  if (SR) return listenViaSpeechRecognition(SR, opts);
-  return listenViaRecorder(opts);
-}
-
-/** 브라우저 내장 실시간 음성인식 — 말하는 즉시 텍스트가 나온다 */
-function listenViaSpeechRecognition(SR: any, opts: ListenOptions): ListenHandle {
-  const silenceMs = opts.silenceMs ?? 1800;
-  const maxMs = opts.maxMs ?? 30000;
-
-  let resolvePromise!: (r: ListenResult) => void;
-  const promise = new Promise<ListenResult>((resolve) => {
-    resolvePromise = resolve;
-  });
-
-  let finalText = "";
-  let interimText = "";
-  let sawSpeech = false;
-  let lastResultAt = Date.now();
-  let cancelled = false;
-  let settled = false;
-  let micDenied = false;
-  let fallback: ListenHandle | null = null;
-
-  const rec = new SR();
-  rec.lang = "ko-KR";
-  rec.continuous = true;
-  rec.interimResults = true;
-
-  let silenceTimer: ReturnType<typeof setInterval> | null = null;
-  let maxTimer: ReturnType<typeof setTimeout> | null = null;
-
-  const settle = () => {
-    if (settled) return;
-    settled = true;
-    if (silenceTimer) clearInterval(silenceTimer);
-    if (maxTimer) clearTimeout(maxTimer);
-    const transcript = cancelled ? "" : (finalText + " " + interimText).trim();
-    resolvePromise({ transcript, micDenied });
-  };
-
-  /** 내장 인식이 서비스 문제로 못 쓰이면(iOS 받아쓰기 꺼짐, 네트워크 등)
-   *  같은 handle 그대로 녹음+Whisper 경로로 갈아탄다 */
-  const fallbackToRecorder = () => {
-    if (settled || fallback || cancelled) return;
-    settled = true;
-    if (silenceTimer) clearInterval(silenceTimer);
-    if (maxTimer) clearTimeout(maxTimer);
-    try {
-      rec.abort();
-    } catch {}
-    opts.onDebug?.("녹음+변환 방식으로 전환");
-    fallback = listenViaRecorder(opts);
-    fallback.promise.then(resolvePromise);
-  };
-
-  let resultCount = 0;
-  rec.onresult = (event: any) => {
-    interimText = "";
-    finalText = "";
-    for (let i = 0; i < event.results.length; i++) {
-      const r = event.results[i];
-      if (r.isFinal) finalText += r[0].transcript;
-      else interimText += r[0].transcript;
-    }
-    const combined = (finalText + " " + interimText).trim();
-    if (combined) {
-      if (!sawSpeech) {
-        sawSpeech = true;
-        opts.onSpeechStart?.();
-      }
-      lastResultAt = Date.now();
-      resultCount++;
-      if (resultCount === 1) opts.onDebug?.("내장인식: 음성 감지됨");
-      opts.onPartial?.(combined);
-    }
-  };
-
-  rec.onerror = (event: any) => {
-    const err = event?.error;
-    opts.onDebug?.("내장인식 오류: " + err);
-    if (
-      err === "not-allowed" ||
-      err === "audio-capture" ||
-      err === "service-not-allowed" ||
-      err === "network" ||
-      err === "language-not-supported"
-    ) {
-      // 일부 사파리는 제스처 없이 start()하면 not-allowed를 던진다(실제 권한 거부 아님).
-      // 녹음 경로로 갈아타서 진짜 마이크 거부인지 그쪽에서 판별하게 한다.
-      fallbackToRecorder();
-    }
-    // "no-speech" 등은 onend 가 이어서 처리한다
-  };
-
-  rec.onend = () => {
-    // 브라우저가 스스로 끝냈든(자체 침묵 감지) 우리가 stop() 했든 여기로 온다
-    if (!settled) opts.onDebug?.("내장인식 종료" + (sawSpeech ? "" : " (음성 감지 없음)"));
-    settle();
-  };
-
-  silenceTimer = setInterval(() => {
-    if (sawSpeech && Date.now() - lastResultAt > silenceMs) {
-      try {
-        rec.stop();
-      } catch {
-        settle();
-      }
-    }
-  }, 200);
-
-  maxTimer = setTimeout(() => {
-    try {
-      rec.stop();
-    } catch {
-      settle();
-    }
-  }, maxMs);
-
-  opts.onDebug?.("내장인식 시작");
-  try {
-    rec.start();
-  } catch {
-    opts.onDebug?.("내장인식 시작 실패");
-    fallbackToRecorder();
-  }
-
-  return {
-    finish: () => {
-      if (fallback) {
-        fallback.finish();
-        return;
-      }
-      try {
-        rec.stop();
-      } catch {
-        settle();
-      }
-    },
-    cancel: () => {
-      cancelled = true;
-      if (fallback) {
-        fallback.cancel();
-        return;
-      }
-      try {
-        rec.abort();
-      } catch {
-        settle();
-      }
-      settle();
-    },
-    promise,
-  };
 }
 
 // ponytail: RMS 고정 임계값 — 환경소음이 큰 곳에선 오탐할 수 있다. 문제 되면 첫 0.5초
 // 평균소음 기반 적응 임계값으로 올린다.
 const SPEECH_RMS = 6;
 
-/** 폴백: 녹음 후 Whisper 일괄 전사 (실시간 자막 없음) */
-function listenViaRecorder(opts: ListenOptions): ListenHandle {
+export function listenOnce(opts: ListenOptions = {}): ListenHandle {
   const silenceMs = opts.silenceMs ?? 1800;
   const maxMs = opts.maxMs ?? 30000;
-
-  let recorder: MediaRecorder | null = null;
-  let stream: MediaStream | null = null;
-  let audioCtx: AudioContext | null = null;
-  let usingSharedCtx = false;
-  let vadSource: MediaStreamAudioSourceNode | null = null;
-  let vadAnalyser: AnalyserNode | null = null;
-  let vadTimer: ReturnType<typeof setInterval> | null = null;
-  let maxTimer: ReturnType<typeof setTimeout> | null = null;
-  let cancelled = false;
-  let finishRequested = false;
-  let noVad = false;
+  const debug = (m: string) => opts.onDebug?.(m);
 
   let resolvePromise!: (r: ListenResult) => void;
   const promise = new Promise<ListenResult>((resolve) => {
     resolvePromise = resolve;
   });
 
+  // ---- 공통 상태 ----
+  let cancelled = false;
+  let finishing = false;
+  let settled = false;
+  let sawSpeech = false; // SR 결과 또는 VAD 중 아무거나
+  let lastVoiceAt = Date.now();
+  let micDenied = false;
+  let noVad = false;
+
+  // ---- SR(내장인식) 상태 ----
+  let srFinal = "";
+  let srInterim = "";
+  let rec: any = null;
+  let srActive = false;
+
+  // ---- 녹음 상태 ----
+  let recorder: MediaRecorder | null = null;
+  let stream: MediaStream | null = null;
+  let chunks: Blob[] = [];
+  let recordedBlob: Blob | null = null;
+  let audioCtx: AudioContext | null = null;
+  let usingSharedCtx = false;
+  let vadSource: MediaStreamAudioSourceNode | null = null;
+  let vadAnalyser: AnalyserNode | null = null;
+
+  let vadTimer: ReturnType<typeof setInterval> | null = null;
+  let maxTimer: ReturnType<typeof setTimeout> | null = null;
+
+  const markSpeech = () => {
+    lastVoiceAt = Date.now();
+    if (!sawSpeech) {
+      sawSpeech = true;
+      opts.onSpeechStart?.();
+    }
+  };
+
   const cleanup = () => {
     if (vadTimer) clearInterval(vadTimer);
     if (maxTimer) clearTimeout(maxTimer);
+    vadTimer = null;
+    maxTimer = null;
     if (stream) {
       stream.getTracks().forEach((t) => t.stop());
       stream = null;
@@ -308,25 +173,127 @@ function listenViaRecorder(opts: ListenOptions): ListenHandle {
     vadSource = null;
     vadAnalyser = null;
     if (audioCtx) {
-      // 공유 컨텍스트는 다음 듣기에서 재사용하므로 닫지 않는다
       if (!usingSharedCtx) audioCtx.close().catch(() => {});
       audioCtx = null;
     }
   };
 
-  const stopRecorder = () => {
+  /** 최종 판정: 내장인식 텍스트 우선, 없으면 녹음본을 Whisper로 */
+  const settle = async () => {
+    if (settled) return;
+    settled = true;
+    cleanup();
+    if (cancelled) {
+      resolvePromise({ transcript: "" });
+      return;
+    }
+    const srText = (srFinal + " " + srInterim).trim();
+    if (srText) {
+      debug("내장인식 결과 사용");
+      resolvePromise({ transcript: srText, noVad, micDenied });
+      return;
+    }
+    if (recordedBlob && recordedBlob.size > 0) {
+      opts.onTranscribing?.();
+      debug(`녹음 완료(${Math.round(recordedBlob.size / 1024)}KB) → 변환 중`);
+      try {
+        const formData = new FormData();
+        formData.append("file", recordedBlob, "recording");
+        const res = await fetch("/api/transcribe", { method: "POST", body: formData });
+        if (!res.ok) throw new Error("transcribe failed");
+        const data = await res.json();
+        const text = (data.transcript || "").trim();
+        debug(text ? "변환 성공" : "변환 결과 비어있음");
+        resolvePromise({ transcript: text, noVad, micDenied });
+      } catch {
+        debug("변환 요청 실패");
+        resolvePromise({ transcript: "", noVad, micDenied });
+      }
+      return;
+    }
+    resolvePromise({ transcript: "", noVad, micDenied });
+  };
+
+  /** 듣기 종료 절차 — 녹음이 돌고 있으면 blob을 모은 뒤 판정한다 */
+  const finishAll = () => {
+    if (finishing || settled) return;
+    finishing = true;
+    if (vadTimer) clearInterval(vadTimer);
+    if (maxTimer) clearTimeout(maxTimer);
+    if (srActive) {
+      try {
+        rec.stop();
+      } catch {}
+    }
     if (recorder && recorder.state !== "inactive") {
-      recorder.stop();
+      recorder.stop(); // onstop → recordedBlob 조립 → settle()
+    } else {
+      settle();
     }
   };
 
+  // ---- 1) 내장인식(있으면) — 실시간 자막 담당 ----
+  const SR =
+    typeof window !== "undefined"
+      ? window.SpeechRecognition || window.webkitSpeechRecognition
+      : undefined;
+  if (SR) {
+    try {
+      rec = new SR();
+      rec.lang = "ko-KR";
+      rec.continuous = true;
+      rec.interimResults = true;
+
+      let firstResult = true;
+      rec.onresult = (event: any) => {
+        srInterim = "";
+        srFinal = "";
+        for (let i = 0; i < event.results.length; i++) {
+          const r = event.results[i];
+          if (r.isFinal) srFinal += r[0].transcript;
+          else srInterim += r[0].transcript;
+        }
+        const combined = (srFinal + " " + srInterim).trim();
+        if (combined) {
+          if (firstResult) {
+            firstResult = false;
+            debug("내장인식: 음성 감지됨");
+          }
+          markSpeech();
+          opts.onPartial?.(combined);
+        }
+      };
+      rec.onerror = (event: any) => {
+        const err = event?.error;
+        if (err && err !== "no-speech" && err !== "aborted") {
+          debug("내장인식 오류: " + err + " (녹음으로 계속)");
+        }
+        // 녹음이 병행 중이므로 여기서 세션을 끝내지 않는다
+        srActive = false;
+      };
+      rec.onend = () => {
+        srActive = false;
+        // 내장인식이 스스로 침묵을 감지하고 글자를 확보한 채 끝났으면 그걸로 종료
+        if (!finishing && !settled && (srFinal + srInterim).trim()) {
+          finishAll();
+        }
+        // 글자 없이 끝났으면(no-speech/백엔드 없음) 녹음+VAD가 계속 담당
+      };
+      rec.start();
+      srActive = true;
+      debug("내장인식 시작");
+    } catch {
+      srActive = false;
+      debug("내장인식 시작 실패 (녹음으로 계속)");
+    }
+  }
+
+  // ---- 2) 녹음 + 침묵감지 — 항상 병행 (Whisper 폴백의 원본) ----
   (async () => {
     try {
-      const chunks: Blob[] = [];
       stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      if (cancelled) {
+      if (cancelled || settled) {
         cleanup();
-        resolvePromise({ transcript: "" });
         return;
       }
 
@@ -334,43 +301,15 @@ function listenViaRecorder(opts: ListenOptions): ListenHandle {
       recorder.ondataavailable = (e) => {
         if (e.data.size > 0) chunks.push(e.data);
       };
-
-      recorder.onstop = async () => {
-        const mime = recorder?.mimeType || "audio/webm";
-        cleanup();
-        if (cancelled) {
-          resolvePromise({ transcript: "", noVad });
-          return;
-        }
-        const blob = new Blob(chunks, { type: mime });
-        if (blob.size === 0) {
-          resolvePromise({ transcript: "", noVad });
-          return;
-        }
-        opts.onTranscribing?.();
-        opts.onDebug?.(`녹음 완료(${Math.round(blob.size / 1024)}KB) → 변환 중`);
-        try {
-          const formData = new FormData();
-          formData.append("file", blob, "recording");
-          const res = await fetch("/api/transcribe", { method: "POST", body: formData });
-          if (!res.ok) throw new Error("transcribe failed");
-          const data = await res.json();
-          const text = (data.transcript || "").trim();
-          opts.onDebug?.(text ? "변환 성공" : "변환 결과 비어있음");
-          resolvePromise({ transcript: text, noVad });
-        } catch {
-          opts.onDebug?.("변환 요청 실패");
-          resolvePromise({ transcript: "", noVad });
-        }
+      recorder.onstop = () => {
+        recordedBlob = new Blob(chunks, { type: recorder?.mimeType || "audio/webm" });
+        if (finishing) settle();
       };
+      recorder.start();
+      debug("녹음 시작");
 
-      // 침묵 감지(VAD): WebAudio로 입력 볼륨을 관찰한다.
-      // unlockAudio()로 해금된 공유 컨텍스트가 있으면 그걸 쓴다(자동재생 정책 회피).
-      let sawSpeech = false;
-      let lastVoiceAt = Date.now();
+      // 침묵 감지(VAD)
       try {
-        // 공유 컨텍스트가 있으면 suspended여도 그걸 쓴다 — 제스처 직후라면
-        // resume이 이 안에서 성공한다(상태 검사를 resume보다 먼저 하면 레이스로 죽음)
         const shared = getSharedCtx();
         if (shared) {
           audioCtx = shared;
@@ -383,7 +322,7 @@ function listenViaRecorder(opts: ListenOptions): ListenHandle {
         }
         if (audioCtx.state !== "running") {
           noVad = true;
-          opts.onDebug?.("녹음: 침묵감지 불가(버튼으로 종료)");
+          debug("침묵감지 불가 — 버튼으로 끝내주세요");
         } else {
           const source = audioCtx.createMediaStreamSource(stream);
           const analyser = audioCtx.createAnalyser();
@@ -392,6 +331,7 @@ function listenViaRecorder(opts: ListenOptions): ListenHandle {
           vadSource = source;
           vadAnalyser = analyser;
           const buf = new Uint8Array(analyser.fftSize);
+          let vadSaw = false;
 
           vadTimer = setInterval(() => {
             analyser.getByteTimeDomainData(buf);
@@ -402,46 +342,62 @@ function listenViaRecorder(opts: ListenOptions): ListenHandle {
             }
             const rms = Math.sqrt(sum / buf.length);
             if (rms > SPEECH_RMS) {
-              if (!sawSpeech) {
-                sawSpeech = true;
-                opts.onSpeechStart?.();
-                opts.onDebug?.("녹음: 음성 감지됨");
+              if (!vadSaw) {
+                vadSaw = true;
+                debug("마이크: 음성 감지됨");
               }
-              lastVoiceAt = Date.now();
+              markSpeech();
             } else if (sawSpeech && Date.now() - lastVoiceAt > silenceMs) {
-              finishRequested = true;
-              stopRecorder();
+              finishAll();
             }
           }, 100);
         }
       } catch {
         noVad = true;
+        debug("침묵감지 불가 — 버튼으로 끝내주세요");
       }
 
-      maxTimer = setTimeout(() => {
-        finishRequested = true;
-        stopRecorder();
-      }, maxMs);
-
-      recorder.start();
-      opts.onDebug?.("녹음 시작");
-      if (finishRequested || cancelled) stopRecorder();
+      if (finishing) recorder.stop();
     } catch {
-      opts.onDebug?.("마이크 열기 실패(권한 확인)");
-      cleanup();
-      resolvePromise({ transcript: "", noVad: true, micDenied: true });
+      // 마이크를 못 열었다 — 내장인식이 살아있으면 그쪽 단독으로 계속
+      if (srActive) {
+        debug("녹음 불가 — 내장인식만 사용");
+        // 내장인식 단독 모드: onend가 세션 종료를 담당하도록 승격
+        const prevOnEnd = rec.onend;
+        rec.onend = () => {
+          prevOnEnd?.();
+          if (!finishing && !settled) finishAll();
+        };
+      } else {
+        micDenied = true;
+        debug("마이크 열기 실패(권한 확인)");
+        finishAll();
+      }
     }
   })();
 
+  maxTimer = setTimeout(() => finishAll(), maxMs);
+
   return {
-    finish: () => {
-      finishRequested = true;
-      stopRecorder();
-    },
+    finish: () => finishAll(),
     cancel: () => {
       cancelled = true;
-      stopRecorder();
+      if (srActive) {
+        try {
+          rec.abort();
+        } catch {}
+        srActive = false;
+      }
+      if (recorder && recorder.state !== "inactive") {
+        try {
+          recorder.stop();
+        } catch {}
+      }
       cleanup();
+      if (!settled) {
+        settled = true;
+        resolvePromise({ transcript: "" });
+      }
     },
     promise,
   };
