@@ -6,19 +6,29 @@ import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
 import HeaderBack from "@/components/HeaderBack";
 import { listenOnce, playTts, stopTts, unlockAudio, ListenHandle } from "@/lib/voice";
+import {
+  connectRealtimeMeetup,
+  RealtimeMeetupHandle,
+  MeetupFields,
+} from "@/lib/realtimeMeetup";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+type Mode = "realtime" | "classic";
 
 export default function CreateListeningPage() {
   const router = useRouter();
 
-  // ---- 대화 상태 ----
+  // ---- 공통 대화 상태 ----
+  const [mode, setMode] = useState<Mode>("realtime");
   const [transcript, setTranscript] = useState("");
   const [liveText, setLiveText] = useState("");
+  const [agentLine, setAgentLine] = useState(""); // 도우미(에이전트)의 최근 말
   const [listening, setListening] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
+  const [started, setStarted] = useState(false); // 필드 박스 노출 여부
 
-  // ---- 파싱 결과 (이렇게 들었어요) ----
+  // ---- 필드 ----
   const [time, setTime] = useState<string | null>(null);
   const [location, setLocation] = useState<string | null>(null);
   const [activity, setActivity] = useState<string | null>(null);
@@ -26,7 +36,6 @@ export default function CreateListeningPage() {
   const [followUpQuestion, setFollowUpQuestion] = useState<string | null>(null);
   const [isParsing, setIsParsing] = useState(false);
   const [parseNonce, setParseNonce] = useState(0);
-  const hasParsed = parseNonce > 0;
 
   // ---- 수동 보정 UI ----
   const [textInput, setTextInput] = useState("");
@@ -38,17 +47,21 @@ export default function CreateListeningPage() {
   const [inputActivity, setInputActivity] = useState("");
 
   // ---- 오케스트레이션 ----
+  const rtRef = useRef<RealtimeMeetupHandle | null>(null);
+  const [rtStatus, setRtStatus] = useState<"connecting" | "connected" | "closed" | "error">(
+    "connecting"
+  );
   const handleRef = useRef<ListenHandle | null>(null);
   const turnTokenRef = useRef(0);
   const emptyCountRef = useRef(0);
   const micDeniedRef = useRef(false);
   const unmountedRef = useRef(false);
-  const [needTap, setNeedTap] = useState(false); // 자동 듣기가 안 돼 탭이 필요한 상태
+  const [needTap, setNeedTap] = useState(false);
   const [debugLines, setDebugLines] = useState<string[]>([]);
 
   const pushDebug = (msg: string) => {
     if (unmountedRef.current) return;
-    setDebugLines((prev) => [...prev.slice(-2), msg]); // 최근 3개만 유지
+    setDebugLines((prev) => [...prev.slice(-2), msg]);
   };
 
   const activeQuestion = missingField
@@ -59,7 +72,59 @@ export default function CreateListeningPage() {
       : followUpQuestion || "무엇을 하고 싶으세요?"
     : null;
 
-  const cancelCurrent = () => {
+  // =====================================================================
+  // 실시간(OpenAI Realtime) 모드
+  // =====================================================================
+  const mergeFields = (f: MeetupFields) => {
+    // null = 아직 모름 → 기존 값 유지. 값이 오면 갱신(에이전트의 정정 포함).
+    if (f.time != null && f.time !== "") setTime(f.time);
+    if (f.location != null && f.location !== "") setLocation(f.location);
+    if (f.activity != null && f.activity !== "") setActivity(f.activity);
+    setStarted(true);
+  };
+
+  const connectRealtime = async () => {
+    setRtStatus("connecting");
+    try {
+      const handle = await connectRealtimeMeetup({
+        onFields: (f) => {
+          if (!unmountedRef.current) mergeFields(f);
+        },
+        onUserText: (t) => {
+          if (unmountedRef.current) return;
+          setTranscript(t);
+          setLiveText(t);
+          setStarted(true);
+        },
+        onAgentText: (t) => {
+          if (unmountedRef.current) return;
+          setAgentLine(t);
+          setStarted(true);
+        },
+        onStatus: (s) => {
+          if (!unmountedRef.current) setRtStatus(s);
+        },
+        onDebug: pushDebug,
+      });
+      if (unmountedRef.current) {
+        handle.disconnect();
+        return;
+      }
+      rtRef.current = handle;
+    } catch (e) {
+      console.warn("realtime connect failed, falling back:", e);
+      pushDebug("실시간 연결 실패 — 기본 방식으로 전환");
+      if (unmountedRef.current) return;
+      setMode("classic");
+      const token = ++turnTokenRef.current;
+      classicListen("initial", token);
+    }
+  };
+
+  // =====================================================================
+  // 클래식(녹음+Whisper+TTS) 폴백 — 실시간 연결이 안 될 때만
+  // =====================================================================
+  const cancelClassic = () => {
     turnTokenRef.current++;
     handleRef.current?.cancel();
     handleRef.current = null;
@@ -76,6 +141,7 @@ export default function CreateListeningPage() {
     setMissingField(data.missingField ?? null);
     setFollowUpQuestion(data.followUpQuestion ?? null);
     setParseNonce((n) => n + 1);
+    setStarted(true);
   };
 
   const parseTranscript = async (
@@ -104,8 +170,7 @@ export default function CreateListeningPage() {
     }
   };
 
-  /** 한 번 듣기 — 결과를 대화 단계에 맞게 라우팅한다 */
-  const listen = async (kind: "initial" | "answer", token: number) => {
+  const classicListen = async (kind: "initial" | "answer", token: number) => {
     setNeedTap(false);
     setLiveText("");
     setListening(true);
@@ -140,21 +205,19 @@ export default function CreateListeningPage() {
       }
       return;
     }
-    // 빈 결과
     if (noVad) {
       setNeedTap(true);
       return;
     }
     emptyCountRef.current++;
     if (emptyCountRef.current < 2) {
-      await listen(kind, token);
+      await classicListen(kind, token);
     } else {
       setNeedTap(true);
     }
   };
 
-  /** 문답 턴: 질문을 음성으로 말하고, 끝나면 자동으로 듣는다 */
-  const runTurn = async (question: string) => {
+  const classicRunTurn = async (question: string) => {
     const token = ++turnTokenRef.current;
     emptyCountRef.current = 0;
     const played = await playTts(question);
@@ -164,80 +227,107 @@ export default function CreateListeningPage() {
       return;
     }
     if (!played) await sleep(500);
-    await listen("answer", token);
+    await classicListen("answer", token);
   };
 
-  // 첫 진입: 자동으로 듣기 시도 (안 되는 환경이면 버튼 탭으로 시작)
+  useEffect(() => {
+    if (mode !== "classic") return;
+    if (parseNonce === 0) return;
+    if (!activeQuestion) return;
+    classicRunTurn(activeQuestion);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [parseNonce]);
+
+  // =====================================================================
+  // 진입/이탈
+  // =====================================================================
   useEffect(() => {
     unmountedRef.current = false;
-    const token = ++turnTokenRef.current;
-    listen("initial", token);
+    connectRealtime();
     return () => {
       unmountedRef.current = true;
       turnTokenRef.current++;
+      rtRef.current?.disconnect();
+      rtRef.current = null;
       handleRef.current?.cancel();
       stopTts();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 파싱 결과가 나올 때마다: 빠진 필드가 있으면 음성 문답 턴 시작
-  useEffect(() => {
-    if (parseNonce === 0) return;
-    if (!activeQuestion) return;
-    runTurn(activeQuestion);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [parseNonce]);
-
-  /** 마이크 버튼 탭 — 제스처가 확보되는 유일하게 확실한 시작점 */
+  // =====================================================================
+  // 사용자 조작
+  // =====================================================================
   const handleMicTap = () => {
-    unlockAudio();
+    unlockAudio(); // 제스처로 오디오 해금(도우미 목소리 재생 보장)
+    if (mode === "realtime") {
+      if (rtStatus === "closed" || rtStatus === "error") {
+        connectRealtime(); // 재연결
+      }
+      return; // 연결 중/연결됨: 서버가 알아서 듣는다
+    }
+    // classic
     if (listening) {
-      handleRef.current?.finish(); // "다 말했어요" 역할
+      handleRef.current?.finish();
       return;
     }
     if (transcribing || isParsing) return;
-    micDeniedRef.current = false; // 권한을 켰을 수도 있으니 재시도
+    micDeniedRef.current = false;
     const token = ++turnTokenRef.current;
     stopTts();
-    listen(hasParsed && activeQuestion ? "answer" : "initial", token);
+    classicListen(started && activeQuestion ? "answer" : "initial", token);
   };
 
   const handleAnswerText = (text: string) => {
     if (!text.trim()) return;
     unlockAudio();
-    cancelCurrent();
     setTextInput("");
+    if (mode === "realtime") {
+      rtRef.current?.sendText(text.trim());
+      return;
+    }
+    cancelClassic();
     parseTranscript(text.trim());
   };
 
   const handleReplayTts = () => {
     unlockAudio();
-    if (activeQuestion) playTts(activeQuestion);
+    const line = mode === "realtime" ? agentLine : activeQuestion;
+    if (line) playTts(line);
   };
 
   const handleRestart = () => {
     unlockAudio();
-    cancelCurrent();
     setTranscript("");
     setLiveText("");
+    setAgentLine("");
     setTime(null);
     setLocation(null);
     setActivity(null);
     setMissingField(null);
     setFollowUpQuestion(null);
     setParseNonce(0);
+    setStarted(false);
     micDeniedRef.current = false;
     emptyCountRef.current = 0;
+    if (mode === "realtime") {
+      rtRef.current?.disconnect();
+      rtRef.current = null;
+      connectRealtime();
+      return;
+    }
+    cancelClassic();
     const token = ++turnTokenRef.current;
-    listen("initial", token);
+    classicListen("initial", token);
   };
 
   const isFormComplete = Boolean(time && location && activity);
 
   const handlePost = () => {
     if (!isFormComplete) return;
-    cancelCurrent();
+    rtRef.current?.disconnect();
+    rtRef.current = null;
+    cancelClassic();
     const draftData = {
       transcript: transcript || `${time}에 ${location}에서 ${activity}`,
       time: time!,
@@ -248,21 +338,34 @@ export default function CreateListeningPage() {
     router.push("/create/duration");
   };
 
-  const statusText = listening
-    ? "듣고 있어요"
-    : transcribing
-    ? "말씀을 글로 옮기고 있어요..."
-    : isParsing
-    ? "말씀을 확인하고 있어요..."
-    : needTap
-    ? micDeniedRef.current
-      ? "마이크 권한을 허용하신 뒤 버튼을 눌러주세요"
-      : "버튼을 누르고 말씀해주세요"
-    : hasParsed
-    ? isFormComplete
-      ? "내용을 확인하시고 올리기를 눌러주세요"
-      : "버튼을 누르고 답하실 수도 있어요"
-    : "버튼을 누르고 말씀해주세요";
+  // =====================================================================
+  // 표시 상태
+  // =====================================================================
+  const rtLive = mode === "realtime" && rtStatus === "connected";
+  const showPulse = rtLive || listening;
+
+  const statusText =
+    mode === "realtime"
+      ? rtStatus === "connecting"
+        ? "연결하고 있어요..."
+        : rtStatus === "connected"
+        ? "듣고 있어요 — 편하게 말씀하세요"
+        : "버튼을 누르면 다시 연결돼요"
+      : listening
+      ? "듣고 있어요"
+      : transcribing
+      ? "말씀을 글로 옮기고 있어요..."
+      : isParsing
+      ? "말씀을 확인하고 있어요..."
+      : needTap
+      ? micDeniedRef.current
+        ? "마이크 권한을 허용하신 뒤 버튼을 눌러주세요"
+        : "버튼을 누르고 말씀해주세요"
+      : started
+      ? isFormComplete
+        ? "내용을 확인하시고 올리기를 눌러주세요"
+        : "버튼을 누르고 답하실 수도 있어요"
+      : "버튼을 누르고 말씀해주세요";
 
   return (
     <WireframeLayout justify="start" className="flex flex-col">
@@ -275,14 +378,14 @@ export default function CreateListeningPage() {
             type="button"
             onClick={handleMicTap}
             className={`w-[126px] h-[126px] rounded-full border-2 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all select-none ${
-              listening
+              showPulse
                 ? "border-red-500 bg-red-50"
-                : transcribing || isParsing
+                : transcribing || isParsing || rtStatus === "connecting"
                 ? "border-gray-300 bg-gray-100 opacity-70"
                 : "border-black bg-white hover:bg-gray-50 active:scale-95 shadow-sm"
             }`}
           >
-            {listening ? (
+            {showPulse ? (
               <div className="flex items-center justify-center gap-1.5">
                 <div className="w-1.5 h-4 rounded bg-black animate-pulse" />
                 <div className="w-1.5 h-[34px] rounded bg-black animate-pulse" />
@@ -299,9 +402,6 @@ export default function CreateListeningPage() {
             )}
           </button>
           <span className="text-sm font-bold text-black">{statusText}</span>
-          {listening && (
-            <span className="text-[11px] text-gray-500">말씀이 끝나면 자동으로 알아들어요 · 버튼을 누르면 바로 끝나요</span>
-          )}
           {/* ponytail: 진단 표시줄 — 원인 파악되면 제거 */}
           {debugLines.length > 0 && (
             <span className="text-[10px] text-gray-400 leading-tight">
@@ -310,7 +410,21 @@ export default function CreateListeningPage() {
           )}
         </div>
 
-        {/* 실시간 받아적기 박스 */}
+        {/* 도우미 말풍선 (실시간 모드) */}
+        {mode === "realtime" && agentLine && (
+          <div className="w-full p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center justify-between gap-2 text-left">
+            <p className="text-sm font-bold text-black">{agentLine}</p>
+            <button
+              type="button"
+              onClick={handleReplayTts}
+              className="text-xs text-gray-700 bg-white border border-gray-300 px-2.5 py-1 rounded shrink-0 cursor-pointer"
+            >
+              다시 듣기
+            </button>
+          </div>
+        )}
+
+        {/* 받아적기 박스 */}
         <div className="w-full p-4 border border-gray-200 rounded-lg bg-gray-50 flex flex-col gap-2 text-left">
           <span className="text-xs text-gray-500 font-medium">말씀하신 대로 적고 있어요</span>
           <p className="text-sm font-bold text-black">
@@ -319,8 +433,8 @@ export default function CreateListeningPage() {
           <p className="text-sm text-gray-400">…</p>
         </div>
 
-        {/* 이렇게 들었어요 — 파싱 결과 + 문답 */}
-        {hasParsed && (
+        {/* 이렇게 들었어요 — 필드 */}
+        {started && (
           <div className="w-full p-4 border border-gray-200 rounded-lg bg-white flex flex-col gap-4 text-left">
             <span className="text-xs text-gray-500 font-medium">이렇게 들었어요</span>
 
@@ -361,7 +475,7 @@ export default function CreateListeningPage() {
                         const val = inputTime.trim() || null;
                         setTime(val);
                         setEditingTime(false);
-                        if (!val) parseTranscript("", { time: null });
+                        if (!val && mode === "classic") parseTranscript("", { time: null });
                       }}
                       className="text-xs text-black font-bold underline cursor-pointer"
                     >
@@ -380,20 +494,18 @@ export default function CreateListeningPage() {
                     </button>
                   ))}
               </div>
-              {!time && missingField === "time" && (
-                <div className="mt-1 p-3 bg-amber-50 border border-amber-200 rounded-lg flex flex-col gap-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-bold text-black">
-                      {followUpQuestion || "언제 만나고 싶으세요?"}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={handleReplayTts}
-                      className="text-xs text-gray-700 bg-white border border-gray-300 px-2.5 py-1 rounded shrink-0 cursor-pointer"
-                    >
-                      다시 듣기
-                    </button>
-                  </div>
+              {mode === "classic" && !time && missingField === "time" && (
+                <div className="mt-1 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center justify-between gap-2">
+                  <p className="text-sm font-bold text-black">
+                    {followUpQuestion || "언제 만나고 싶으세요?"}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleReplayTts}
+                    className="text-xs text-gray-700 bg-white border border-gray-300 px-2.5 py-1 rounded shrink-0 cursor-pointer"
+                  >
+                    다시 듣기
+                  </button>
                 </div>
               )}
             </div>
@@ -431,7 +543,7 @@ export default function CreateListeningPage() {
                         const val = inputLocation.trim() || null;
                         setLocation(val);
                         setEditingLocation(false);
-                        if (!val) parseTranscript("", { location: null });
+                        if (!val && mode === "classic") parseTranscript("", { location: null });
                       }}
                       className="text-xs text-black font-bold underline cursor-pointer"
                     >
@@ -450,20 +562,18 @@ export default function CreateListeningPage() {
                     </button>
                   ))}
               </div>
-              {!location && missingField === "location" && (
-                <div className="mt-1 p-3 bg-amber-50 border border-amber-200 rounded-lg flex flex-col gap-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-bold text-black">
-                      {followUpQuestion || "어디서 만나고 싶으세요?"}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={handleReplayTts}
-                      className="text-xs text-gray-700 bg-white border border-gray-300 px-2.5 py-1 rounded shrink-0 cursor-pointer"
-                    >
-                      다시 듣기
-                    </button>
-                  </div>
+              {mode === "classic" && !location && missingField === "location" && (
+                <div className="mt-1 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center justify-between gap-2">
+                  <p className="text-sm font-bold text-black">
+                    {followUpQuestion || "어디서 만나고 싶으세요?"}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleReplayTts}
+                    className="text-xs text-gray-700 bg-white border border-gray-300 px-2.5 py-1 rounded shrink-0 cursor-pointer"
+                  >
+                    다시 듣기
+                  </button>
                 </div>
               )}
             </div>
@@ -501,7 +611,7 @@ export default function CreateListeningPage() {
                         const val = inputActivity.trim() || null;
                         setActivity(val);
                         setEditingActivity(false);
-                        if (!val) parseTranscript("", { activity: null });
+                        if (!val && mode === "classic") parseTranscript("", { activity: null });
                       }}
                       className="text-xs text-black font-bold underline cursor-pointer"
                     >
@@ -520,26 +630,24 @@ export default function CreateListeningPage() {
                     </button>
                   ))}
               </div>
-              {!activity && missingField === "activity" && (
-                <div className="mt-1 p-3 bg-amber-50 border border-amber-200 rounded-lg flex flex-col gap-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-bold text-black">
-                      {followUpQuestion || "무엇을 하고 싶으세요?"}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={handleReplayTts}
-                      className="text-xs text-gray-700 bg-white border border-gray-300 px-2.5 py-1 rounded shrink-0 cursor-pointer"
-                    >
-                      다시 듣기
-                    </button>
-                  </div>
+              {mode === "classic" && !activity && missingField === "activity" && (
+                <div className="mt-1 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center justify-between gap-2">
+                  <p className="text-sm font-bold text-black">
+                    {followUpQuestion || "무엇을 하고 싶으세요?"}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleReplayTts}
+                    className="text-xs text-gray-700 bg-white border border-gray-300 px-2.5 py-1 rounded shrink-0 cursor-pointer"
+                  >
+                    다시 듣기
+                  </button>
                 </div>
               )}
             </div>
 
-            {/* 글자 입력 폴백 (질문이 있을 때만) */}
-            {activeQuestion && (
+            {/* 글자 입력 폴백 */}
+            {!isFormComplete && (
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -551,7 +659,9 @@ export default function CreateListeningPage() {
                   type="text"
                   value={textInput}
                   onChange={(e) => setTextInput(e.target.value)}
-                  onFocus={cancelCurrent}
+                  onFocus={() => {
+                    if (mode === "classic") cancelClassic();
+                  }}
                   placeholder="글자로 입력하셔도 돼요"
                   className="w-full px-2.5 py-1.5 border border-gray-300 rounded text-xs focus:outline-none focus:border-black bg-white"
                 />
