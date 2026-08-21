@@ -60,7 +60,7 @@ export default function CreateDurationPage() {
 
   return (
     <WireframeLayout justify="start" className="flex flex-col">
-      <HeaderBack title="얼마나 걸릴까요?" backHref="/create/confirm" />
+      <HeaderBack title="얼마나 걸릴까요?" backHref="/create/listening" />
 
       <div className="p-4 flex flex-col gap-5">
         {/* Recap box */}

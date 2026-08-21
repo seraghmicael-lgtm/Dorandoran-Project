@@ -17,8 +17,8 @@ export default function RouteIndexPage() {
     { href: "/my-meetups/cancel/complete", label: "/my-meetups/cancel/complete (처리 완료)" },
     { href: "/my-meetups/expired", label: "/my-meetups/expired (07_불발 알림)" },
     { href: "/create/speak", label: "/create/speak (01_말하기)" },
-    { href: "/create/listening", label: "/create/listening (02_듣는 중)" },
-    { href: "/create/confirm", label: "/create/confirm (03_이렇게 들었어요)" },
+    
+    { href: "/create/listening", label: "/create/listening (02+03 통합 · 음성 문답)" },
     { href: "/create/duration", label: "/create/duration (04_얼마나 걸릴까요)" },
     { href: "/create/people", label: "/create/people (05_몇 분이 함께할까요)" },
     { href: "/create/posted", label: "/create/posted (06_올렸어요)" },
