@@ -12,6 +12,8 @@ import {
   RealtimeMeetupHandle,
   MeetupFields,
 } from "@/lib/realtimeMeetup";
+import { useAudioBands } from "@/lib/useAudioBands";
+import BarVisualizer, { VisualizerState } from "@/components/ui/bar-visualizer";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -53,6 +55,8 @@ export default function CreateListeningPage() {
     "connecting"
   );
   const [agentSpeaking, setAgentSpeaking] = useState(false);
+  const [micStream, setMicStream] = useState<MediaStream | null>(null);
+  const [agentStream, setAgentStream] = useState<MediaStream | null>(null);
   const handleRef = useRef<ListenHandle | null>(null);
   const turnTokenRef = useRef(0);
   const emptyCountRef = useRef(0);
@@ -104,7 +108,9 @@ export default function CreateListeningPage() {
           setStarted(true);
         },
         onAgentSpeaking: (sp) => {
-          if (!unmountedRef.current) setAgentSpeaking(sp);
+          if (unmountedRef.current) return;
+          setAgentSpeaking(sp);
+          if (sp) setAgentStream(rtRef.current?.getAgentStream() ?? null);
         },
         onStatus: (s) => {
           if (!unmountedRef.current) setRtStatus(s);
@@ -116,6 +122,8 @@ export default function CreateListeningPage() {
         return;
       }
       rtRef.current = handle;
+      setMicStream(handle.micStream);
+      setAgentStream(handle.getAgentStream());
     } catch (e) {
       console.warn("realtime connect failed, falling back:", e);
       pushDebug("실시간 연결 실패 — 기본 방식으로 전환");
@@ -350,6 +358,25 @@ export default function CreateListeningPage() {
   const rtLive = mode === "realtime" && rtStatus === "connected";
   const showPulse = rtLive || listening;
 
+  // 오디오 비주얼라이저(LiveKit shadcn 이식) — 실제 소리 밴드
+  const userBands = useAudioBands(micStream, 6);
+  const agentBands = useAudioBands(agentSpeaking ? agentStream : null, 6);
+  const vizState: VisualizerState =
+    mode === "realtime"
+      ? rtStatus === "connecting"
+        ? "connecting"
+        : rtStatus === "connected"
+        ? agentSpeaking
+          ? "speaking"
+          : "listening"
+        : "idle"
+      : listening
+      ? "listening"
+      : transcribing || isParsing
+      ? "connecting"
+      : "idle";
+  const vizBands = agentSpeaking ? agentBands : userBands;
+
   const statusText =
     mode === "realtime"
       ? rtStatus === "connecting"
@@ -393,14 +420,9 @@ export default function CreateListeningPage() {
                 : "border-black bg-white hover:bg-gray-50 active:scale-95 shadow-sm"
             }`}
           >
-            {showPulse ? (
-              <div className="flex items-center justify-center gap-1.5">
-                <div className="w-1.5 h-4 rounded bg-black animate-pulse" />
-                <div className="w-1.5 h-[34px] rounded bg-black animate-pulse" />
-                <div className="w-1.5 h-[50px] rounded bg-black animate-pulse" />
-                <div className="w-1.5 h-7 rounded bg-black animate-pulse" />
-                <div className="w-1.5 h-[42px] rounded bg-black animate-pulse" />
-                <div className="w-1.5 h-5 rounded bg-black animate-pulse" />
+            {showPulse || vizState === "connecting" ? (
+              <div className="h-[54px] w-[70px]">
+                <BarVisualizer state={vizState} bands={vizBands} />
               </div>
             ) : (
               <>

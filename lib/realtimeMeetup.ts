@@ -21,6 +21,10 @@ export interface RealtimeMeetupCallbacks {
 export interface RealtimeMeetupHandle {
   sendText: (text: string) => void;
   disconnect: () => void;
+  /** 시각화용 — 사용자 마이크 스트림 */
+  micStream: MediaStream;
+  /** 시각화용 — 도우미 음성 스트림(연결 후 채워짐) */
+  getAgentStream: () => MediaStream | null;
 }
 
 // 에이전트 목소리가 나올 오디오 엘리먼트 — 우리가 만들어서 제스처로 해금해둔다.
@@ -108,7 +112,15 @@ export async function connectRealtimeMeetup(
     agentAudioEl.autoplay = true;
   }
 
-  const transport = new OpenAIRealtimeWebRTC({ audioElement: agentAudioEl });
+  // 마이크는 우리가 직접 연다 — 시각화(막대)와 SDK가 같은 스트림을 쓴다.
+  // (권한 팝업도 이 시점, 즉 듣기 시작 직후에 확실히 뜬다)
+  const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  debug("마이크 열림");
+
+  const transport = new OpenAIRealtimeWebRTC({
+    audioElement: agentAudioEl,
+    mediaStream: micStream,
+  });
 
   const session = new RealtimeSession(agent, {
     transport,
@@ -189,7 +201,13 @@ export async function connectRealtimeMeetup(
       try {
         session.close();
       } catch {}
+      // SDK는 외부에서 받은 mediaStream을 멈추지 않는다 — 우리가 정리한다
+      try {
+        micStream.getTracks().forEach((t) => t.stop());
+      } catch {}
       cb.onStatus("closed");
     },
+    micStream,
+    getAgentStream: () => (agentAudioEl?.srcObject as MediaStream | null) ?? null,
   };
 }
