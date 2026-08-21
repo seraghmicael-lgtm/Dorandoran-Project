@@ -44,6 +44,12 @@ export default function CreateListeningPage() {
   const micDeniedRef = useRef(false);
   const unmountedRef = useRef(false);
   const [needTap, setNeedTap] = useState(false); // 자동 듣기가 안 돼 탭이 필요한 상태
+  const [debugLines, setDebugLines] = useState<string[]>([]);
+
+  const pushDebug = (msg: string) => {
+    if (unmountedRef.current) return;
+    setDebugLines((prev) => [...prev.slice(-2), msg]); // 최근 3개만 유지
+  };
 
   const activeQuestion = missingField
     ? missingField === "time"
@@ -110,6 +116,7 @@ export default function CreateListeningPage() {
       onTranscribing: () => {
         if (!unmountedRef.current) setTranscribing(true);
       },
+      onDebug: pushDebug,
     });
     handleRef.current = handle;
     const { transcript: heard, noVad, micDenied } = await handle.promise;
@@ -294,6 +301,12 @@ export default function CreateListeningPage() {
           <span className="text-sm font-bold text-black">{statusText}</span>
           {listening && (
             <span className="text-[11px] text-gray-500">말씀이 끝나면 자동으로 알아들어요 · 버튼을 누르면 바로 끝나요</span>
+          )}
+          {/* ponytail: 진단 표시줄 — 원인 파악되면 제거 */}
+          {debugLines.length > 0 && (
+            <span className="text-[10px] text-gray-400 leading-tight">
+              {debugLines.join(" · ")}
+            </span>
           )}
         </div>
 

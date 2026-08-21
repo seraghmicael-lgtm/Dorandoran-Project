@@ -104,6 +104,8 @@ interface ListenOptions {
   onPartial?: (text: string) => void;
   onSpeechStart?: () => void;
   onTranscribing?: () => void;
+  /** 진단용 — 엔진 선택·이벤트·오류 코드를 짧은 문자열로 알려준다 */
+  onDebug?: (msg: string) => void;
 }
 
 export function listenOnce(opts: ListenOptions = {}): ListenHandle {
@@ -161,10 +163,12 @@ function listenViaSpeechRecognition(SR: any, opts: ListenOptions): ListenHandle 
     try {
       rec.abort();
     } catch {}
+    opts.onDebug?.("녹음+변환 방식으로 전환");
     fallback = listenViaRecorder(opts);
     fallback.promise.then(resolvePromise);
   };
 
+  let resultCount = 0;
   rec.onresult = (event: any) => {
     interimText = "";
     finalText = "";
@@ -180,12 +184,15 @@ function listenViaSpeechRecognition(SR: any, opts: ListenOptions): ListenHandle 
         opts.onSpeechStart?.();
       }
       lastResultAt = Date.now();
+      resultCount++;
+      if (resultCount === 1) opts.onDebug?.("내장인식: 음성 감지됨");
       opts.onPartial?.(combined);
     }
   };
 
   rec.onerror = (event: any) => {
     const err = event?.error;
+    opts.onDebug?.("내장인식 오류: " + err);
     if (
       err === "not-allowed" ||
       err === "audio-capture" ||
@@ -202,6 +209,7 @@ function listenViaSpeechRecognition(SR: any, opts: ListenOptions): ListenHandle 
 
   rec.onend = () => {
     // 브라우저가 스스로 끝냈든(자체 침묵 감지) 우리가 stop() 했든 여기로 온다
+    if (!settled) opts.onDebug?.("내장인식 종료" + (sawSpeech ? "" : " (음성 감지 없음)"));
     settle();
   };
 
@@ -223,9 +231,11 @@ function listenViaSpeechRecognition(SR: any, opts: ListenOptions): ListenHandle 
     }
   }, maxMs);
 
+  opts.onDebug?.("내장인식 시작");
   try {
     rec.start();
   } catch {
+    opts.onDebug?.("내장인식 시작 실패");
     fallbackToRecorder();
   }
 
@@ -338,14 +348,18 @@ function listenViaRecorder(opts: ListenOptions): ListenHandle {
           return;
         }
         opts.onTranscribing?.();
+        opts.onDebug?.(`녹음 완료(${Math.round(blob.size / 1024)}KB) → 변환 중`);
         try {
           const formData = new FormData();
           formData.append("file", blob, "recording");
           const res = await fetch("/api/transcribe", { method: "POST", body: formData });
           if (!res.ok) throw new Error("transcribe failed");
           const data = await res.json();
-          resolvePromise({ transcript: (data.transcript || "").trim(), noVad });
+          const text = (data.transcript || "").trim();
+          opts.onDebug?.(text ? "변환 성공" : "변환 결과 비어있음");
+          resolvePromise({ transcript: text, noVad });
         } catch {
+          opts.onDebug?.("변환 요청 실패");
           resolvePromise({ transcript: "", noVad });
         }
       };
@@ -355,18 +369,21 @@ function listenViaRecorder(opts: ListenOptions): ListenHandle {
       let sawSpeech = false;
       let lastVoiceAt = Date.now();
       try {
+        // 공유 컨텍스트가 있으면 suspended여도 그걸 쓴다 — 제스처 직후라면
+        // resume이 이 안에서 성공한다(상태 검사를 resume보다 먼저 하면 레이스로 죽음)
         const shared = getSharedCtx();
-        if (shared && shared.state === "running") {
+        if (shared) {
           audioCtx = shared;
           usingSharedCtx = true;
         } else {
           audioCtx = new AudioContext();
-          if (audioCtx.state === "suspended") {
-            await audioCtx.resume().catch(() => {});
-          }
+        }
+        if (audioCtx.state === "suspended") {
+          await audioCtx.resume().catch(() => {});
         }
         if (audioCtx.state !== "running") {
           noVad = true;
+          opts.onDebug?.("녹음: 침묵감지 불가(버튼으로 종료)");
         } else {
           const source = audioCtx.createMediaStreamSource(stream);
           const analyser = audioCtx.createAnalyser();
@@ -388,6 +405,7 @@ function listenViaRecorder(opts: ListenOptions): ListenHandle {
               if (!sawSpeech) {
                 sawSpeech = true;
                 opts.onSpeechStart?.();
+                opts.onDebug?.("녹음: 음성 감지됨");
               }
               lastVoiceAt = Date.now();
             } else if (sawSpeech && Date.now() - lastVoiceAt > silenceMs) {
@@ -406,8 +424,10 @@ function listenViaRecorder(opts: ListenOptions): ListenHandle {
       }, maxMs);
 
       recorder.start();
+      opts.onDebug?.("녹음 시작");
       if (finishRequested || cancelled) stopRecorder();
     } catch {
+      opts.onDebug?.("마이크 열기 실패(권한 확인)");
       cleanup();
       resolvePromise({ transcript: "", noVad: true, micDenied: true });
     }
