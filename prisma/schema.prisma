@@ -28,6 +28,7 @@ model Meetup {
   lng           Float?
   maxPeople     Int      @default(3)
   status        String   @default("open") // open | matched | expired | cancelled
+  cancelledAt   DateTime?
   createdAt     DateTime @default(now())
 
   creatorId String
