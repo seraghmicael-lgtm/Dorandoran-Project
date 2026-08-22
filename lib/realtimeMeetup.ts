@@ -125,15 +125,19 @@ export async function connectRealtimeMeetup(
   // 에코캔슬 명시: 도우미 목소리가 마이크로 되돌아 들어가 이중 발화를 유발하는 것 방지.
   let micStream: MediaStream;
   try {
-    micStream = await navigator.mediaDevices.getUserMedia({
-      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+    const { preferredMicConstraints } = await import("./voice");
+    const audio = await preferredMicConstraints({
+      echoCancellation: true,
+      noiseSuppression: true,
+      autoGainControl: true,
     });
+    micStream = await navigator.mediaDevices.getUserMedia({ audio });
   } catch (err) {
     const { describeMicFailure } = await import("./voice");
     debug("마이크 열기 실패: " + (await describeMicFailure(err)));
     throw err;
   }
-  debug("마이크 열림");
+  debug("입력장치: " + (micStream.getAudioTracks()[0]?.label || "?").slice(0, 28));
 
   const stopMic = () => {
     try {

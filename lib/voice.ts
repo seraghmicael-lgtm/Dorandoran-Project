@@ -37,6 +37,29 @@ export function getSharedCtx(): AudioContext | null {
   return sharedCtx;
 }
 
+// BlackHole 같은 가상 오디오 장치가 시스템 기본 입력이면 브라우저 캡처가 전부
+// 무음이 된다(권한·송신은 전부 정상으로 보임). 실제 마이크를 자동 선택한다.
+const VIRTUAL_MIC = /blackhole|loopback|aggregate|virtual|soundflower|vb-audio|vb-cable|cable/i;
+
+export async function preferredMicConstraints(
+  base: MediaTrackConstraints = {}
+): Promise<MediaTrackConstraints> {
+  try {
+    const devs = await navigator.mediaDevices.enumerateDevices();
+    const inputs = devs.filter((d) => d.kind === "audioinput" && d.label);
+    if (!inputs.length) return { ...base }; // 권한 전이라 라벨 없음 → 기본값
+    const def = inputs.find((d) => d.deviceId === "default") || inputs[0];
+    if (!VIRTUAL_MIC.test(def.label)) return { ...base }; // 기본 장치가 진짜 마이크
+    const real = inputs.find(
+      (d) => !VIRTUAL_MIC.test(d.label) && d.deviceId !== "default" && d.deviceId !== "communications"
+    );
+    if (!real) return { ...base };
+    return { ...base, deviceId: { exact: real.deviceId } };
+  } catch {
+    return { ...base };
+  }
+}
+
 /** 마이크 실패를 정확히 진단: 에러 이름 + 브라우저 권한 상태.
  *  "granted인데 NotAllowedError"면 macOS 시스템(앱 수준) 마이크 권한 거부가 확정이다. */
 export async function describeMicFailure(err: any): Promise<string> {
@@ -149,6 +172,8 @@ export function listenOnce(opts: ListenOptions = {}): ListenHandle {
   let lastVoiceAt = Date.now();
   let micDenied = false;
   let noVad = false;
+  let vadWasActive = false;
+  let maxRms = 0;
 
   // ---- SR(내장인식) 상태 ----
   let srFinal = "";
@@ -214,6 +239,13 @@ export function listenOnce(opts: ListenOptions = {}): ListenHandle {
       return;
     }
     if (recordedBlob && recordedBlob.size > 0) {
+      // 무음 가드: VAD가 살아있는데 발화·에너지가 전혀 없으면 Whisper에 보내지 않는다.
+      // (무음을 보내면 "고맙습니다"류 방송체 환각이 생성된다)
+      if (vadWasActive && !sawSpeech && maxRms < 3) {
+        debug("무음 구간 — 전사 생략");
+        resolvePromise({ transcript: "", noVad, micDenied });
+        return;
+      }
       opts.onTranscribing?.();
       debug(`녹음 완료(${Math.round(recordedBlob.size / 1024)}KB) → 변환 중`);
       try {
@@ -313,7 +345,10 @@ export function listenOnce(opts: ListenOptions = {}): ListenHandle {
   // ---- 2) 녹음 + 침묵감지 — 항상 병행 (Whisper 폴백의 원본) ----
   (async () => {
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const audioConstraints = await preferredMicConstraints({});
+      stream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
+      const label = stream.getAudioTracks()[0]?.label || "?";
+      debug("입력장치: " + label.slice(0, 28));
       if (cancelled || settled) {
         cleanup();
         return;
@@ -354,6 +389,7 @@ export function listenOnce(opts: ListenOptions = {}): ListenHandle {
           vadAnalyser = analyser;
           const buf = new Uint8Array(analyser.fftSize);
           let vadSaw = false;
+          vadWasActive = true;
 
           vadTimer = setInterval(() => {
             analyser.getByteTimeDomainData(buf);
@@ -363,6 +399,7 @@ export function listenOnce(opts: ListenOptions = {}): ListenHandle {
               sum += d * d;
             }
             const rms = Math.sqrt(sum / buf.length);
+            if (rms > maxRms) maxRms = rms;
             if (rms > SPEECH_RMS) {
               if (!vadSaw) {
                 vadSaw = true;
