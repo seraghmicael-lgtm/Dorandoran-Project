@@ -396,6 +396,16 @@ export default function CreateListeningPage() {
   // =====================================================================
   useEffect(() => {
     unmountedRef.current = false;
+    // 진입 즉시 소개+첫 질문을 TTS로 확정 재생 — 도우미(실시간) 음성에 의존하지 않는다
+    (async () => {
+      const OPENING = "저는 모임 만들기를 도와줄 거예요. 언제 만나고 싶으세요?";
+      introSpokenRef.current = true;
+      setAgentLine(OPENING);
+      setStarted(true);
+      ttsSpeakingRef.current = true;
+      await playTts(OPENING);
+      ttsSpeakingRef.current = false;
+    })();
     connectRealtime();
     return () => {
       unmountedRef.current = true;
