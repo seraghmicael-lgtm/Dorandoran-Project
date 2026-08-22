@@ -117,6 +117,8 @@ interface ListenOptions {
   maxMs?: number;
   /** 'recorder': 내장인식(SR) 없이 녹음+Whisper만 (실시간 세션과 병행할 때 충돌 방지) */
   engine?: "auto" | "recorder";
+  /** 이 시간(ms) 동안 아무 말도 감지 안 되면 빈 결과로 종료 (문답 루프의 재질문 트리거) */
+  noSpeechMs?: number;
   /** 실시간 자막 — 말하는 도중 지금까지 인식된 문장을 계속 준다 */
   onPartial?: (text: string) => void;
   onSpeechStart?: () => void;
@@ -397,6 +399,15 @@ export function listenOnce(opts: ListenOptions = {}): ListenHandle {
   })();
 
   maxTimer = setTimeout(() => finishAll(), maxMs);
+
+  // 무발화 타임아웃: 이 시간까지 음성 감지가 없으면 일단 마무리한다.
+  // 중요: 빈 결과로 버리지 않고 finishAll()로 가서, VAD가 놓친 조용한 발화도
+  // 녹음본째 Whisper에 넣어 확인한다. (VAD 불가 기기에선 고정 창 역할)
+  if (opts.noSpeechMs) {
+    setTimeout(() => {
+      if (!settled && !finishing && !sawSpeech) finishAll();
+    }, opts.noSpeechMs);
+  }
 
   return {
     finish: () => finishAll(),

@@ -112,29 +112,44 @@ export default function CreateListeningPage() {
     localHandleRef.current = null;
   };
 
+  // 시간 → 장소 → 할일 순서. 앞 필드가 차기 전에는 다음 질문으로 넘어가지 않는다.
+  const firstMissingQuestion = (): string | null => {
+    const f = fieldsRef.current;
+    if (!f.t) return "언제 만나고 싶으세요?";
+    if (!f.l) return "어디서 만나고 싶으세요?";
+    if (!f.a) return "무엇을 하고 싶으세요?";
+    return null;
+  };
+
+  const ttsSpeakingRef = useRef(false);
+
   const runLocalLoop = async () => {
     // iOS는 두 번째 마이크 캡처가 WebRTC 오디오 세션과 충돌할 수 있어 보조 루프를 끈다
     if (/iP(hone|ad|od)/.test(navigator.userAgent)) return;
     const token = ++localLoopRef.current;
-    while (
-      localLoopRef.current === token &&
-      !unmountedRef.current &&
-      !(fieldsRef.current.t && fieldsRef.current.l && fieldsRef.current.a)
-    ) {
-      if (agentSpeakingRef.current) {
-        await sleep(300); // 도우미가 말하는 동안은 귀를 닫는다(역유입 방지)
+    let emptyRounds = 0;
+    while (localLoopRef.current === token && !unmountedRef.current) {
+      if (agentSpeakingRef.current || ttsSpeakingRef.current) {
+        await sleep(300); // 도우미/질문 음성이 나가는 동안은 귀를 닫는다(역유입 방지)
         continue;
       }
-      const handle = listenOnce({ engine: "recorder", silenceMs: 1300, onDebug: () => {} });
+      const handle = listenOnce({
+        engine: "recorder",
+        silenceMs: 1300,
+        noSpeechMs: 8000,
+        maxMs: 20000,
+        onDebug: () => {},
+      });
       localHandleRef.current = handle;
-      const { transcript: heard, noVad, micDenied } = await handle.promise;
+      const { transcript: heard, micDenied } = await handle.promise;
       localHandleRef.current = null;
       if (localLoopRef.current !== token || unmountedRef.current) return;
-      if (micDenied || noVad) {
-        pushDebug("보조 인식 대기(버튼/음성만 사용)");
-        return; // 이 기기에선 보조 루프 불가 — 실시간 이벤트에 맡긴다
+      if (micDenied) {
+        pushDebug("보조 인식: 마이크 불가");
+        return;
       }
       if (heard) {
+        emptyRounds = 0;
         setTranscript(heard);
         setLiveText(heard);
         setStarted(true);
@@ -144,6 +159,25 @@ export default function CreateListeningPage() {
           location: fieldsRef.current.l,
           activity: fieldsRef.current.a,
         });
+      } else {
+        emptyRounds++;
+      }
+
+      // 문답: 첫 빈 필드(시간→장소→할일)를 TTS로 묻고 다시 듣는다.
+      const q = firstMissingQuestion();
+      if (!q) break; // 세 필드 완성 — 루프 종료
+      if (localLoopRef.current !== token || unmountedRef.current) return;
+      if (!agentSpeakingRef.current && emptyRounds <= 4) {
+        setAgentLine(q);
+        setStarted(true);
+        ttsSpeakingRef.current = true;
+        await playTts(q);
+        ttsSpeakingRef.current = false;
+      }
+      if (emptyRounds > 4) {
+        pushDebug("응답 대기 — 버튼을 눌러 이어가세요");
+        setNeedTap(true);
+        return;
       }
     }
   };
@@ -350,6 +384,11 @@ export default function CreateListeningPage() {
     if (mode === "realtime") {
       if (rtStatus === "closed" || rtStatus === "error") {
         connectRealtime(); // 재연결
+      } else if (needTap) {
+        // 보조 문답 루프가 응답 대기로 멈춘 상태 — 제스처 안에서 재개
+        setNeedTap(false);
+        stopLocalLoop();
+        runLocalLoop();
       }
       return; // 연결 중/연결됨: 서버가 알아서 듣는다
     }
@@ -462,7 +501,9 @@ export default function CreateListeningPage() {
       ? rtStatus === "connecting"
         ? "연결하고 있어요..."
         : rtStatus === "connected"
-        ? agentSpeaking
+        ? needTap
+          ? "버튼을 누르고 말씀해주세요"
+          : agentSpeaking
           ? "도우미가 말하고 있어요"
           : "듣고 있어요 — 편하게 말씀하세요"
         : "버튼을 누르면 다시 연결돼요"
