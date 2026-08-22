@@ -194,15 +194,25 @@ export async function connectRealtimeMeetup(
     }
   });
 
-  session.on("agent_end", (_ctx: any, _agent: any, text: string) => {
-    if (text && text.trim()) cb.onAgentText(text.trim());
-  });
-  session.on("audio_start", () => {
+  // WebRTC 모드에선 audio_start/audio_stopped(오디오 델타 이벤트)가 오지 않는다 —
+  // 응답 생성 이벤트(agent_start/agent_end)는 데이터채널로 확실히 오므로 그걸로
+  // "도우미 발화 중" 신호를 만든다. 재생 꼬리를 감안해 종료 후 1초 여유를 둔다.
+  let speakTail: ReturnType<typeof setTimeout> | null = null;
+  session.on("agent_start", () => {
+    if (speakTail) clearTimeout(speakTail);
     cb.onAgentSpeaking?.(true);
-    // 스트림이 붙은 뒤 재생이 차단돼 있으면 한 번 더 시도
     agentAudioEl?.play().catch(() => debug("도우미 소리 차단됨 — 버튼을 한 번 눌러주세요"));
   });
-  session.on("audio_stopped", () => cb.onAgentSpeaking?.(false));
+  session.on("agent_end", (_ctx: any, _agent: any, text: string) => {
+    if (text && text.trim()) cb.onAgentText(text.trim());
+    if (speakTail) clearTimeout(speakTail);
+    speakTail = setTimeout(() => cb.onAgentSpeaking?.(false), 1000);
+  });
+  session.on("audio_start", () => cb.onAgentSpeaking?.(true));
+  session.on("audio_stopped", () => {
+    if (speakTail) clearTimeout(speakTail);
+    speakTail = setTimeout(() => cb.onAgentSpeaking?.(false), 300);
+  });
   session.on("error", (e: any) => {
     debug("실시간 오류: " + (e?.error?.message ?? e?.message ?? String(e)).slice(0, 60));
   });

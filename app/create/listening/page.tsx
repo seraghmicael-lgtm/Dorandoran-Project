@@ -97,6 +97,7 @@ export default function CreateListeningPage() {
   const localLoopRef = useRef(0); // 0=꺼짐, n=활성 루프 토큰
   const localHandleRef = useRef<ListenHandle | null>(null);
   const agentSpeakingRef = useRef(false);
+  const lastAgentActivityRef = useRef(0);
   const fieldsRef = useRef<{ t: string | null; l: string | null; a: string | null }>({
     t: null,
     l: null,
@@ -138,6 +139,7 @@ export default function CreateListeningPage() {
         silenceMs: 1300,
         noSpeechMs: 8000,
         maxMs: 20000,
+        externalStream: rtRef.current?.micStream, // 세션과 같은 마이크 재사용(여닫는 잡음 제거)
         onDebug: () => {},
       });
       localHandleRef.current = handle;
@@ -167,7 +169,16 @@ export default function CreateListeningPage() {
       const q = firstMissingQuestion();
       if (!q) break; // 세 필드 완성 — 루프 종료
       if (localLoopRef.current !== token || unmountedRef.current) return;
-      if (!agentSpeakingRef.current && emptyRounds <= 4) {
+      // 도우미(실시간 에이전트)가 살아있으면 그쪽이 먼저 묻게 3초 양보한다 — 목소리 겹침 방지
+      const roundEndAt = Date.now();
+      let yielded = 0;
+      while (yielded < 3000 && !agentSpeakingRef.current && lastAgentActivityRef.current < roundEndAt) {
+        await sleep(300);
+        yielded += 300;
+        if (localLoopRef.current !== token || unmountedRef.current) return;
+      }
+      const agentTookOver = agentSpeakingRef.current || lastAgentActivityRef.current >= roundEndAt;
+      if (!agentTookOver && emptyRounds <= 4) {
         setAgentLine(q);
         setStarted(true);
         ttsSpeakingRef.current = true;
@@ -200,6 +211,7 @@ export default function CreateListeningPage() {
         },
         onAgentText: (t) => {
           if (unmountedRef.current) return;
+          lastAgentActivityRef.current = Date.now();
           setAgentLine(t);
           setStarted(true);
         },
@@ -207,7 +219,12 @@ export default function CreateListeningPage() {
           if (unmountedRef.current) return;
           agentSpeakingRef.current = sp;
           setAgentSpeaking(sp);
-          if (sp) setAgentStream(rtRef.current?.getAgentStream() ?? null);
+          if (sp) {
+            lastAgentActivityRef.current = Date.now();
+            setAgentStream(rtRef.current?.getAgentStream() ?? null);
+            // 도우미가 말하는 동안 잡힌 보조 녹음은 버린다(도우미 목소리 역전사 방지)
+            localHandleRef.current?.cancel();
+          }
         },
         onStatus: (s) => {
           if (!unmountedRef.current) setRtStatus(s);
@@ -579,7 +596,7 @@ export default function CreateListeningPage() {
         <div className="w-full p-4 border border-gray-200 rounded-lg bg-gray-50 flex flex-col gap-2 text-left">
           <span className="text-xs text-gray-500 font-medium">말씀하신 대로 적고 있어요</span>
           <p className="text-sm font-bold text-black">
-            {liveText || transcript || "세 시에 오일장 구경 같이"}
+            {liveText || transcript || "말씀하시면 여기에 글로 나타나요"}
           </p>
           <p className="text-sm text-gray-400">…</p>
         </div>

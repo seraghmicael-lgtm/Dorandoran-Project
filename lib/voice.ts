@@ -142,6 +142,9 @@ interface ListenOptions {
   engine?: "auto" | "recorder";
   /** 이 시간(ms) 동안 아무 말도 감지 안 되면 빈 결과로 종료 (문답 루프의 재질문 트리거) */
   noSpeechMs?: number;
+  /** 이미 열린 마이크 스트림 재사용(실시간 세션과 공유) — 장치 여닫는 잡음 제거.
+   *  이 경우 cleanup에서 트랙을 멈추지 않는다. */
+  externalStream?: MediaStream;
   /** 실시간 자막 — 말하는 도중 지금까지 인식된 문장을 계속 준다 */
   onPartial?: (text: string) => void;
   onSpeechStart?: () => void;
@@ -208,7 +211,7 @@ export function listenOnce(opts: ListenOptions = {}): ListenHandle {
     vadTimer = null;
     maxTimer = null;
     if (stream) {
-      stream.getTracks().forEach((t) => t.stop());
+      if (!opts.externalStream) stream.getTracks().forEach((t) => t.stop());
       stream = null;
     }
     try {
@@ -345,10 +348,14 @@ export function listenOnce(opts: ListenOptions = {}): ListenHandle {
   // ---- 2) 녹음 + 침묵감지 — 항상 병행 (Whisper 폴백의 원본) ----
   (async () => {
     try {
-      const audioConstraints = await preferredMicConstraints({});
-      stream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
-      const label = stream.getAudioTracks()[0]?.label || "?";
-      debug("입력장치: " + label.slice(0, 28));
+      if (opts.externalStream) {
+        stream = opts.externalStream;
+      } else {
+        const audioConstraints = await preferredMicConstraints({});
+        stream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
+        const label = stream.getAudioTracks()[0]?.label || "?";
+        debug("입력장치: " + label.slice(0, 28));
+      }
       if (cancelled || settled) {
         cleanup();
         return;
