@@ -123,9 +123,16 @@ export async function connectRealtimeMeetup(
 
   // 마이크는 우리가 직접 연다 — 시각화(막대)와 SDK가 같은 스트림을 쓴다.
   // 에코캔슬 명시: 도우미 목소리가 마이크로 되돌아 들어가 이중 발화를 유발하는 것 방지.
-  const micStream = await navigator.mediaDevices.getUserMedia({
-    audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-  });
+  let micStream: MediaStream;
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+    });
+  } catch (err) {
+    const { describeMicFailure } = await import("./voice");
+    debug("마이크 열기 실패: " + (await describeMicFailure(err)));
+    throw err;
+  }
   debug("마이크 열림");
 
   const stopMic = () => {

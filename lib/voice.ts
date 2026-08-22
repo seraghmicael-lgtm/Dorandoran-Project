@@ -37,6 +37,22 @@ export function getSharedCtx(): AudioContext | null {
   return sharedCtx;
 }
 
+/** 마이크 실패를 정확히 진단: 에러 이름 + 브라우저 권한 상태.
+ *  "granted인데 NotAllowedError"면 macOS 시스템(앱 수준) 마이크 권한 거부가 확정이다. */
+export async function describeMicFailure(err: any): Promise<string> {
+  const name = err?.name || "UnknownError";
+  let perm = "?";
+  try {
+    const st = await (navigator.permissions as any)?.query?.({ name: "microphone" });
+    perm = st?.state ?? "?";
+  } catch {}
+  let hint = "";
+  if (name === "NotAllowedError" && perm === "granted") hint = " → macOS 시스템설정>마이크에서 이 브라우저 허용 필요";
+  else if (name === "NotFoundError") hint = " → 입력장치 없음";
+  else if (name === "NotReadableError") hint = " → 마이크가 다른 앱에 점유됨";
+  return `${name}/브라우저권한:${perm}${hint}`;
+}
+
 export function stopTts() {
   try {
     sharedAudio?.pause();
@@ -358,7 +374,7 @@ export function listenOnce(opts: ListenOptions = {}): ListenHandle {
       }
 
       if (finishing) recorder.stop();
-    } catch {
+    } catch (err) {
       // 마이크를 못 열었다 — 내장인식이 살아있으면 그쪽 단독으로 계속
       if (srActive) {
         debug("녹음 불가 — 내장인식만 사용");
@@ -370,7 +386,7 @@ export function listenOnce(opts: ListenOptions = {}): ListenHandle {
         };
       } else {
         micDenied = true;
-        debug("마이크 열기 실패(권한 확인)");
+        describeMicFailure(err).then((d) => debug("마이크 열기 실패: " + d));
         finishAll();
       }
     }
