@@ -1,7 +1,42 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import WireframeLayout from "@/components/WireframeLayout";
+import { prisma } from "@/lib/prisma";
 
-export default function MyMeetupsCreatedPage() {
+export default async function MyMeetupsCreatedPage() {
+  // 내가(uid 쿠키) 올린 모임을 최신순으로 — 올리기 직후 이 목록에 바로 나타난다
+  const uid = (await cookies()).get("uid")?.value ?? null;
+  let myMeetups: {
+    id: string;
+    startTime: string;
+    activity: string;
+    locationName: string;
+    maxPeople: number;
+    status: string;
+    participantCount: number;
+  }[] = [];
+  if (uid) {
+    try {
+      const rows = await prisma.meetup.findMany({
+        where: { creatorId: uid },
+        orderBy: { createdAt: "desc" },
+        include: { participants: true },
+      });
+      myMeetups = rows.map((m) => ({
+        id: m.id,
+        startTime: m.startTime,
+        activity: m.activity,
+        locationName: m.locationName ?? "",
+        maxPeople: m.maxPeople,
+        status: m.status,
+        participantCount: m.participants.length,
+      }));
+    } catch (e) {
+      console.error("만든 동행 조회 실패:", e);
+    }
+  }
+  const open = myMeetups.filter((m) => m.status === "open");
+
   return (
     <WireframeLayout justify="start" bottomNav="five" className="flex flex-col">
       {/* Tabs: 참여한 동행 / 만든 동행 (active) */}
@@ -31,25 +66,51 @@ export default function MyMeetupsCreatedPage() {
       <div className="px-5">
         <h2 className="text-lg font-bold text-black pb-3">진행중</h2>
 
-        <div className="p-3.5 border border-gray-300 rounded flex flex-col gap-3">
+        {open.length > 0 ? (
           <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <span className="text-lg font-bold text-black">오후 5시</span>
-              <span className="text-sm font-medium text-gray-500">1 / 3명</span>
-            </div>
-            <div className="flex flex-col gap-1">
-              <p className="text-xl font-bold text-black">동네 공원에서 같이 운동합시다</p>
-              <p className="text-sm font-medium text-gray-400">예상 시간 : 30분</p>
-              <p className="text-sm font-medium text-gray-400">
-                도란공원 입구ㆍ걸어서 10분
-              </p>
-            </div>
-          </div>
+            {open.map((m) => (
+              <div key={m.id} className="p-3.5 border border-gray-300 rounded flex flex-col gap-3">
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-bold text-black">{m.startTime}</span>
+                    <span className="text-sm font-medium text-gray-500">
+                      {m.participantCount} / {m.maxPeople}명
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <p className="text-xl font-bold text-black">{m.activity}</p>
+                    <p className="text-sm font-medium text-gray-400">{m.locationName}</p>
+                  </div>
+                </div>
 
-          <div className="w-full py-4 bg-white border border-gray-300 rounded-[10px] flex items-center justify-center">
-            <span className="text-base font-medium text-black">만든 동행 취소하기</span>
+                <div className="w-full py-4 bg-white border border-gray-300 rounded-[10px] flex items-center justify-center">
+                  <span className="text-base font-medium text-black">만든 동행 취소하기</span>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+        ) : (
+          /* 아직 올린 모임이 없으면 Figma 예시 카드 유지 */
+          <div className="p-3.5 border border-gray-300 rounded flex flex-col gap-3">
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <span className="text-lg font-bold text-black">오후 5시</span>
+                <span className="text-sm font-medium text-gray-500">1 / 3명</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <p className="text-xl font-bold text-black">동네 공원에서 같이 운동합시다</p>
+                <p className="text-sm font-medium text-gray-400">예상 시간 : 30분</p>
+                <p className="text-sm font-medium text-gray-400">
+                  도란공원 입구ㆍ걸어서 10분
+                </p>
+              </div>
+            </div>
+
+            <div className="w-full py-4 bg-white border border-gray-300 rounded-[10px] flex items-center justify-center">
+              <span className="text-base font-medium text-black">만든 동행 취소하기</span>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="h-2 bg-gray-100 mt-4" />

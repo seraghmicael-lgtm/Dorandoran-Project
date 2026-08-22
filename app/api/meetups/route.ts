@@ -58,7 +58,17 @@ export async function POST(request: Request) {
       console.warn("Participant auto-add warning:", participantErr);
     }
 
-    return NextResponse.json(meetup, { status: 201 });
+    // 작성자를 쿠키로 기억해 "만든 동행" 목록에서 내 모임을 찾을 수 있게 한다
+    const res = NextResponse.json(meetup, { status: 201 });
+    if (uidCookie !== creatorId) {
+      res.cookies.set("uid", creatorId, {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 365,
+      });
+    }
+    return res;
   } catch (error) {
     console.error("Error creating meetup:", error);
     return NextResponse.json(
