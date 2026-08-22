@@ -92,6 +92,62 @@ export default function CreateListeningPage() {
   const rtAttemptsRef = useRef(0);
   const connectingRef = useRef(false);
 
+  // 로컬 보조 인식(실시간 세션 병행): 서버 전사 이벤트가 브라우저에 안 와도
+  // 말씀 한 번마다 녹음→Whisper→파싱으로 반드시 필드를 채운다.
+  const localLoopRef = useRef(0); // 0=꺼짐, n=활성 루프 토큰
+  const localHandleRef = useRef<ListenHandle | null>(null);
+  const agentSpeakingRef = useRef(false);
+  const fieldsRef = useRef<{ t: string | null; l: string | null; a: string | null }>({
+    t: null,
+    l: null,
+    a: null,
+  });
+  useEffect(() => {
+    fieldsRef.current = { t: time, l: location, a: activity };
+  }, [time, location, activity]);
+
+  const stopLocalLoop = () => {
+    localLoopRef.current = 0;
+    localHandleRef.current?.cancel();
+    localHandleRef.current = null;
+  };
+
+  const runLocalLoop = async () => {
+    // iOS는 두 번째 마이크 캡처가 WebRTC 오디오 세션과 충돌할 수 있어 보조 루프를 끈다
+    if (/iP(hone|ad|od)/.test(navigator.userAgent)) return;
+    const token = ++localLoopRef.current;
+    while (
+      localLoopRef.current === token &&
+      !unmountedRef.current &&
+      !(fieldsRef.current.t && fieldsRef.current.l && fieldsRef.current.a)
+    ) {
+      if (agentSpeakingRef.current) {
+        await sleep(300); // 도우미가 말하는 동안은 귀를 닫는다(역유입 방지)
+        continue;
+      }
+      const handle = listenOnce({ engine: "recorder", silenceMs: 1300, onDebug: () => {} });
+      localHandleRef.current = handle;
+      const { transcript: heard, noVad, micDenied } = await handle.promise;
+      localHandleRef.current = null;
+      if (localLoopRef.current !== token || unmountedRef.current) return;
+      if (micDenied || noVad) {
+        pushDebug("보조 인식 대기(버튼/음성만 사용)");
+        return; // 이 기기에선 보조 루프 불가 — 실시간 이벤트에 맡긴다
+      }
+      if (heard) {
+        setTranscript(heard);
+        setLiveText(heard);
+        setStarted(true);
+        pushDebug("보조 인식: " + heard.slice(0, 24));
+        await parseTranscript(heard, {
+          time: fieldsRef.current.t,
+          location: fieldsRef.current.l,
+          activity: fieldsRef.current.a,
+        });
+      }
+    }
+  };
+
   const connectRealtime = async (): Promise<boolean> => {
     if (connectingRef.current) return false;
     connectingRef.current = true;
@@ -115,6 +171,7 @@ export default function CreateListeningPage() {
         },
         onAgentSpeaking: (sp) => {
           if (unmountedRef.current) return;
+          agentSpeakingRef.current = sp;
           setAgentSpeaking(sp);
           if (sp) setAgentStream(rtRef.current?.getAgentStream() ?? null);
         },
@@ -131,6 +188,7 @@ export default function CreateListeningPage() {
       setMicStream(handle.micStream);
       setAgentStream(handle.getAgentStream());
       setMode("realtime");
+      runLocalLoop(); // 보조 인식 병행 시작
       return true;
     } catch (e) {
       console.warn("realtime connect failed:", e);
@@ -274,6 +332,7 @@ export default function CreateListeningPage() {
     return () => {
       unmountedRef.current = true;
       turnTokenRef.current++;
+      stopLocalLoop();
       rtRef.current?.disconnect();
       rtRef.current = null;
       handleRef.current?.cancel();
@@ -344,6 +403,7 @@ export default function CreateListeningPage() {
     micDeniedRef.current = false;
     emptyCountRef.current = 0;
     if (mode === "realtime") {
+      stopLocalLoop();
       rtRef.current?.disconnect();
       rtRef.current = null;
       connectRealtime();
@@ -358,6 +418,7 @@ export default function CreateListeningPage() {
 
   const handlePost = () => {
     if (!isFormComplete) return;
+    stopLocalLoop();
     rtRef.current?.disconnect();
     rtRef.current = null;
     cancelClassic();

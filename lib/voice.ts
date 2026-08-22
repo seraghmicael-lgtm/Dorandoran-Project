@@ -115,6 +115,8 @@ interface ListenOptions {
   silenceMs?: number;
   /** 안전 상한(ms) — 이 시간이 지나면 무조건 종료 */
   maxMs?: number;
+  /** 'recorder': 내장인식(SR) 없이 녹음+Whisper만 (실시간 세션과 병행할 때 충돌 방지) */
+  engine?: "auto" | "recorder";
   /** 실시간 자막 — 말하는 도중 지금까지 인식된 문장을 계속 준다 */
   onPartial?: (text: string) => void;
   onSpeechStart?: () => void;
@@ -250,7 +252,9 @@ export function listenOnce(opts: ListenOptions = {}): ListenHandle {
 
   // ---- 1) 내장인식(있으면) — 실시간 자막 담당 ----
   const SR =
-    typeof window !== "undefined"
+    opts.engine === "recorder"
+      ? undefined
+      : typeof window !== "undefined"
       ? window.SpeechRecognition || window.webkitSpeechRecognition
       : undefined;
   if (SR) {
