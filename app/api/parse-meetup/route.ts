@@ -64,6 +64,19 @@ Existing known fields:
 Instructions:
 1. Parse the user's input transcript for time, location, or activity.
 2. If an existing field is already provided and not null, keep it UNLESS the transcript explicitly provides a new value for that field.
+2-1. CHANGE INTENT — elderly users rephrase changes in many ways. Treat ALL of these as
+   "replace that field with the new value" (only the referenced field changes; keep the rest):
+   - 직접 지시: "시간(을) 4시로 바꿔/바꿔줘/변경해줘", "장소는 도란공원으로 바꿔", "활동 바꿀래"
+   - 대체 표현: "3시 말고 4시", "오일장이 아니라 공원", "그거 말고 산책", "차라리 5시", "그냥 공원으로"
+   - 재지정: "4시로 하자/해요/할래요/합시다", "공원에서 보자/만나요", "산책으로 하죠"
+   - 정정: "아니(요) 4시", "아니야 공원이야", "잘못 말했어 5시야", "다시 말할게, 뜨개질"
+   - 상대 시간 조정(기존 time 기준 계산해서 결과 시각을 넣어라):
+     "한 시간 미뤄/늦춰(줘)" → +1시간, "30분 당겨" → -30분, "한 시간 뒤로" → +1시간,
+     "조금 이따로" → +30분 정도. 예: 기존 "오후 3시" + "한 시간 미뤄" → "오후 4시".
+   - 필드 미지칭 변경: 필드 이름을 말하지 않아도 값의 종류로 판단하라 —
+     시각 패턴("4시", "네 시 반")이면 time, 장소명이면 location, 행동/활동이면 activity.
+   - 비우기: "장소(는) 다시 정할래", "그건 아직 모르겠어" → 해당 필드를 빈 문자열 ""로
+     반환하라(원래 몰랐던 필드의 null과 구분하기 위함이다).
 3. Return ONLY a JSON object with these exact five keys:
    - "time": string or null — a time-of-day only, WITHOUT any day word (no "오늘"/"내일"/etc).
      The screen that displays this always prefixes it with a fixed "오늘" label, so including a day
@@ -142,9 +155,15 @@ Output pure valid JSON.`;
     }
 
     const parsed = JSON.parse(content);
-    const parsedTime = typeof parsed.time === "string" && parsed.time.trim() ? parsed.time.trim() : existingTime;
-    const parsedLocation = typeof parsed.location === "string" && parsed.location.trim() ? parsed.location.trim() : existingLocation;
-    const parsedActivity = typeof parsed.activity === "string" && parsed.activity.trim() ? parsed.activity.trim() : existingActivity;
+    // "" = 의도적 비우기(다시 정할래), null = 이번 발화에 없음(기존 유지), 값 = 갱신
+    const mergeField = (v: unknown, existing: string | null): string | null => {
+      if (v === "") return null;
+      if (typeof v === "string" && v.trim()) return v.trim();
+      return existing;
+    };
+    const parsedTime = mergeField(parsed.time, existingTime);
+    const parsedLocation = mergeField(parsed.location, existingLocation);
+    const parsedActivity = mergeField(parsed.activity, existingActivity);
 
     let missingField: "time" | "location" | "activity" | null = null;
     if (!parsedTime) missingField = "time";

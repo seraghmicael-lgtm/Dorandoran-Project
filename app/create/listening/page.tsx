@@ -82,10 +82,13 @@ export default function CreateListeningPage() {
   // 실시간(OpenAI Realtime) 모드
   // =====================================================================
   const mergeFields = (f: MeetupFields) => {
-    // null = 아직 모름 → 기존 값 유지. 값이 오면 갱신(에이전트의 정정 포함).
-    if (f.time != null && f.time !== "") setTime(f.time);
-    if (f.location != null && f.location !== "") setLocation(f.location);
-    if (f.activity != null && f.activity !== "") setActivity(f.activity);
+    // null = 아직 모름(기존 유지) · "" = 의도적 비우기 · 값 = 갱신(정정 포함)
+    if (f.time === "") setTime(null);
+    else if (f.time != null) setTime(f.time);
+    if (f.location === "") setLocation(null);
+    else if (f.location != null) setLocation(f.location);
+    if (f.activity === "") setActivity(null);
+    else if (f.activity != null) setActivity(f.activity);
     setStarted(true);
   };
 
