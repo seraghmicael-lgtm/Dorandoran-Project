@@ -6,6 +6,7 @@ import WireframeLayout from "@/components/WireframeLayout";
 import HeaderBack from "@/components/HeaderBack";
 import { unlockAudio } from "@/lib/voice";
 import { unlockAgentAudio } from "@/lib/realtimeMeetup";
+import BarVisualizer from "@/components/ui/bar-visualizer";
 
 export default function CreateSpeakPage() {
   const router = useRouter();
@@ -41,7 +42,9 @@ export default function CreateSpeakPage() {
             }}
             className="w-[150px] h-[150px] rounded-full border-2 border-black bg-white flex flex-col items-center justify-center gap-2 hover:bg-gray-50 shadow-sm cursor-pointer"
           >
-            <div className="w-8 h-8 rounded-full bg-gray-300 border border-gray-400" />
+            <div className="h-[44px] w-[76px]">
+              <BarVisualizer state="connecting" bands={[0, 0, 0, 0, 0, 0]} />
+            </div>
             <span className="text-sm font-bold text-black">누르고 말하기</span>
           </button>
         </div>

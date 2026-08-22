@@ -144,7 +144,11 @@ export async function connectRealtimeMeetup(
     model: "gpt-realtime",
     config: {
       audio: {
-        input: { transcription: { model: "gpt-4o-mini-transcribe", language: "ko" } },
+        input: {
+          transcription: { model: "gpt-4o-mini-transcribe", language: "ko" },
+          // 연결 직후 SDK가 보내는 session.update에서도 VAD가 확실히 켜져 있도록 명시
+          turnDetection: { type: "server_vad", silence_duration_ms: 900 },
+        },
         output: { voice: "alloy" },
       },
     },
@@ -217,6 +221,39 @@ export async function connectRealtimeMeetup(
   try {
     (transport as any).sendEvent?.({ type: "response.create" });
   } catch {}
+
+  // 상행(마이크→서버) 진단: outbound-rtp 바이트가 실제로 늘어나는지 확인
+  {
+    const track = micStream.getAudioTracks()[0];
+    debug(`마이크 트랙: ${track ? track.readyState + (track.muted ? "/muted" : "") : "없음"}`);
+    const readSent = async (): Promise<number> => {
+      try {
+        const pc = (transport as any).connectionState?.peerConnection as
+          | RTCPeerConnection
+          | undefined;
+        if (!pc) return -1;
+        const stats = await pc.getStats();
+        let sent = 0;
+        stats.forEach((r: any) => {
+          if (r.type === "outbound-rtp" && (r.kind === "audio" || r.mediaType === "audio")) {
+            sent += r.bytesSent ?? 0;
+          }
+        });
+        return sent;
+      } catch {
+        return -1;
+      }
+    };
+    setTimeout(async () => {
+      const a = await readSent();
+      setTimeout(async () => {
+        const b = await readSent();
+        if (a < 0 || b < 0) debug("송신 통계 접근 불가");
+        else if (b > a) debug(`마이크 송신 정상(${Math.round((b - a) / 1024)}KB/4초)`);
+        else debug("마이크 송신 0 — 입력장치/권한 확인 필요");
+      }, 4000);
+    }, 2000);
+  }
 
   return {
     sendText: (text: string) => {

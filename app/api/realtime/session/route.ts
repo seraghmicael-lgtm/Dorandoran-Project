@@ -22,6 +22,13 @@ export async function POST() {
           audio: {
             input: {
               transcription: { model: "gpt-4o-mini-transcribe", language: "ko" },
+              // audio.input을 명시하면 생성 시 VAD가 꺼진 채 만들어질 수 있어
+              // 서버 VAD를 반드시 명시한다. 어르신 말 속도를 감안해 침묵 900ms.
+              turn_detection: {
+                type: "server_vad",
+                silence_duration_ms: 900,
+                create_response: true,
+              },
             },
             output: { voice: "alloy" },
           },
