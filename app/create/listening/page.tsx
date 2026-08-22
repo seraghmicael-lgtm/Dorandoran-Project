@@ -123,6 +123,18 @@ export default function CreateListeningPage() {
   };
 
   const ttsSpeakingRef = useRef(false);
+  const introSpokenRef = useRef(false); // "저는 모임 만들기를 도와줄 거예요" 1회만
+
+  /** 첫 발화엔 소개 멘트를 붙여 가이드를 시작한다 */
+  const speakGuided = async (q: string) => {
+    const text = introSpokenRef.current ? q : `저는 모임 만들기를 도와줄 거예요. ${q}`;
+    introSpokenRef.current = true;
+    setAgentLine(text);
+    setStarted(true);
+    ttsSpeakingRef.current = true;
+    await playTts(text);
+    ttsSpeakingRef.current = false;
+  };
 
   const runLocalLoop = async () => {
     // iOS는 두 번째 마이크 캡처가 WebRTC 오디오 세션과 충돌할 수 있어 보조 루프를 끈다
@@ -179,11 +191,7 @@ export default function CreateListeningPage() {
       }
       const agentTookOver = agentSpeakingRef.current || lastAgentActivityRef.current >= roundEndAt;
       if (!agentTookOver && emptyRounds <= 4) {
-        setAgentLine(q);
-        setStarted(true);
-        ttsSpeakingRef.current = true;
-        await playTts(q);
-        ttsSpeakingRef.current = false;
+        await speakGuided(q);
       }
       if (emptyRounds > 4) {
         pushDebug("응답 대기 — 버튼을 눌러 이어가세요");
@@ -211,6 +219,7 @@ export default function CreateListeningPage() {
         },
         onAgentText: (t) => {
           if (unmountedRef.current) return;
+          introSpokenRef.current = true;
           lastAgentActivityRef.current = Date.now();
           setAgentLine(t);
           setStarted(true);
@@ -220,6 +229,7 @@ export default function CreateListeningPage() {
           agentSpeakingRef.current = sp;
           setAgentSpeaking(sp);
           if (sp) {
+            introSpokenRef.current = true;
             lastAgentActivityRef.current = Date.now();
             setAgentStream(rtRef.current?.getAgentStream() ?? null);
             // 도우미가 말하는 동안 잡힌 보조 녹음은 버린다(도우미 목소리 역전사 방지)
@@ -356,7 +366,11 @@ export default function CreateListeningPage() {
   const classicRunTurn = async (question: string) => {
     const token = ++turnTokenRef.current;
     emptyCountRef.current = 0;
-    const played = await playTts(question);
+    const spoken = introSpokenRef.current
+      ? question
+      : `저는 모임 만들기를 도와줄 거예요. ${question}`;
+    introSpokenRef.current = true;
+    const played = await playTts(spoken);
     if (unmountedRef.current || token !== turnTokenRef.current) return;
     if (micDeniedRef.current) {
       setNeedTap(true);
