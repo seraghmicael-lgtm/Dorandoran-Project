@@ -13,6 +13,8 @@ export interface MeetupDraft {
   startTime?: string;
   /** 05_몇 분이 함께할까요에서 선택 */
   maxPeople?: number;
+  /** 06_하실 말씀 — 게시판에 그대로 보이는 한마디 */
+  message?: string;
 }
 
 const KEY = "dorandoran_meetup_draft";

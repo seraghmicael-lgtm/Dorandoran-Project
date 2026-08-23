@@ -28,6 +28,7 @@ model Meetup {
   lng           Float?
   maxPeople     Int      @default(3)
   status        String   @default("open") // open | matched | expired | cancelled
+  message       String?  // 06_하실 말씀 — 게시판에 그대로 보이는 한마디
   cancelledAt   DateTime?
   createdAt     DateTime @default(now())
 

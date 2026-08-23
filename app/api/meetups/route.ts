@@ -6,7 +6,7 @@ import { UID_COOKIE, UID_COOKIE_ATTRS } from "@/lib/session";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { activity, startTime, locationName, lat, lng, maxPeople } = body;
+    const { activity, startTime, locationName, lat, lng, maxPeople, message } = body;
 
     const cookieStore = await cookies();
     const uidCookie = cookieStore.get("uid")?.value;
@@ -43,6 +43,7 @@ export async function POST(request: Request) {
         lat: typeof lat === "number" ? lat : null,
         lng: typeof lng === "number" ? lng : null,
         maxPeople: typeof maxPeople === "number" ? maxPeople : 3,
+        message: typeof message === "string" && message.trim() ? message.trim() : null,
         status: "open",
         creatorId: creatorId,
       },
