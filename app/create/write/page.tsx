@@ -38,7 +38,7 @@ export default function CreateWritePage() {
 
   return (
     <WireframeLayout justify="start" className="flex flex-col">
-      <HeaderBack title="손으로 쓰기" backHref="/create/speak" />
+      <HeaderBack title="손으로 쓰기" backHref="/create/activity" />
 
       <div className="p-4 flex flex-col items-center gap-5">
         {/* Sentence fill-in box */}

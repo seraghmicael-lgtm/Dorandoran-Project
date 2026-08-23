@@ -3,22 +3,21 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import WireframeLayout from "@/components/WireframeLayout";
-import HeaderBack from "@/components/HeaderBack";
-import { computeEndTime } from "@/lib/koreanTime";
+import CreateStepHeader from "@/components/CreateStepHeader";
+import { computeEndClock, computeEndTime } from "@/lib/koreanTime";
 import { MeetupDraft, loadDraft, updateDraft } from "@/lib/draft";
 
-const OPTIONS: { label: string; minutes: number }[] = [
+// 와이어프레임_v02 03_얼마나 걸릴까요 — 선택한 시간 기준으로 끝나는 시각을 보여준다
+const OPTIONS: { label: string; minutes: number | null }[] = [
   { label: "30분", minutes: 30 },
   { label: "1시간", minutes: 60 },
   { label: "2시간", minutes: 120 },
-  { label: "2시간 넘게", minutes: 120 },
+  { label: "2시간 이상", minutes: null }, // 끝나는 시각을 안 정해요
 ];
-
 
 export default function CreateDurationPage() {
   const router = useRouter();
   const [draft, setDraft] = useState<MeetupDraft>({});
-  const [selected, setSelected] = useState("2시간");
 
   useEffect(() => {
     const d = loadDraft();
@@ -26,74 +25,49 @@ export default function CreateDurationPage() {
   }, []);
 
   const time = draft.time || "오후 3시";
-  const location = draft.location || "송정 오일장";
-  const activity = draft.activity || "오일장 구경";
+  const dayPrefix = time.includes("오늘") || time.includes("내일") ? "" : "오늘 ";
 
-  const minutes = OPTIONS.find((o) => o.label === selected)?.minutes ?? 120;
-  const endTime = computeEndTime(time, minutes);
-  const rangeText = endTime ? `${time} ~ ${endTime}` : time;
+  const choose = (opt: { label: string; minutes: number | null }) => {
+    let startTime: string;
+    if (opt.minutes == null) {
+      startTime = `${dayPrefix}${time}`; // 끝 시각 미정
+    } else {
+      const end = computeEndTime(time, opt.minutes);
+      startTime = end ? `${dayPrefix}${time} ~ ${end}` : `${dayPrefix}${time}`;
+    }
+    updateDraft({ duration: opt.label, startTime });
+    // 음성 대화로 이미 장소가 정해졌으면 장소 화면은 건너뛴다
+    const d = loadDraft();
+    router.push(d?.location ? "/create/people" : "/create/place");
+  };
 
-  const handleNext = () => {
-    const dayPrefix = time.includes("오늘") || time.includes("내일") ? "" : "오늘 ";
-    updateDraft({
-      time,
-      location,
-      activity,
-      duration: selected,
-      startTime: `${dayPrefix}${rangeText}`,
-    });
-    router.push("/create/people");
+  const endLabel = (minutes: number | null): string => {
+    if (minutes == null) return "끝나는 시각을 안 정해요";
+    const end = computeEndClock(time, minutes);
+    return end ? `${end}에 끝나요` : "";
   };
 
   return (
-    <WireframeLayout justify="start" className="flex flex-col">
-      <HeaderBack title="얼마나 걸릴까요?" backHref="/create/listening" />
+    <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
+      <CreateStepHeader step={3} backHref="/create/time" />
 
-      <div className="p-4 flex flex-col gap-5">
-        {/* Recap box */}
-        <div className="w-full p-4 border border-gray-200 rounded-lg bg-gray-50 flex flex-col gap-1.5 text-left">
-          <span className="text-xs text-gray-500 font-medium">지금까지 정하신 내용</span>
-          <p className="text-sm font-bold text-black leading-relaxed">
-            오늘 {time}에 {location}에서 {activity} 같이 하실 분
-          </p>
-        </div>
+      <div className="px-[18px] py-[22px] flex flex-col">
+        <h1 className="text-[22px] font-bold text-black">얼마나 걸릴까요?</h1>
+        <div className="h-5" />
 
-        <div className="flex flex-col gap-2">
-          <h1 className="text-xl font-bold text-black">얼마나 걸릴까요?</h1>
-          <p className="text-sm text-gray-600">대충 정하셔도 돼요. 나중에 바꾸실 수 있어요.</p>
-        </div>
-
-        {/* 2x2 duration options */}
-        <div className="grid grid-cols-2 gap-2.5">
-          {OPTIONS.map((o) => (
+        <div className="flex flex-col gap-2.5">
+          {OPTIONS.map((opt) => (
             <button
-              key={o.label}
+              key={opt.label}
               type="button"
-              onClick={() => setSelected(o.label)}
-              className={`h-[59px] flex items-center justify-center rounded text-base border cursor-pointer ${
-                selected === o.label
-                  ? "border-black border-2 bg-gray-100 font-bold text-black"
-                  : "border-gray-300 bg-white text-black"
-              }`}
+              onClick={() => choose(opt)}
+              className="w-full border border-gray-300 px-[18px] py-[19px] flex items-center justify-between cursor-pointer hover:bg-gray-50 active:bg-gray-100"
             >
-              {o.label}
+              <span className="text-[20px] font-bold text-black">{opt.label}</span>
+              <span className="text-[15px] text-gray-500">{endLabel(opt.minutes)}</span>
             </button>
           ))}
         </div>
-
-        {/* Result preview row */}
-        <div className="w-full px-4 py-3.5 border border-gray-200 rounded-lg bg-white flex items-center justify-between">
-          <span className="text-sm text-gray-600">그러면 이렇게 올라가요</span>
-          <span className="text-sm font-bold text-black">{rangeText}</span>
-        </div>
-
-        <button
-          type="button"
-          onClick={handleNext}
-          className="w-full h-[55px] bg-black text-white flex items-center justify-center rounded text-sm font-medium cursor-pointer"
-        >
-          다음
-        </button>
       </div>
     </WireframeLayout>
   );

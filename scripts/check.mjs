@@ -1,7 +1,7 @@
 // 회귀 검증: 유닛(koreanTime·meetupDialog) + 파서 계약(/api/parse-meetup).
 // 사용법: 서버 켠 상태에서 `npm run check` (BASE_URL 환경변수로 대상 변경 가능)
 // LLM 응답은 비결정적이므로 계약 검사는 "포함/비어있음" 수준의 느슨한 단언만 쓴다.
-import { computeEndTime } from "../lib/koreanTime.ts";
+import { computeEndTime, computeEndClock } from "../lib/koreanTime.ts";
 import { FIELD_QUESTIONS, OPENING_LINE, firstMissing } from "../lib/meetupDialog.ts";
 
 const BASE = process.env.BASE_URL || "http://localhost:3000";
@@ -24,6 +24,10 @@ ok(computeEndTime("오후 3시", 30) === "3시 30분", "3시+30m");
 ok(computeEndTime("오후 3시 30분", 60) === "4시 30분", "3:30+1h");
 ok(computeEndTime("오전 11시", 120) === "1시", "11시+2h 랩어라운드");
 ok(computeEndTime("세 시", 60) === null, "한글 숫자 → null");
+ok(computeEndClock("오후 3시", 60) === "오후 4시", "끝시각(오전/오후): 3시+1h");
+ok(computeEndClock("오전 11시", 120) === "오후 1시", "끝시각: 정오 경계 뒤집힘");
+ok(computeEndClock("오후 11시 30분", 60) === "오전 12시 30분", "끝시각: 자정 경계");
+ok(computeEndClock("3시", 60) === null, "오전/오후 없으면 null");
 
 // ---------- 유닛: meetupDialog ----------
 console.log("[meetupDialog]");

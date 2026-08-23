@@ -32,7 +32,7 @@ export default function CreatePeoplePage() {
 
   return (
     <WireframeLayout justify="start" className="flex flex-col">
-      <HeaderBack title="몇 분이 함께할까요?" backHref="/create/duration" />
+      <HeaderBack title="몇 분이 함께할까요?" backHref="/create/place" />
 
       <div className="p-4 flex flex-col gap-5">
         {/* Recap box */}

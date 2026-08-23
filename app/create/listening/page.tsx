@@ -563,7 +563,7 @@ export default function CreateListeningPage() {
 
   return (
     <WireframeLayout justify="start" className="flex flex-col">
-      <HeaderBack title="동행 만들기" backHref="/create/speak" />
+      <HeaderBack title="동행 만들기" backHref="/create/activity" />
 
       <div className="p-4 flex flex-col items-center gap-5 text-center">
         {/* 마이크 버튼 + 상태 */}
