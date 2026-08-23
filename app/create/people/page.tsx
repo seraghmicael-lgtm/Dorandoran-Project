@@ -4,33 +4,20 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import WireframeLayout from "@/components/WireframeLayout";
 import HeaderBack from "@/components/HeaderBack";
+import { MeetupDraft, loadDraft, updateDraft } from "@/lib/draft";
 
 const OPTIONS = [2, 3, 4, 5];
 const KOREAN_COUNT = ["", "한", "두", "세", "네"];
 
-interface Draft {
-  transcript?: string;
-  time?: string;
-  location?: string;
-  activity?: string;
-  duration?: string;
-  startTime?: string;
-}
 
 export default function CreatePeoplePage() {
   const router = useRouter();
-  const [draft, setDraft] = useState<Draft>({});
+  const [draft, setDraft] = useState<MeetupDraft>({});
   const [selected, setSelected] = useState(3);
 
   useEffect(() => {
-    const raw = sessionStorage.getItem("dorandoran_meetup_draft");
-    if (raw) {
-      try {
-        setDraft(JSON.parse(raw));
-      } catch {
-        // ignore broken draft; fall back to Figma example values below
-      }
-    }
+    const d = loadDraft();
+    if (d) setDraft(d);
   }, []);
 
   const startTime = draft.startTime || "오늘 오후 3시 ~ 5시";
@@ -39,8 +26,7 @@ export default function CreatePeoplePage() {
   const waiting = KOREAN_COUNT[selected - 1] || `${selected - 1}`;
 
   const handlePost = () => {
-    const nextDraft = { ...draft, maxPeople: selected };
-    sessionStorage.setItem("dorandoran_meetup_draft", JSON.stringify(nextDraft));
+    updateDraft({ maxPeople: selected });
     router.push("/create/posted");
   };
 

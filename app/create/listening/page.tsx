@@ -13,6 +13,8 @@ import {
   MeetupFields,
 } from "@/lib/realtimeMeetup";
 import { useAudioBands } from "@/lib/useAudioBands";
+import { FIELD_QUESTIONS, OPENING_LINE, firstMissingQuestion as dialogFirstMissing } from "@/lib/meetupDialog";
+import { saveDraft } from "@/lib/draft";
 import BarVisualizer, { VisualizerState } from "@/components/ui/bar-visualizer";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -71,11 +73,7 @@ export default function CreateListeningPage() {
   };
 
   const activeQuestion = missingField
-    ? missingField === "time"
-      ? followUpQuestion || "언제 만나고 싶으세요?"
-      : missingField === "location"
-      ? followUpQuestion || "어디서 만나고 싶으세요?"
-      : followUpQuestion || "무엇을 하고 싶으세요?"
+    ? followUpQuestion || FIELD_QUESTIONS[missingField]
     : null;
 
   // =====================================================================
@@ -116,13 +114,10 @@ export default function CreateListeningPage() {
     localHandleRef.current = null;
   };
 
-  // 시간 → 장소 → 할일 순서. 앞 필드가 차기 전에는 다음 질문으로 넘어가지 않는다.
+  // 시간 → 장소 → 할일 순서(단일 소스 위임). 앞 필드가 차기 전에는 다음 질문으로 안 넘어간다.
   const firstMissingQuestion = (): string | null => {
     const f = fieldsRef.current;
-    if (!f.t) return "언제 만나고 싶으세요?";
-    if (!f.l) return "어디서 만나고 싶으세요?";
-    if (!f.a) return "무엇을 하고 싶으세요?";
-    return null;
+    return dialogFirstMissing({ time: f.t, location: f.l, activity: f.a });
   };
 
   const ttsSpeakingRef = useRef(false);
@@ -130,7 +125,7 @@ export default function CreateListeningPage() {
 
   /** 첫 발화엔 소개 멘트를 붙여 가이드를 시작한다 */
   const speakGuided = async (q: string) => {
-    const text = introSpokenRef.current ? q : `저는 모임 만들기를 도와줄 거예요. ${q}`;
+    const text = introSpokenRef.current ? q : `${OPENING_LINE.split(". ")[0]}. ${q}`;
     introSpokenRef.current = true;
     setAgentLine(text);
     setStarted(true);
@@ -371,7 +366,7 @@ export default function CreateListeningPage() {
     emptyCountRef.current = 0;
     const spoken = introSpokenRef.current
       ? question
-      : `저는 모임 만들기를 도와줄 거예요. ${question}`;
+      : `${OPENING_LINE.split(". ")[0]}. ${question}`;
     introSpokenRef.current = true;
     const played = await playTts(spoken);
     if (unmountedRef.current || token !== turnTokenRef.current) return;
@@ -398,12 +393,11 @@ export default function CreateListeningPage() {
     unmountedRef.current = false;
     // 진입 즉시 소개+첫 질문을 TTS로 확정 재생 — 도우미(실시간) 음성에 의존하지 않는다
     (async () => {
-      const OPENING = "저는 모임 만들기를 도와줄 거예요. 언제 만나고 싶으세요?";
       introSpokenRef.current = true;
-      setAgentLine(OPENING);
+      setAgentLine(OPENING_LINE);
       setStarted(true);
       ttsSpeakingRef.current = true;
-      await playTts(OPENING);
+      await playTts(OPENING_LINE);
       ttsSpeakingRef.current = false;
     })();
     connectRealtime();
@@ -511,7 +505,7 @@ export default function CreateListeningPage() {
       location: location!,
       activity: activity!,
     };
-    sessionStorage.setItem("dorandoran_meetup_draft", JSON.stringify(draftData));
+    saveDraft(draftData);
     router.push("/create/duration");
   };
 
@@ -692,7 +686,7 @@ export default function CreateListeningPage() {
               {mode === "classic" && !time && missingField === "time" && (
                 <div className="mt-1 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center justify-between gap-2">
                   <p className="text-sm font-bold text-black">
-                    {followUpQuestion || "언제 만나고 싶으세요?"}
+                    {followUpQuestion || FIELD_QUESTIONS.time}
                   </p>
                   <button
                     type="button"
@@ -760,7 +754,7 @@ export default function CreateListeningPage() {
               {mode === "classic" && !location && missingField === "location" && (
                 <div className="mt-1 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center justify-between gap-2">
                   <p className="text-sm font-bold text-black">
-                    {followUpQuestion || "어디서 만나고 싶으세요?"}
+                    {followUpQuestion || FIELD_QUESTIONS.location}
                   </p>
                   <button
                     type="button"
@@ -828,7 +822,7 @@ export default function CreateListeningPage() {
               {mode === "classic" && !activity && missingField === "activity" && (
                 <div className="mt-1 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center justify-between gap-2">
                   <p className="text-sm font-bold text-black">
-                    {followUpQuestion || "무엇을 하고 싶으세요?"}
+                    {followUpQuestion || FIELD_QUESTIONS.activity}
                   </p>
                   <button
                     type="button"

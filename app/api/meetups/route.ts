@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { UID_COOKIE, UID_COOKIE_ATTRS } from "@/lib/session";
 
 export async function POST(request: Request) {
   try {
@@ -61,12 +62,7 @@ export async function POST(request: Request) {
     // 작성자를 쿠키로 기억해 "만든 동행" 목록에서 내 모임을 찾을 수 있게 한다
     const res = NextResponse.json(meetup, { status: 201 });
     if (uidCookie !== creatorId) {
-      res.cookies.set("uid", creatorId, {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 365,
-      });
+      res.cookies.set(UID_COOKIE, creatorId, UID_COOKIE_ATTRS);
     }
     return res;
   } catch (error) {

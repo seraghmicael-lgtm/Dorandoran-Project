@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { UID_COOKIE, UID_COOKIE_ATTRS } from "@/lib/session";
 
 const ADJECTIVES = [
   "즐거운",
@@ -55,12 +56,7 @@ export async function POST() {
       });
     }
 
-    cookieStore.set("uid", user.id, {
-      httpOnly: true,
-      path: "/",
-      maxAge: 60 * 60 * 24 * 365,
-      sameSite: "lax",
-    });
+    cookieStore.set(UID_COOKIE, user.id, UID_COOKIE_ATTRS);
 
     return NextResponse.json({ ok: true, user });
   } catch (error) {

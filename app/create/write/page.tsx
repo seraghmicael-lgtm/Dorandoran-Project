@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
 import HeaderBack from "@/components/HeaderBack";
+import { saveDraft } from "@/lib/draft";
 
 export default function CreateWritePage() {
   const router = useRouter();
@@ -31,7 +32,7 @@ export default function CreateWritePage() {
       location,
       activity,
     };
-    sessionStorage.setItem("dorandoran_meetup_draft", JSON.stringify(draftData));
+    saveDraft(draftData);
     router.push("/create/posted");
   };
 

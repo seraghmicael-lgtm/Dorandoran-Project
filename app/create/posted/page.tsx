@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
+import { MeetupDraft, loadDraft, clearDraft } from "@/lib/draft";
 
 interface MeetupData {
   id?: string;
@@ -17,13 +18,7 @@ const DEFAULT_MEETUP: MeetupData = {
   locationName: "송정 오일장 · 걸어서 12분",
 };
 
-function buildPayload(draft: {
-  time?: string;
-  location?: string;
-  activity?: string;
-  startTime?: string;
-  maxPeople?: number;
-}) {
+function buildPayload(draft: MeetupDraft) {
   const rawTime = draft.time || "오후 3시";
   const rawActivity = draft.activity || "오일장 구경";
   const rawLocation = draft.location || "송정 오일장";
@@ -94,19 +89,12 @@ export default function CreatePostedPage() {
   };
 
   useEffect(() => {
-    const rawDraft = sessionStorage.getItem("dorandoran_meetup_draft");
-    if (!rawDraft) return;
-
-    try {
-      const draft = JSON.parse(rawDraft);
-      sessionStorage.removeItem("dorandoran_meetup_draft");
-      const body = buildPayload(draft);
-      setPayload(body);
-      submit(body);
-    } catch (e) {
-      console.error("Invalid meetup draft JSON:", e);
-      setStatus("error");
-    }
+    const draft = loadDraft();
+    if (!draft) return; // 없거나 깨짐 — 예시 화면 유지
+    clearDraft();
+    const body = buildPayload(draft);
+    setPayload(body);
+    submit(body);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

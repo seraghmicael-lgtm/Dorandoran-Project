@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import WireframeLayout from "@/components/WireframeLayout";
 import HeaderBack from "@/components/HeaderBack";
 import { computeEndTime } from "@/lib/koreanTime";
+import { MeetupDraft, loadDraft, updateDraft } from "@/lib/draft";
 
 const OPTIONS: { label: string; minutes: number }[] = [
   { label: "30분", minutes: 30 },
@@ -13,27 +14,15 @@ const OPTIONS: { label: string; minutes: number }[] = [
   { label: "2시간 넘게", minutes: 120 },
 ];
 
-interface Draft {
-  transcript?: string;
-  time?: string;
-  location?: string;
-  activity?: string;
-}
 
 export default function CreateDurationPage() {
   const router = useRouter();
-  const [draft, setDraft] = useState<Draft>({});
+  const [draft, setDraft] = useState<MeetupDraft>({});
   const [selected, setSelected] = useState("2시간");
 
   useEffect(() => {
-    const raw = sessionStorage.getItem("dorandoran_meetup_draft");
-    if (raw) {
-      try {
-        setDraft(JSON.parse(raw));
-      } catch {
-        // ignore broken draft; fall back to Figma example values below
-      }
-    }
+    const d = loadDraft();
+    if (d) setDraft(d);
   }, []);
 
   const time = draft.time || "오후 3시";
@@ -46,15 +35,13 @@ export default function CreateDurationPage() {
 
   const handleNext = () => {
     const dayPrefix = time.includes("오늘") || time.includes("내일") ? "" : "오늘 ";
-    const nextDraft = {
-      ...draft,
+    updateDraft({
       time,
       location,
       activity,
       duration: selected,
       startTime: `${dayPrefix}${rangeText}`,
-    };
-    sessionStorage.setItem("dorandoran_meetup_draft", JSON.stringify(nextDraft));
+    });
     router.push("/create/people");
   };
 

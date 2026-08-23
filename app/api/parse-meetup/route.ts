@@ -1,54 +1,41 @@
 import { NextResponse } from "next/server";
+import { FIELD_QUESTIONS, firstMissing } from "@/lib/meetupDialog";
+
+type Fields = {
+  time: string | null;
+  location: string | null;
+  activity: string | null;
+};
+
+/** 파싱 실패·불가 시 공통 응답 — 기존 필드 유지 + 첫 빈 필드 질문 */
+function fallbackResult(f: Fields) {
+  const missingField = firstMissing(f);
+  return NextResponse.json({
+    ...f,
+    missingField,
+    followUpQuestion: missingField ? FIELD_QUESTIONS[missingField] : null,
+  });
+}
 
 export async function POST(request: Request) {
+  let existing: Fields = { time: null, location: null, activity: null };
   try {
     const body = await request.json();
     const transcript = body?.transcript;
-
-    const existingTime = typeof body?.time === "string" ? body.time : typeof body?.existingTime === "string" ? body.existingTime : null;
-    const existingLocation = typeof body?.location === "string" ? body.location : typeof body?.existingLocation === "string" ? body.existingLocation : null;
-    const existingActivity = typeof body?.activity === "string" ? body.activity : typeof body?.existingActivity === "string" ? body.existingActivity : null;
+    existing = {
+      time: typeof body?.time === "string" ? body.time : null,
+      location: typeof body?.location === "string" ? body.location : null,
+      activity: typeof body?.activity === "string" ? body.activity : null,
+    };
 
     if (!transcript || typeof transcript !== "string" || !transcript.trim()) {
-      let missingField: "time" | "location" | "activity" | null = null;
-      if (!existingTime) missingField = "time";
-      else if (!existingLocation) missingField = "location";
-      else if (!existingActivity) missingField = "activity";
-
-      let followUpQuestion: string | null = null;
-      if (missingField === "time") followUpQuestion = "언제 만나고 싶으세요?";
-      else if (missingField === "location") followUpQuestion = "어디서 만나고 싶으세요?";
-      else if (missingField === "activity") followUpQuestion = "무엇을 하고 싶으세요?";
-
-      return NextResponse.json({
-        time: existingTime,
-        location: existingLocation,
-        activity: existingActivity,
-        missingField,
-        followUpQuestion,
-      });
+      return fallbackResult(existing);
     }
 
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
       console.warn("OPENAI_API_KEY missing, returning fallback values.");
-      let missingField: "time" | "location" | "activity" | null = null;
-      if (!existingTime) missingField = "time";
-      else if (!existingLocation) missingField = "location";
-      else if (!existingActivity) missingField = "activity";
-
-      let followUpQuestion: string | null = null;
-      if (missingField === "time") followUpQuestion = "언제 만나고 싶으세요?";
-      else if (missingField === "location") followUpQuestion = "어디서 만나고 싶으세요?";
-      else if (missingField === "activity") followUpQuestion = "무엇을 하고 싶으세요?";
-
-      return NextResponse.json({
-        time: existingTime,
-        location: existingLocation,
-        activity: existingActivity,
-        missingField,
-        followUpQuestion,
-      });
+      return fallbackResult(existing);
     }
 
     const model = process.env.LLM_MODEL || "gpt-4o";
@@ -57,9 +44,9 @@ export async function POST(request: Request) {
 Extract the time, location, and activity details from the user's transcript in Korean.
 
 Existing known fields:
-- time: ${existingTime ? `"${existingTime}"` : "null"}
-- location: ${existingLocation ? `"${existingLocation}"` : "null"}
-- activity: ${existingActivity ? `"${existingActivity}"` : "null"}
+- time: ${existing.time ? `"${existing.time}"` : "null"}
+- location: ${existing.location ? `"${existing.location}"` : "null"}
+- activity: ${existing.activity ? `"${existing.activity}"` : "null"}
 
 Instructions:
 1. Parse the user's input transcript for time, location, or activity.
@@ -87,7 +74,7 @@ Instructions:
    - "missingField": "time" | "location" | "activity" | null
      (Pick the FIRST missing field among time, location, activity in that priority order. If none missing, set to null)
    - "followUpQuestion": string or null
-     (If missingField is present, write a short, gentle, polite Korean question for seniors asking for that missing information. E.g., "어디서 만나고 싶으세요?", "무엇을 하고 싶으세요?", "언제 만나고 싶으세요?". If missingField is null, set to null)
+     (If missingField is present, write a short, gentle, polite Korean question for seniors asking for that missing information. E.g., "${FIELD_QUESTIONS.location}", "${FIELD_QUESTIONS.activity}", "${FIELD_QUESTIONS.time}". If missingField is null, set to null)
 
 Output pure valid JSON.`;
 
@@ -109,93 +96,37 @@ Output pure valid JSON.`;
     });
 
     if (!openAiResponse.ok) {
-      const errorText = await openAiResponse.text();
-      console.error("OpenAI API error:", errorText);
-
-      let missingField: "time" | "location" | "activity" | null = null;
-      if (!existingTime) missingField = "time";
-      else if (!existingLocation) missingField = "location";
-      else if (!existingActivity) missingField = "activity";
-
-      let followUpQuestion: string | null = null;
-      if (missingField === "time") followUpQuestion = "언제 만나고 싶으세요?";
-      else if (missingField === "location") followUpQuestion = "어디서 만나고 싶으세요?";
-      else if (missingField === "activity") followUpQuestion = "무엇을 하고 싶으세요?";
-
-      return NextResponse.json({
-        time: existingTime,
-        location: existingLocation,
-        activity: existingActivity,
-        missingField,
-        followUpQuestion,
-      });
+      console.error("OpenAI API error:", await openAiResponse.text());
+      return fallbackResult(existing);
     }
 
     const data = await openAiResponse.json();
     const content = data.choices?.[0]?.message?.content;
-
-    if (!content) {
-      let missingField: "time" | "location" | "activity" | null = null;
-      if (!existingTime) missingField = "time";
-      else if (!existingLocation) missingField = "location";
-      else if (!existingActivity) missingField = "activity";
-
-      let followUpQuestion: string | null = null;
-      if (missingField === "time") followUpQuestion = "언제 만나고 싶으세요?";
-      else if (missingField === "location") followUpQuestion = "어디서 만나고 싶으세요?";
-      else if (missingField === "activity") followUpQuestion = "무엇을 하고 싶으세요?";
-
-      return NextResponse.json({
-        time: existingTime,
-        location: existingLocation,
-        activity: existingActivity,
-        missingField,
-        followUpQuestion,
-      });
-    }
+    if (!content) return fallbackResult(existing);
 
     const parsed = JSON.parse(content);
     // "" = 의도적 비우기(다시 정할래), null = 이번 발화에 없음(기존 유지), 값 = 갱신
-    const mergeField = (v: unknown, existing: string | null): string | null => {
+    const mergeField = (v: unknown, prev: string | null): string | null => {
       if (v === "") return null;
       if (typeof v === "string" && v.trim()) return v.trim();
-      return existing;
+      return prev;
     };
-    const parsedTime = mergeField(parsed.time, existingTime);
-    const parsedLocation = mergeField(parsed.location, existingLocation);
-    const parsedActivity = mergeField(parsed.activity, existingActivity);
+    const merged: Fields = {
+      time: mergeField(parsed.time, existing.time),
+      location: mergeField(parsed.location, existing.location),
+      activity: mergeField(parsed.activity, existing.activity),
+    };
 
-    let missingField: "time" | "location" | "activity" | null = null;
-    if (!parsedTime) missingField = "time";
-    else if (!parsedLocation) missingField = "location";
-    else if (!parsedActivity) missingField = "activity";
+    const missingField = firstMissing(merged);
+    const followUpQuestion = missingField
+      ? (typeof parsed.followUpQuestion === "string" && parsed.followUpQuestion.trim()
+          ? parsed.followUpQuestion.trim()
+          : FIELD_QUESTIONS[missingField])
+      : null;
 
-    let followUpQuestion: string | null = typeof parsed.followUpQuestion === "string" && parsed.followUpQuestion.trim() ? parsed.followUpQuestion.trim() : null;
-
-    if (missingField && !followUpQuestion) {
-      if (missingField === "time") followUpQuestion = "언제 만나고 싶으세요?";
-      else if (missingField === "location") followUpQuestion = "어디서 만나고 싶으세요?";
-      else if (missingField === "activity") followUpQuestion = "무엇을 하고 싶으세요?";
-    }
-    if (!missingField) {
-      followUpQuestion = null;
-    }
-
-    return NextResponse.json({
-      time: parsedTime,
-      location: parsedLocation,
-      activity: parsedActivity,
-      missingField,
-      followUpQuestion,
-    });
+    return NextResponse.json({ ...merged, missingField, followUpQuestion });
   } catch (error) {
     console.error("Error in /api/parse-meetup:", error);
-    return NextResponse.json({
-      time: null,
-      location: null,
-      activity: null,
-      missingField: "time",
-      followUpQuestion: "언제 만나고 싶으세요?",
-    });
+    return fallbackResult(existing);
   }
 }
