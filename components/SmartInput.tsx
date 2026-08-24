@@ -19,6 +19,7 @@ export default function SmartInput({
   hint,
   suggestions = [],
   confirmLabel = "이걸로 할게요",
+  divider = true,
   onConfirm,
 }: {
   /** 빈 문자열이면 머리말을 아예 안 보여준다(고를 목록이 없는 화면) */
@@ -28,6 +29,8 @@ export default function SmartInput({
   suggestions?: string[];
   /** 확인 버튼 문구. 바로 다음으로 가는 화면이 아니면 바꿔 쓴다(예: "이 장소 찾기") */
   confirmLabel?: string;
+  /** 위쪽 구분선. 화면 맨 아래에 올 땐 true, 제목 바로 밑으로 올릴 땐 false */
+  divider?: boolean;
   onConfirm: (value: string) => void;
 }) {
   const router = useRouter();
@@ -45,7 +48,11 @@ export default function SmartInput({
   };
 
   return (
-    <div className="w-full border-t border-gray-200 pt-[18px] flex flex-col gap-[9px]">
+    <div
+      className={`w-full flex flex-col gap-[9px] ${
+        divider ? "border-t border-gray-200 pt-[18px]" : ""
+      }`}
+    >
       {label && <p className="text-[15px] text-gray-500">{label}</p>}
 
       <div

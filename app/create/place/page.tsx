@@ -63,13 +63,31 @@ export default function CreatePlacePage() {
         <h1 className="text-[22px] font-bold text-black">어디서 만날까요?</h1>
         <div className="h-5" />
 
+        {/* 검색칸을 제목 바로 밑에 둔다 — 이 화면의 첫 할 일이 "어디를 찾을지 말하기"다.
+            고를 목록이 없으니 "목록에 없으면" 머리말과 위 구분선도 뺀다. */}
+        <SmartInput
+          label=""
+          divider={false}
+          placeholder="예) 도란공원 정문"
+          hint={
+            origin === null
+              ? "“도란공원 정문”처럼 만날 곳을 적어주세요"
+              : "“도란공원”처럼 쓰거나 말하시면 지도에서 찾아드려요"
+          }
+          // 위치를 모르면 검색이 아니라 적은 그대로 쓰는 것이므로 문구도 그렇게 말한다
+          confirmLabel={searching ? "찾고 있어요..." : origin === null ? "이걸로 할게요" : "이 장소 찾기"}
+          onConfirm={search}
+        />
+
+        <div className="h-[18px]" />
+
         {pin ? (
           <GoogleMap lat={pin.lat} lng={pin.lng} height="h-[420px]" className="border border-gray-300" />
         ) : (
           <div className="h-[420px] border border-gray-300 flex items-center justify-center text-[15px] text-gray-500 text-center px-6">
             {origin === undefined
               ? "지도를 준비하고 있어요..."
-              : "위치를 몰라서 지도는 못 보여드려요. 아래에 만날 곳을 적어주세요."}
+              : "위치를 몰라서 지도는 못 보여드려요. 위 칸에 만날 곳을 적어주세요."}
           </div>
         )}
 
@@ -130,20 +148,6 @@ export default function CreatePlacePage() {
           </>
         )}
 
-        <div className="h-[18px]" />
-        {/* 이 화면엔 고를 목록이 없으니 "목록에 없으면" 머리말을 빼고 검색칸만 둔다 */}
-        <SmartInput
-          label=""
-          placeholder="예) 도란공원 정문"
-          hint={
-            origin === null
-              ? "“도란공원 정문”처럼 만날 곳을 적어주세요"
-              : "“도란공원”처럼 쓰거나 말하시면 지도에서 찾아드려요"
-          }
-          // 위치를 모르면 검색이 아니라 적은 그대로 쓰는 것이므로 문구도 그렇게 말한다
-          confirmLabel={searching ? "찾고 있어요..." : origin === null ? "이걸로 할게요" : "이 장소 찾기"}
-          onConfirm={search}
-        />
       </div>
     </WireframeLayout>
   );
