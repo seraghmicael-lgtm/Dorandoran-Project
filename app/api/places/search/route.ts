@@ -25,6 +25,15 @@ function haversineM(aLat: number, aLng: number, bLat: number, bLng: number): num
   return 2 * R * Math.asin(Math.sqrt(s));
 }
 
+/** 반경 RADIUS_M 를 감싸는 사각형. Places searchText 의 locationRestriction 은
+ *  원(circle)을 받지 않고 사각형만 받는다 — 원으로 보내면 400 INVALID_ARGUMENT.
+ *  사각형은 원의 외접이라 모서리가 반경을 넘치므로, 결과는 실제 거리로 다시 자른다. */
+function boundingBox(lat: number, lng: number) {
+  const dLat = RADIUS_M / 111_320;
+  const dLng = RADIUS_M / (111_320 * Math.max(0.1, Math.cos((lat * Math.PI) / 180)));
+  return { low: { lat: lat - dLat, lng: lng - dLng }, high: { lat: lat + dLat, lng: lng + dLng } };
+}
+
 /** 좌표가 온전한 것만 남기고 거리를 붙인다 */
 function toHits(
   raw: { name: string; address: string; lat?: number; lng?: number }[],
@@ -51,6 +60,7 @@ async function searchPlaces(
   lng: number,
   key: string
 ): Promise<PlaceHit[] | null> {
+  const box = boundingBox(lat, lng);
   const res = await fetch("https://places.googleapis.com/v1/places:searchText", {
     method: "POST",
     headers: {
@@ -60,8 +70,13 @@ async function searchPlaces(
     },
     body: JSON.stringify({
       textQuery: query,
-      // circle 제한이 5km를 API 단에서 강제한다
-      locationRestriction: { circle: { center: { latitude: lat, longitude: lng }, radius: RADIUS_M } },
+      // 사각형으로 후보를 좁히고(원은 안 받는다), 넘치는 모서리는 호출부가 거리로 자른다
+      locationRestriction: {
+        rectangle: {
+          low: { latitude: box.low.lat, longitude: box.low.lng },
+          high: { latitude: box.high.lat, longitude: box.high.lng },
+        },
+      },
       languageCode: "ko",
       regionCode: "KR",
       maxResultCount: 5,
@@ -99,9 +114,8 @@ async function geocode(
   key: string
 ): Promise<PlaceHit[]> {
   // 반경 5km를 감싸는 사각형으로 후보를 좁힌 뒤, 실제 거리로 다시 거른다
-  const dLat = RADIUS_M / 111_320;
-  const dLng = RADIUS_M / (111_320 * Math.max(0.1, Math.cos((lat * Math.PI) / 180)));
-  const bounds = `${lat - dLat},${lng - dLng}|${lat + dLat},${lng + dLng}`;
+  const box = boundingBox(lat, lng);
+  const bounds = `${box.low.lat},${box.low.lng}|${box.high.lat},${box.high.lng}`;
   const url =
     `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(query)}` +
     `&bounds=${encodeURIComponent(bounds)}&language=ko&region=kr&key=${key}`;
@@ -148,7 +162,7 @@ export async function POST(request: Request) {
       source = "geocoding";
     }
 
-    // Places는 circle로 이미 걸러지지만 Geocoding은 사각형이라 여기서 실제 반경으로 다시 자른다
+    // 두 경로 모두 사각형으로만 좁혀졌다 — 5km 보장은 여기서 실제 거리로 자르는 이 줄이 한다
     const within = hits
       .filter((p) => p.distanceM <= RADIUS_M)
       .sort((a, b) => a.distanceM - b.distanceM);

@@ -198,11 +198,29 @@ try {
     return res.json();
   };
   const SEOUL = [37.5445, 127.0557]; // 성수동 근처
-  const p1 = await searchPlace("성수동 카페", ...SEOUL);
+  const p1 = await searchPlace("경로당", ...SEOUL);
   ok(p1.place && p1.place.distanceM <= 5000, "장소 검색: 5km 안에서 찾음", JSON.stringify(p1.place));
-  // 같은 이름이 전국에 있어도 먼 곳은 절대 잡히면 안 된다 (제주에서 서울 장소를 물어봄)
-  const p2 = await searchPlace("성수동 카페", 33.4996, 126.5312);
-  ok(!p2.place, "장소 검색: 반경 밖은 걸러냄", JSON.stringify(p2));
+
+  // 핵심 불변식: 돌려주는 모든 결과가 준 위치에서 5km 안이어야 한다.
+  // (Places 는 검색엔진이라 "성수동 카페"를 제주에서 물으면 제주 카페를 준다 — 그래도
+  //  그 결과들은 제주 기준 5km 안이어야 한다. 사각형 모서리 초과분이 새면 여기서 걸린다.)
+  for (const [label, q, la, ln] of [
+    ["서울/카페", "카페", ...SEOUL],
+    ["서울/먼 지명", "부산역", ...SEOUL],
+    ["제주/서울 지명", "성수동 카페", 33.4996, 126.5312],
+  ]) {
+    const r = await searchPlace(q, la, ln);
+    const all = [r.place, ...(r.others ?? [])].filter(Boolean);
+    ok(
+      all.every((p) => p.distanceM <= 5000),
+      `장소 검색(${label}): 모든 결과가 5km 안`,
+      JSON.stringify(all.map((p) => `${p.name}:${p.distanceM}m`))
+    );
+    ok(
+      all.length < 2 || all.every((p, i) => i === 0 || all[i - 1].distanceM <= p.distanceM),
+      `장소 검색(${label}): 가까운 순 정렬`
+    );
+  }
   const p3 = await searchPlace("", ...SEOUL);
   ok(!p3.place && p3.reason === "no-query", "장소 검색: 빈 질의는 no-query");
   const p4 = await searchPlace("공원", NaN, NaN);
