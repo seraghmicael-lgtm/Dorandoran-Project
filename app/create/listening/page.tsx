@@ -23,7 +23,7 @@ import {
 import { saveDraft } from "@/lib/draft";
 import BarVisualizer, { VisualizerState } from "@/components/ui/bar-visualizer";
 import GoogleMap from "@/components/GoogleMap";
-import { findNearbyPlace, getCurrentOrigin, PlaceHit } from "@/lib/places";
+import { directionsUrl, findNearbyPlace, getCurrentOrigin, PlaceHit } from "@/lib/places";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -872,7 +872,17 @@ export default function CreateListeningPage() {
                         : `${(place.distanceM / 1000).toFixed(1)}km`}
                     </span>
                   </p>
-                  <p className="text-xs text-gray-400">여기가 맞나요? 아니면 고치기를 눌러주세요.</p>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs text-gray-400">여기가 맞나요? 아니면 고치기를 눌러주세요.</p>
+                    <a
+                      href={directionsUrl(place)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs font-bold text-[#3D6B5A] underline-offset-2 hover:underline shrink-0"
+                    >
+                      길찾기 &gt;
+                    </a>
+                  </div>
                 </div>
               )}
               {placeNotFound && (

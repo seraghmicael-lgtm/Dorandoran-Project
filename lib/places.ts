@@ -46,12 +46,23 @@ export function getCurrentOrigin(): Promise<{ lat: number; lng: number } | null>
   });
 }
 
-/** 카카오맵·구글지도 어디서든 열리는 길찾기 주소. 좌표가 없으면 이름으로라도 연다. */
-export function directionsUrl(p: { lat?: number | null; lng?: number | null; name?: string | null }): string {
-  const base = "https://www.google.com/maps/dir/?api=1&destination=";
-  if (typeof p.lat === "number" && typeof p.lng === "number") {
-    const q = `${p.lat},${p.lng}`;
-    return base + encodeURIComponent(q);
-  }
-  return base + encodeURIComponent(p.name ?? "");
+/**
+ * 길찾기 주소. 폰에서 누르면 구글 지도 앱이 열리고(없으면 웹), 출발지는 지금 계신 곳이 된다.
+ *
+ * 걷기 안내를 기본으로 한다 — 이 앱은 걸어서 갈 수 있는 거리의 동행만 다룬다.
+ * 좌표가 있으면 좌표로(정확), 없으면 장소 이름으로 연다.
+ */
+export function directionsUrl(
+  p: { lat?: number | null; lng?: number | null; name?: string | null },
+  travelmode: "walking" | "transit" | "driving" = "walking"
+): string {
+  const destination =
+    typeof p.lat === "number" && typeof p.lng === "number"
+      ? `${p.lat},${p.lng}`
+      : (p.name ?? "");
+  return (
+    "https://www.google.com/maps/dir/?api=1" +
+    `&destination=${encodeURIComponent(destination)}` +
+    `&travelmode=${travelmode}`
+  );
 }

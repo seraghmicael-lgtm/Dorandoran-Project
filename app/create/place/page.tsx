@@ -7,7 +7,7 @@ import CreateStepHeader from "@/components/CreateStepHeader";
 import SmartInput from "@/components/SmartInput";
 import GoogleMap from "@/components/GoogleMap";
 import { updateDraft } from "@/lib/draft";
-import { findNearbyPlace, getCurrentOrigin, PlaceHit } from "@/lib/places";
+import { directionsUrl, findNearbyPlace, getCurrentOrigin, PlaceHit } from "@/lib/places";
 
 // 와이어프레임_v02 04_어디서 만날까요
 // 고정 카드 3개(송정마을 어귀 등) 대신 지도 + 검색으로 바꿨다 — 어느 동네에서 열든
@@ -82,11 +82,22 @@ export default function CreatePlacePage() {
               {result.place.address && (
                 <span className="text-[15px] text-gray-500">{result.place.address}</span>
               )}
-              <span className="text-[15px] text-gray-500">
-                {result.place.distanceM < 1000
-                  ? `여기서 ${result.place.distanceM}m`
-                  : `여기서 ${(result.place.distanceM / 1000).toFixed(1)}km`}
-              </span>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[15px] text-gray-500">
+                  {result.place.distanceM < 1000
+                    ? `여기서 ${result.place.distanceM}m`
+                    : `여기서 ${(result.place.distanceM / 1000).toFixed(1)}km`}
+                </span>
+                {/* 고르기 전에 얼마나 걸리는지 지도로 확인할 수 있게 */}
+                <a
+                  href={directionsUrl(result.place)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[15px] font-bold text-[#3D6B5A] underline-offset-2 hover:underline shrink-0"
+                >
+                  길찾기 &gt;
+                </a>
+              </div>
             </div>
             <div className="h-2.5" />
             <button

@@ -9,6 +9,7 @@ import {
   seoulNow,
 } from "../lib/koreanTime.ts";
 import { FIELD_QUESTIONS, OPENING_LINE, firstMissing, applyParse } from "../lib/meetupDialog.ts";
+import { directionsUrl } from "../lib/places.ts";
 
 const BASE = process.env.BASE_URL || "http://localhost:3000";
 let pass = 0;
@@ -76,6 +77,20 @@ ok(formatKoreanClock(13, 30) === "오후 1시 30분", "13:30 → 오후 1시 30�
     }).format(new Date())
   );
   ok(seoulNow().getHours() === seoulHour % 24, "seoulNow 가 한국 시각을 가리킴", `${seoulNow().getHours()} vs ${seoulHour}`);
+}
+
+// 길찾기 링크 — 폰에서 누르면 지도 앱이 걷기 안내로 열려야 한다
+{
+  const u = directionsUrl({ lat: 37.5446148, lng: 127.0580149, name: "도란공원" });
+  ok(u.includes("destination=37.5446148%2C127.0580149"), "길찾기: 좌표가 있으면 좌표로", u);
+  ok(u.includes("travelmode=walking"), "길찾기: 걷기 안내가 기본");
+  const u2 = directionsUrl({ lat: null, lng: null, name: "도란마트 정문 앞" });
+  ok(
+    u2.includes("destination=") && u2.includes(encodeURIComponent("도란마트 정문 앞")),
+    "길찾기: 좌표가 없으면 이름으로",
+    u2
+  );
+  ok(directionsUrl({ lat: 37.5, lng: 127 }, "transit").includes("travelmode=transit"), "길찾기: 이동수단 지정 가능");
 }
 
 // ---------- 유닛: meetupDialog ----------
