@@ -32,3 +32,28 @@ export function firstMissingQuestion(f: MeetupFieldValues): string | null {
   const k = firstMissing(f);
   return k ? FIELD_QUESTIONS[k] : null;
 }
+
+const norm = (v?: string | null): string | null => (v == null || v === "" ? null : v);
+
+/**
+ * 파서 응답을 화면 값에 반영한다.
+ *
+ * 실시간 모드에선 음성 에이전트와 보조 인식 루프가 같은 세 필드를 동시에 쓴다.
+ * 파싱 요청을 보낸 뒤 응답이 오기까지 1~3초 사이에 에이전트가 필드를 채우면,
+ * 응답(요청 당시 스냅샷 기준으로 계산됨)을 통째로 덮어쓸 때 그 값이 지워진다.
+ * 지워진 필드 때문에 다시 그 항목을 묻는 것이 "다 채웠는데 계속 묻는" 현상이다.
+ *
+ * 그래서 응답 전체가 아니라 "이번 파싱이 실제로 바꾼 필드만" 반영한다.
+ * 스냅샷과 응답이 같은 필드는 이번 발화가 건드리지 않은 것이므로 현재 값을 지킨다.
+ */
+export function applyParse(
+  snapshot: MeetupFieldValues,
+  parsed: MeetupFieldValues,
+  current: MeetupFieldValues
+): Record<MeetupFieldName, string | null> {
+  const pick = (k: MeetupFieldName) => {
+    const next = norm(parsed[k]);
+    return next !== norm(snapshot[k]) ? next : norm(current[k]);
+  };
+  return { time: pick("time"), location: pick("location"), activity: pick("activity") };
+}

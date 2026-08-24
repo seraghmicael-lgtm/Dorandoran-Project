@@ -13,7 +13,13 @@ import {
   MeetupFields,
 } from "@/lib/realtimeMeetup";
 import { useAudioBands } from "@/lib/useAudioBands";
-import { FIELD_QUESTIONS, OPENING_LINE, firstMissingQuestion as dialogFirstMissing } from "@/lib/meetupDialog";
+import {
+  FIELD_QUESTIONS,
+  OPENING_LINE,
+  applyParse,
+  firstMissing,
+  firstMissingQuestion as dialogFirstMissing,
+} from "@/lib/meetupDialog";
 import { saveDraft } from "@/lib/draft";
 import BarVisualizer, { VisualizerState } from "@/components/ui/bar-visualizer";
 
@@ -81,13 +87,17 @@ export default function CreateListeningPage() {
   // =====================================================================
   const mergeFields = (f: MeetupFields) => {
     // null = 아직 모름(기존 유지) · "" = 의도적 비우기 · 값 = 갱신(정정 포함)
-    if (f.time === "") setTime(null);
-    else if (f.time != null) setTime(f.time);
-    if (f.location === "") setLocation(null);
-    else if (f.location != null) setLocation(f.location);
-    if (f.activity === "") setActivity(null);
-    else if (f.activity != null) setActivity(f.activity);
+    const one = (v: string | null | undefined, prev: string | null) =>
+      v === "" ? null : v != null ? v : prev;
+    const cur = fieldsRef.current;
+    const next = {
+      time: one(f.time, cur.t),
+      location: one(f.location, cur.l),
+      activity: one(f.activity, cur.a),
+    };
+    commitFields(next);
     setStarted(true);
+    return next; // 도구 결과로 되돌려 에이전트가 화면 상태를 알게 한다
   };
 
   const rtAttemptsRef = useRef(0);
@@ -104,9 +114,48 @@ export default function CreateListeningPage() {
     l: null,
     a: null,
   });
-  useEffect(() => {
-    fieldsRef.current = { t: time, l: location, a: activity };
-  }, [time, location, activity]);
+  /** 세 필드를 한 번에 확정한다. 필드를 바꾸는 곳은 전부 여기를 지난다.
+   *  ref 를 동기로 갱신해서 바로 다음 줄의 "다음 질문" 판단이 한 박자 늦은 값을 보지 않게 한다. */
+  const commitFields = (f: { time: string | null; location: string | null; activity: string | null }) => {
+    fieldsRef.current = { t: f.time, l: f.location, a: f.activity };
+    setTime(f.time);
+    setLocation(f.location);
+    setActivity(f.activity);
+  };
+
+  /** 한 필드만 고칠 때(고치기 버튼) — 나머지는 현재 값 그대로 */
+  const commitOne = (key: "time" | "location" | "activity", val: string | null) => {
+    const c = fieldsRef.current;
+    const next = { time: c.t, location: c.l, activity: c.a, [key]: val };
+    commitFields(next);
+    syncAgent(next);
+  };
+
+  /**
+   * 에이전트가 모르는 화면 변경(보조 인식이 채웠거나 사용자가 손으로 고쳤거나)을 알려준다.
+   * 안 알려주면 에이전트는 화면에 이미 채워진 항목을 계속 다시 묻는다.
+   * (에이전트가 스스로 기록한 값은 이미 알고 있으므로 여기를 지나지 않는다.)
+   */
+  const syncAgent = (f: { time: string | null; location: string | null; activity: string | null }) => {
+    // 상태값(mode/rtStatus) 대신 살아있는 핸들로 판단한다 — 보조 루프가 붙든 오래된
+    // 렌더 클로저에서 호출돼도 스테일한 상태 때문에 조용히 건너뛰지 않도록.
+    if (!rtRef.current) return;
+    const filled = [
+      f.time && `시간은 ${f.time}`,
+      f.location && `장소는 ${f.location}`,
+      f.activity && `활동은 ${f.activity}`,
+    ]
+      .filter(Boolean)
+      .join(", ");
+    if (!filled) return;
+    const miss = firstMissing(f);
+    rtRef.current.sendContext(
+      `[화면에 기록된 내용] ${filled}. ` +
+        (miss
+          ? `이건 다시 묻지 말고 "${FIELD_QUESTIONS[miss]}"만 물어보세요.`
+          : `세 가지가 모두 채워졌어요. 더 묻지 말고 마무리 안내만 해주세요.`)
+    );
+  };
 
   const stopLocalLoop = () => {
     localLoopRef.current = 0;
@@ -146,9 +195,11 @@ export default function CreateListeningPage() {
       }
       const handle = listenOnce({
         engine: "recorder",
-        silenceMs: 1300,
+        // 어르신은 한 문장 안에서도 쉬었다 말한다 — 짧게 잡으면 말 중간에 끊겨
+        // 앞토막만 위스퍼로 넘어간다. 넉넉히 잡고 요약은 파서가 한다.
+        silenceMs: 1800,
         noSpeechMs: 8000,
-        maxMs: 20000,
+        maxMs: 30000,
         externalStream: rtRef.current?.micStream, // 세션과 같은 마이크 재사용(여닫는 잡음 제거)
         onDebug: () => {},
       });
@@ -206,9 +257,7 @@ export default function CreateListeningPage() {
     setRtStatus("connecting");
     try {
       const handle = await connectRealtimeMeetup({
-        onFields: (f) => {
-          if (!unmountedRef.current) mergeFields(f);
-        },
+        onFields: (f) => (unmountedRef.current ? undefined : mergeFields(f)),
         onUserText: (t) => {
           if (unmountedRef.current) return;
           setTranscript(t);
@@ -277,13 +326,28 @@ export default function CreateListeningPage() {
     stopTts();
   };
 
-  const applyParsedData = (data: any) => {
+  const applyParsedData = (
+    data: any,
+    snapshot: { time: string | null; location: string | null; activity: string | null }
+  ) => {
     if (!data) return;
-    setTime(data.time ?? null);
-    setLocation(data.location ?? null);
-    setActivity(data.activity ?? null);
-    setMissingField(data.missingField ?? null);
-    setFollowUpQuestion(data.followUpQuestion ?? null);
+    // 응답을 통째로 덮어쓰지 않는다 — 요청이 오가는 사이 에이전트가 채운 값을 지우지 않도록
+    // "이번 파싱이 실제로 바꾼 필드"만 반영한다(applyParse 주석 참조).
+    const cur = fieldsRef.current;
+    const merged = applyParse(snapshot, data, {
+      time: cur.t,
+      location: cur.l,
+      activity: cur.a,
+    });
+    commitFields(merged);
+    // 이번 파싱으로 화면이 실제로 바뀌었으면 에이전트에게도 알린다(중복 질문 방지)
+    if (merged.time !== cur.t || merged.location !== cur.l || merged.activity !== cur.a) {
+      syncAgent(merged);
+    }
+    // 남은 항목은 서버 응답이 아니라 병합 결과로 다시 계산한다(서버는 스냅샷 기준이라 어긋날 수 있다)
+    const miss = firstMissing(merged);
+    setMissingField(miss);
+    setFollowUpQuestion(miss ? data.followUpQuestion ?? null : null);
     setParseNonce((n) => n + 1);
     setStarted(true);
   };
@@ -292,21 +356,21 @@ export default function CreateListeningPage() {
     inputTranscript: string,
     overrideValues?: { time?: string | null; location?: string | null; activity?: string | null }
   ) => {
+    const snapshot = {
+      time: (overrideValues?.time !== undefined ? overrideValues.time : time) ?? null,
+      location: (overrideValues?.location !== undefined ? overrideValues.location : location) ?? null,
+      activity: (overrideValues?.activity !== undefined ? overrideValues.activity : activity) ?? null,
+    };
     setIsParsing(true);
     try {
       const res = await fetch("/api/parse-meetup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          transcript: inputTranscript,
-          time: overrideValues?.time !== undefined ? overrideValues.time : time,
-          location: overrideValues?.location !== undefined ? overrideValues.location : location,
-          activity: overrideValues?.activity !== undefined ? overrideValues.activity : activity,
-        }),
+        body: JSON.stringify({ transcript: inputTranscript, ...snapshot }),
       });
       if (!res.ok) return;
       const data = await res.json();
-      applyParsedData(data);
+      applyParsedData(data, snapshot);
     } catch (err) {
       console.error("parse-meetup failed:", err);
     } finally {
@@ -470,9 +534,7 @@ export default function CreateListeningPage() {
     setTranscript("");
     setLiveText("");
     setAgentLine("");
-    setTime(null);
-    setLocation(null);
-    setActivity(null);
+    commitFields({ time: null, location: null, activity: null });
     setMissingField(null);
     setFollowUpQuestion(null);
     setParseNonce(0);
@@ -662,7 +724,7 @@ export default function CreateListeningPage() {
                       type="button"
                       onClick={() => {
                         const val = inputTime.trim() || null;
-                        setTime(val);
+                        commitOne("time", val);
                         setEditingTime(false);
                         if (!val && mode === "classic") parseTranscript("", { time: null });
                       }}
@@ -730,7 +792,7 @@ export default function CreateListeningPage() {
                       type="button"
                       onClick={() => {
                         const val = inputLocation.trim() || null;
-                        setLocation(val);
+                        commitOne("location", val);
                         setEditingLocation(false);
                         if (!val && mode === "classic") parseTranscript("", { location: null });
                       }}
@@ -798,7 +860,7 @@ export default function CreateListeningPage() {
                       type="button"
                       onClick={() => {
                         const val = inputActivity.trim() || null;
-                        setActivity(val);
+                        commitOne("activity", val);
                         setEditingActivity(false);
                         if (!val && mode === "classic") parseTranscript("", { activity: null });
                       }}

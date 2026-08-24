@@ -2,7 +2,7 @@
 // 사용법: 서버 켠 상태에서 `npm run check` (BASE_URL 환경변수로 대상 변경 가능)
 // LLM 응답은 비결정적이므로 계약 검사는 "포함/비어있음" 수준의 느슨한 단언만 쓴다.
 import { computeEndTime, computeEndClock } from "../lib/koreanTime.ts";
-import { FIELD_QUESTIONS, OPENING_LINE, firstMissing } from "../lib/meetupDialog.ts";
+import { FIELD_QUESTIONS, OPENING_LINE, firstMissing, applyParse } from "../lib/meetupDialog.ts";
 
 const BASE = process.env.BASE_URL || "http://localhost:3000";
 let pass = 0;
@@ -36,6 +36,39 @@ ok(firstMissing({ time: "오후 3시" }) === "location", "time 차면 → locati
 ok(firstMissing({ time: "3시", location: "공원" }) === "activity", "다음 → activity");
 ok(firstMissing({ time: "3시", location: "공원", activity: "산책" }) === null, "완성 → null");
 ok(OPENING_LINE.includes(FIELD_QUESTIONS.time), "오프닝에 첫 질문 포함");
+
+// applyParse: 파싱 응답을 화면에 반영할 때 "바뀐 필드만" 건드린다
+{
+  const eq = (a, b) => a.time === b.time && a.location === b.location && a.activity === b.activity;
+  // 파싱 도중 에이전트가 시간·장소를 채웠다 → 파서가 모르는 그 값들이 지워지면 안 된다
+  ok(
+    eq(
+      applyParse(
+        { time: null, location: null, activity: null },
+        { time: null, location: null, activity: "산책" },
+        { time: "오후 3시", location: "도란공원", activity: null }
+      ),
+      { time: "오후 3시", location: "도란공원", activity: "산책" }
+    ),
+    "동시 기록: 에이전트가 채운 값 보존 + 파싱 결과 반영"
+  );
+  // 의도적 비우기(스냅샷엔 값, 응답은 null)는 그대로 지워야 한다
+  ok(
+    applyParse({ time: "오후 3시" }, { time: null }, { time: "오후 3시" }).time === null,
+    "비우기 요청은 반영"
+  );
+  // 값 변경은 반영
+  ok(
+    applyParse({ time: "오후 3시" }, { time: "오후 4시" }, { time: "오후 3시" }).time === "오후 4시",
+    "정정 반영"
+  );
+  // 파싱이 안 건드린 필드는 그 사이 바뀐 현재 값을 지킨다
+  ok(
+    applyParse({ time: "오후 3시" }, { time: "오후 3시" }, { time: "오후 5시" }).time === "오후 5시",
+    "미변경 필드는 현재 값 유지"
+  );
+  ok(applyParse({}, { location: "" }, { location: "공원" }).location === "공원", "빈 문자열은 null 취급");
+}
 
 // ---------- 계약: /api/parse-meetup ----------
 console.log(`[parse-meetup 계약 @ ${BASE}]`);
@@ -75,6 +108,21 @@ try {
   const r5 = await parse({ transcript: "장소는 다시 정할래", ...CTX });
   ok(r5.location === null && r5.missingField === "location",
     "비우기 → location null + 재질문", JSON.stringify(r5));
+
+  // 길게 말해도 화면 칸에 들어갈 짧은 말로 요약해서 넣는다
+  const LONG =
+    "요즘 무릎이 안 좋아서 멀리는 못 가고요, 그냥 우리 동네 한 바퀴 천천히 걸으면서 " +
+    "이런저런 이야기나 나눴으면 좋겠어요. 사람이 많은 데는 좀 부담스럽고 조용한 게 좋아요.";
+  const r6 = await parse({ transcript: LONG, time: "오후 3시", location: "도란공원", activity: null });
+  ok(typeof r6.activity === "string" && r6.activity.length > 0 && r6.activity.length <= 15,
+    "긴 발화 → 짧게 요약된 activity", JSON.stringify(r6.activity));
+  ok(r6.time === "오후 3시" && r6.location === "도란공원", "긴 발화가 다른 필드를 흔들지 않음",
+    JSON.stringify(r6));
+
+  // 시각은 항상 오전/오후 + 아라비아 숫자 — 뒤 화면의 끝시각 계산이 이 형식에 의존한다
+  const r7 = await parse({ transcript: "네 시쯤에 봐요", time: null, location: null, activity: null });
+  ok(/^(오전|오후) \d/.test(String(r7.time)) && computeEndClock(r7.time, 60) !== null,
+    "한글 숫자 시각 → 오전/오후+숫자로 정규화", JSON.stringify(r7.time));
 } catch (e) {
   fail++;
   console.error("  ✗ 계약 검사 실행 실패:", e.message, "(서버가 켜져 있나요?)");

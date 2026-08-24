@@ -12,7 +12,8 @@ export interface MeetupFields {
 }
 
 export interface RealtimeMeetupCallbacks {
-  onFields: (f: MeetupFields) => void;
+  /** 병합 후의 화면 값을 돌려주면 도구 결과로 에이전트에게 그대로 알려준다 */
+  onFields: (f: MeetupFields) => MeetupFields | void;
   onUserText: (text: string) => void;
   onAgentText: (text: string) => void;
   onAgentSpeaking?: (speaking: boolean) => void;
@@ -22,6 +23,8 @@ export interface RealtimeMeetupCallbacks {
 
 export interface RealtimeMeetupHandle {
   sendText: (text: string) => void;
+  /** 화면 상태를 대화 기록에만 넣는다 — 응답을 트리거하지 않아 말이 겹치지 않는다 */
+  sendContext: (text: string) => void;
   disconnect: () => void;
   /** 시각화용 — 사용자 마이크 스트림 */
   micStream: MediaStream;
@@ -60,6 +63,14 @@ const INSTRUCTIONS = `너는 '도란도란' 앱의 음성 도우미다. 어르�
 - 항상 한국어 존댓말로, 한 번에 한두 문장만, 천천히 또박또박 말한다.
 - 어르신 말에서 필드가 파악되는 즉시 set_meetup_fields 도구를 호출해 기록한다. 파악된 필드만 보내고 모르는 필드는 null로 보낸다.
 - time은 "오후 3시"처럼 시각만 기록한다. "오늘"/"내일" 같은 날짜 단어는 빼라.
+  반드시 "오전"/"오후" + 아라비아 숫자로 적어라: "네 시" → "오후 4시", "여섯시 반" → "오후 6시 30분".
+  한글 숫자나 오전/오후 없는 값으로 기록하면 뒤 화면의 시간 계산이 실패한다.
+- 길게 말씀하셔도 되받아 적지 마라. 어르신이 여러 문장으로 길게 말하면 **핵심만 짧게 요약해서** 기록한다.
+  location과 activity는 화면에 들어갈 짧은 말(대략 12자 이내)로 줄여라. 조사·수식어·사연은 버리고 알맹이만 남긴다.
+  예: "요즘 무릎이 안 좋아서 멀리는 못 가고, 그냥 동네 한 바퀴 천천히 걸으면서 이야기나 나눴으면 좋겠어" → activity는 "동네 산책"
+  예: "우리 아파트 정문 앞에 은행나무 있는 데 있잖아, 거기 벤치 쪽에서" → location은 "아파트 정문 앞"
+  기록한 뒤에는 "○○, 이렇게 적었어요"처럼 요약한 말을 한 번 확인해준다. 어르신이 아니라고 하면 다시 고쳐 기록한다.
+- 말씀이 끝나지 않은 것 같으면(문장이 중간에 끊긴 느낌) 되묻지 말고 조용히 더 기다려라.
 - 빠진 항목은 한 번에 하나씩만, 반드시 시간 → 장소 → 활동 순서로 물어라. 앞 항목이 채워지기 전에는 다음 항목을 묻지 마라. 질문 예: "${FIELD_QUESTIONS.time}", "${FIELD_QUESTIONS.location}", "${FIELD_QUESTIONS.activity}"
 - 어르신이 순서와 다른 정보를 먼저 말하면 그것도 기록은 하되, 다음 질문은 다시 순서상 첫 번째 빈 항목으로 돌아간다.
 - 변경 요청 인식: 이미 채워진 값도 어르신이 바꾸자고 하면 즉시 set_meetup_fields로 갱신하고 "네, ○○로 바꿨어요"라고 짧게 확인해라. 다음 표현들이 모두 변경 요청이다 —
@@ -68,6 +79,7 @@ const INSTRUCTIONS = `너는 '도란도란' 앱의 음성 도우미다. 어르�
   "한 시간 미뤄/늦춰"(기존 시각 +1시간 계산해서 기록), "30분 당겨"(-30분), "조금 이따로"(+30분쯤).
   필드 이름을 말하지 않아도 값의 종류(시각/장소/활동)로 어느 필드인지 판단하라.
   "다시 정할래", "아직 모르겠어"라고 하면 그 필드를 빈 문자열 ""로 보내 비우고(모르는 필드의 null과 구분) 그 항목을 다시 물어라.
+- "[화면에 기록된 내용] …" 으로 시작하는 메시지는 어르신 말이 아니라 화면의 현재 상태다. 그 내용을 이미 확정된 사실로 받아들이고, 거기 적힌 항목은 절대 다시 묻지 마라. 남았다고 표시된 항목만 묻고, 남은 게 없다면 마무리 안내만 해라.
 - 세 가지가 모두 기록되면 "다 됐어요. 화면 아래 올리기 버튼을 눌러주세요."라고 말하고 더 묻지 않는다.
 - 모임 만들기와 무관한 잡담은 정중히 짧게 끊고 목표로 돌아온다.
 
@@ -111,10 +123,20 @@ export async function connectRealtimeMeetup(
       location: z.string().nullable(),
       activity: z.string().nullable(),
     }),
+    // 이 도구는 절대 실패하지 않는다. 실패를 돌려주면 에이전트가 재시도를 반복하다
+    // "계속 문제가 있어서 죄송합니다"류의 사과 루프에 빠진다.
     execute: async (args: MeetupFields) => {
-      cb.onFields(args);
-      debug("필드 기록: " + JSON.stringify(args));
-      return "기록했습니다";
+      try {
+        const after = cb.onFields(args) ?? args;
+        debug("필드 기록: " + JSON.stringify(after));
+        // 화면의 최종 상태를 그대로 돌려준다 — 에이전트가 이미 채워진 항목을 다시 묻지 않도록
+        return `기록했습니다. 지금 화면: 시간=${after.time ?? "없음"}, 장소=${
+          after.location ?? "없음"
+        }, 활동=${after.activity ?? "없음"}`;
+      } catch (e) {
+        debug("필드 기록 실패(무시): " + String(e).slice(0, 40));
+        return "기록했습니다";
+      }
     },
   });
 
@@ -166,8 +188,10 @@ export async function connectRealtimeMeetup(
       audio: {
         input: {
           transcription: { model: "gpt-4o-mini-transcribe", language: "ko" },
-          // 연결 직후 SDK가 보내는 session.update에서도 VAD가 확실히 켜져 있도록 명시
-          turnDetection: { type: "server_vad", silence_duration_ms: 900 },
+          // 연결 직후 SDK가 보내는 session.update에서도 VAD가 확실히 켜져 있도록 명시.
+          // 어르신은 한 문장 안에서도 쉬었다 말한다 — 900ms면 말 중간에 턴이 끊겨
+          // 문장 앞토막만 전달된다. 1.6초로 늘려 긴 말씀을 통째로 받는다.
+          turnDetection: { type: "server_vad", silence_duration_ms: 1600 },
         },
         output: { voice: "alloy" },
       },
@@ -288,6 +312,15 @@ export async function connectRealtimeMeetup(
         session.sendMessage(text);
       } catch {
         debug("텍스트 전송 실패");
+      }
+    },
+    sendContext: (text: string) => {
+      try {
+        // triggerResponse:false — 기록만 남기고 말은 시키지 않는다.
+        // (기본값 true 로 넣으면 도우미가 말하는 중에 응답이 겹쳐 서버 오류가 난다)
+        transport.sendMessage(text, {}, { triggerResponse: false });
+      } catch {
+        debug("상태 전달 실패");
       }
     },
     disconnect: () => {

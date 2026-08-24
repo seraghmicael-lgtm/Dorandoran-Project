@@ -69,8 +69,21 @@ Instructions:
      The screen that displays this always prefixes it with a fixed "오늘" label, so including a day
      word here would duplicate or contradict it. e.g. "오후 3시", "저녁 6시", "오전 10시".
      If the user mentions a different day (e.g. "내일"), still extract only the time-of-day part.
+     ALWAYS normalize to "오전"/"오후" + Arabic numerals: "네 시" → "오후 4시", "여섯시 반" → "오후 6시 30분",
+     "아침 아홉시" → "오전 9시". 오전/오후가 분명하지 않으면 어르신 모임 시간대 상식으로 정하되
+     (7~11시는 오전, 12~19시는 오후) 반드시 둘 중 하나를 붙여라. 뒤 화면이 끝나는 시각을 계산하는데,
+     한글 숫자나 오전/오후 없는 값이면 계산이 실패한다.
    - "location": string or null (e.g. "송정 오일장", "우리 아파트 앞")
    - "activity": string or null (e.g. "오일장 구경", "산책")
+
+   IMPORTANT — location/activity 는 화면 칸에 들어갈 짧은 말이다. 어르신이 여러 문장으로 길게
+   말했더라도 그대로 옮겨 적지 말고 **핵심만 요약해서 대략 12자 이내**로 줄여라. 조사·수식어·
+   사연·이유는 버리고 알맹이만 남긴다. 문장으로 쓰지 말고 명사구로 써라.
+   예: "요즘 무릎이 안 좋아서 멀리는 못 가고 그냥 동네 한 바퀴 천천히 걸으면서 이야기나 나눴으면 좋겠어"
+       → activity: "동네 산책"
+   예: "우리 아파트 정문 앞에 은행나무 있는 데 있잖아, 거기 벤치 쪽에서 보면 좋겠는데"
+       → location: "아파트 정문 앞"
+   예: "장이 서는 날이라 구경도 하고 뭐 좀 사기도 하고" → activity: "오일장 구경"
    - "missingField": "time" | "location" | "activity" | null
      (Pick the FIRST missing field among time, location, activity in that priority order. If none missing, set to null)
    - "followUpQuestion": string or null
