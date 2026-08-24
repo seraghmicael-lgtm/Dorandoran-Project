@@ -4,6 +4,7 @@ import { useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import WireframeLayout from "@/components/WireframeLayout";
 import CreateStepHeader from "@/components/CreateStepHeader";
+import MemoryBubbles from "@/components/MemoryBubbles";
 import SmartInput from "@/components/SmartInput";
 import { loadDraft, updateDraft } from "@/lib/draft";
 
@@ -32,6 +33,7 @@ export default function CreateActivityPage() {
       <CreateStepHeader step={1} backHref="/home" />
 
       <div className="px-[18px] py-[22px] flex flex-col">
+        <MemoryBubbles />
         <h1 className="text-[22px] font-bold text-black">뭐 하실래요?</h1>
         <div className="h-5" />
 

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import WireframeLayout from "@/components/WireframeLayout";
 import CreateStepHeader from "@/components/CreateStepHeader";
+import MemoryBubbles from "@/components/MemoryBubbles";
 import SmartInput from "@/components/SmartInput";
 import { updateDraft } from "@/lib/draft";
 
@@ -35,6 +36,7 @@ export default function CreatePeoplePage() {
       <CreateStepHeader step={5} backHref="/create/place" />
 
       <div className="px-[18px] py-[22px] flex flex-col">
+        <MemoryBubbles />
         <h1 className="text-[22px] font-bold text-black">몇 분이 함께할까요?</h1>
         <p className="text-[15px] text-gray-500 mt-1">나를 포함한 숫자예요.</p>
         <div className="h-5" />

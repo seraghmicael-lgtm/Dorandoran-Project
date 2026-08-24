@@ -10,6 +10,7 @@ import {
 } from "../lib/koreanTime.ts";
 import { FIELD_QUESTIONS, OPENING_LINE, firstMissing, applyParse } from "../lib/meetupDialog.ts";
 import { directionsUrl } from "../lib/places.ts";
+import { memoryChips } from "../lib/draft.ts";
 
 const BASE = process.env.BASE_URL || "http://localhost:3000";
 let pass = 0;
@@ -91,6 +92,35 @@ ok(formatKoreanClock(13, 30) === "오후 1시 30분", "13:30 → 오후 1시 30�
     u2
   );
   ok(directionsUrl({ lat: 37.5, lng: 127 }, "transit").includes("travelmode=transit"), "길찾기: 이동수단 지정 가능");
+}
+
+// 메모리풍선 — 단계를 지날수록 칩이 하나씩 늘어난다
+{
+  ok(memoryChips(null).length === 0, "메모리풍선: 아무것도 없으면 빈 배열");
+  ok(memoryChips({}).length === 0, "메모리풍선: 빈 draft 도 빈 배열");
+  ok(
+    memoryChips({ activity: "산책" }).join("|") === "산책",
+    "메모리풍선: 활동만 정했을 때"
+  );
+  const full = memoryChips({
+    activity: "산책",
+    time: "오후 3시",
+    duration: "1시간",
+    location: "도토리마을 공원 입구",
+    maxPeople: 4,
+  });
+  ok(
+    full.join("|") === "산책|오후 3시|1시간 동안|도토리마을 공원 입구|4명",
+    "메모리풍선: Figma 순서·문구 그대로",
+    full.join(" / ")
+  );
+  // 중간이 비어도 순서가 밀리지 않는다
+  ok(
+    memoryChips({ activity: "산책", location: "공원" }).join("|") === "산책|공원",
+    "메모리풍선: 빈 항목은 건너뛴다"
+  );
+  ok(memoryChips({ maxPeople: 0 }).join("|") === "0명", "메모리풍선: 0명도 표시(0을 빈 값으로 안 본다)");
+  ok(memoryChips({ activity: "   " }).length === 0, "메모리풍선: 공백만 있으면 안 건다");
 }
 
 // ---------- 유닛: meetupDialog ----------

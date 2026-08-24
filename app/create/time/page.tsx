@@ -1,5 +1,6 @@
 import WireframeLayout from "@/components/WireframeLayout";
 import CreateStepHeader from "@/components/CreateStepHeader";
+import MemoryBubbles from "@/components/MemoryBubbles";
 import { meetupTimeOptions, seoulNow } from "@/lib/koreanTime";
 import TimeOptions from "./TimeOptions";
 
@@ -16,6 +17,7 @@ export default function CreateTimePage() {
       <CreateStepHeader step={2} backHref="/create/activity" />
 
       <div className="px-[18px] py-[22px] flex flex-col">
+        <MemoryBubbles />
         <h1 className="text-[22px] font-bold text-black">몇 시에 만날까요?</h1>
         <div className="h-5" />
 

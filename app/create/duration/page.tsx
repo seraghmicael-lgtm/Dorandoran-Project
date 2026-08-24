@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import WireframeLayout from "@/components/WireframeLayout";
 import CreateStepHeader from "@/components/CreateStepHeader";
+import MemoryBubbles from "@/components/MemoryBubbles";
 import { computeEndClock, computeEndTime } from "@/lib/koreanTime";
 import { MeetupDraft, loadDraft, updateDraft } from "@/lib/draft";
 
@@ -52,6 +53,7 @@ export default function CreateDurationPage() {
       <CreateStepHeader step={3} backHref="/create/time" />
 
       <div className="px-[18px] py-[22px] flex flex-col">
+        <MemoryBubbles />
         <h1 className="text-[22px] font-bold text-black">얼마나 걸릴까요?</h1>
         <div className="h-5" />
 

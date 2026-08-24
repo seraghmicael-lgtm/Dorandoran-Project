@@ -45,3 +45,33 @@ export function updateDraft(patch: Partial<MeetupDraft>): MeetupDraft {
 export function clearDraft() {
   sessionStorage.removeItem(KEY);
 }
+
+/**
+ * useSyncExternalStore 용 스냅샷 — 원문 문자열 그대로 돌려준다.
+ * 파싱한 객체를 돌려주면 호출마다 참조가 달라져 렌더가 무한히 돈다.
+ */
+export function draftSnapshot(): string | null {
+  try {
+    return sessionStorage.getItem(KEY);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * 메모리풍선에 걸 칩 목록 (Figma 941:980 순서: 할일 → 시간 → 모임시간 → 장소 → 인원).
+ * 아직 안 정한 항목은 빼고, 하나도 없으면 빈 배열 — 화면은 아무것도 안 그린다.
+ */
+export function memoryChips(d: MeetupDraft | null | undefined): string[] {
+  return [
+    d?.activity,
+    d?.time,
+    d?.duration ? `${d.duration} 동안` : null,
+    d?.location,
+    typeof d?.maxPeople === "number" ? `${d.maxPeople}명` : null,
+  ].filter((v): v is string => typeof v === "string" && v.trim().length > 0);
+}
+
+/** 이 화면에서 draft 는 안 바뀐다(바뀌면 곧 다음 화면으로 넘어간다) — 구독 없음 */
+export const noDraftSubscribe = () => () => {};
+export const noDraftOnServer = () => null;

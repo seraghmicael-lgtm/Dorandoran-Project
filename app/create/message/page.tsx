@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import WireframeLayout from "@/components/WireframeLayout";
 import CreateStepHeader from "@/components/CreateStepHeader";
+import MemoryBubbles from "@/components/MemoryBubbles";
 import { updateDraft } from "@/lib/draft";
 import { listenOnce, unlockAudio, ListenHandle } from "@/lib/voice";
 
@@ -100,6 +101,7 @@ export default function CreateMessagePage() {
       <CreateStepHeader step={6} backHref="/create/people" />
 
       <div className="px-[18px] py-[22px] flex flex-col">
+        <MemoryBubbles />
         <h1 className="text-[22px] font-bold text-black">하실 말씀 있으세요?</h1>
         <p className="text-[15px] text-gray-500 mt-1">안 하셔도 괜찮아요</p>
         <div className="h-5" />

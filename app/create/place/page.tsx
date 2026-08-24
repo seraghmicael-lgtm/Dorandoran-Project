@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import WireframeLayout from "@/components/WireframeLayout";
 import CreateStepHeader from "@/components/CreateStepHeader";
+import MemoryBubbles from "@/components/MemoryBubbles";
 import SmartInput from "@/components/SmartInput";
 import GoogleMap from "@/components/GoogleMap";
 import { updateDraft } from "@/lib/draft";
@@ -60,6 +61,7 @@ export default function CreatePlacePage() {
       <CreateStepHeader step={4} backHref="/create/duration" />
 
       <div className="px-[18px] py-[22px] flex flex-col">
+        <MemoryBubbles />
         <h1 className="text-[22px] font-bold text-black">어디서 만날까요?</h1>
         <div className="h-5" />
 
