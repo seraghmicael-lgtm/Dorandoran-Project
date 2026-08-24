@@ -109,7 +109,7 @@ export default function CreateMessagePage() {
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="여기에 쓰세요 예) 천천히 걸을게요"
+            placeholder="예) 천천히 걸을게요"
             rows={4}
             className="w-full p-4 text-base font-bold text-black placeholder:font-normal placeholder:text-gray-500 focus:outline-none resize-none"
           />

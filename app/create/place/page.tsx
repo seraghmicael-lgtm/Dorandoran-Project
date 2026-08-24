@@ -134,7 +134,7 @@ export default function CreatePlacePage() {
         {/* 이 화면엔 고를 목록이 없으니 "목록에 없으면" 머리말을 빼고 검색칸만 둔다 */}
         <SmartInput
           label=""
-          placeholder="여기에 쓰세요 예) 도란공원 정문"
+          placeholder="예) 도란공원 정문"
           hint={
             origin === null
               ? "“도란공원 정문”처럼 만날 곳을 적어주세요"

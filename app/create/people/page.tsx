@@ -59,7 +59,7 @@ export default function CreatePeoplePage() {
         <div className="h-2.5" />
         <SmartInput
           label="목록에 없으면"
-          placeholder="여기에 쓰세요 예) 여섯 명"
+          placeholder="예) 여섯 명"
           hint="“여섯 명”처럼 쓰거나 말하셔도 돼요"
           onConfirm={handleCustom}
         />

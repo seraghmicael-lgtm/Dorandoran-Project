@@ -53,7 +53,7 @@ export default function CreateActivityPage() {
 
         <div className="h-5" />
         <SmartInput
-          placeholder="여기에 쓰세요 예) 함께 장 보기"
+          placeholder="예) 함께 장 보기"
           hint="“커피”처럼 쓰거나 말하셔도 돼요"
           suggestions={[...OPTIONS, FULL_WIDTH_OPTION]}
           onConfirm={choose}

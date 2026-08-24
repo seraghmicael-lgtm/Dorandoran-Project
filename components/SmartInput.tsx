@@ -10,12 +10,12 @@ import { unlockAgentAudio } from "@/lib/realtimeMeetup";
 // ② 눌러서 쓰는 중: 굵은 입력값 + 바로 아래 후보 칩(키보드에 안 가리게) + "이걸로 할게요"
 // ③ 말한 뒤(칸 안에 인식 결과 + "다시")는 음성이 별도 페이지로 가는 현 라우팅에선
 //    발생하지 않아 배선하지 않는다 — 타이핑 상태가 정정 역할을 겸한다.
-// placeholder 는 화면마다 그 칸에 맞는 예시를 넣는다("여기에 쓰세요 예) 함께 장 보기").
-// 기본값은 예시 없는 형태 — 예시를 안 주면 어르신이 무엇을 쓰라는 건지 알기 어려우니
-// 새 화면에 붙일 땐 반드시 그 칸에 맞는 예시를 넘길 것.
+// placeholder 는 화면마다 그 칸에 맞는 예시를 넣는다("예) 함께 장 보기").
+// 기본값을 두지 않는다 — 예시가 없으면 어르신이 무엇을 쓰라는 건지 알 수 없으니
+// 새 화면에 붙일 때 빠뜨리지 못하게 타입으로 강제한다.
 export default function SmartInput({
   label = "목록에 없으면",
-  placeholder = "여기에 쓰세요",
+  placeholder,
   hint,
   suggestions = [],
   confirmLabel = "이걸로 할게요",
@@ -23,7 +23,7 @@ export default function SmartInput({
 }: {
   /** 빈 문자열이면 머리말을 아예 안 보여준다(고를 목록이 없는 화면) */
   label?: string;
-  placeholder?: string;
+  placeholder: string;
   hint: string;
   suggestions?: string[];
   /** 확인 버튼 문구. 바로 다음으로 가는 화면이 아니면 바꿔 쓴다(예: "이 장소 찾기") */
