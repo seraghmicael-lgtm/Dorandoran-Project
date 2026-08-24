@@ -1,17 +1,26 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import WireframeLayout from "@/components/WireframeLayout";
 import CreateStepHeader from "@/components/CreateStepHeader";
 import SmartInput from "@/components/SmartInput";
-import { updateDraft } from "@/lib/draft";
+import { loadDraft, updateDraft } from "@/lib/draft";
 
 // 와이어프레임_v02 01_뭐 하실래요 (활동)
 const OPTIONS = ["산책", "등산", "바둑", "맛집탐방", "장보기", "커피"];
 const FULL_WIDTH_OPTION = "병원";
 
+// sessionStorage 는 브라우저에만 있다 — 서버 렌더에선 null, 마운트 뒤 실제 값.
+// (렌더 중에 읽으면 SSR 이 터지고, 이펙트로 setState 하면 렌더가 한 번 더 돈다)
+const noSubscribe = () => () => {};
+const readChosenActivity = () => loadDraft()?.activity ?? null;
+const noChosenOnServer = () => null;
+
 export default function CreateActivityPage() {
   const router = useRouter();
+  // 이미 고른 활동이 있으면(이전으로 돌아온 경우) 다시 고르지 않고도 다음으로 갈 수 있다
+  const chosen = useSyncExternalStore(noSubscribe, readChosenActivity, noChosenOnServer);
 
   const choose = (activity: string) => {
     updateDraft({ activity });
@@ -58,6 +67,29 @@ export default function CreateActivityPage() {
           suggestions={[...OPTIONS, FULL_WIDTH_OPTION]}
           onConfirm={choose}
         />
+
+        {/* Figma 938:639 — 이전 / 다음. 흰 배경 · 회색 테두리 · 모서리 각짐 · 60px */}
+        <div className="h-4" />
+        <div className="flex gap-2.5">
+          <button
+            type="button"
+            onClick={() => router.push("/home")}
+            className="flex-1 h-[60px] border border-gray-300 bg-white flex items-center justify-center text-[19px] font-bold text-black cursor-pointer hover:bg-gray-50 active:bg-gray-100"
+          >
+            이전
+          </button>
+          <button
+            type="button"
+            onClick={() => chosen && router.push("/create/time")}
+            disabled={!chosen}
+            // 아직 아무것도 안 고르셨으면 다음으로 못 간다 — 빈 채로 넘어가면
+            // 뒤 화면이 "오일장 구경" 같은 기본값을 지어내 보여준다.
+            className="flex-1 h-[60px] border border-gray-300 bg-white flex items-center justify-center text-[19px] font-bold text-black cursor-pointer hover:bg-gray-50 active:bg-gray-100 disabled:text-gray-400 disabled:bg-gray-50 disabled:cursor-not-allowed"
+          >
+            다음
+          </button>
+        </div>
+        <div className="h-4" />
       </div>
     </WireframeLayout>
   );
