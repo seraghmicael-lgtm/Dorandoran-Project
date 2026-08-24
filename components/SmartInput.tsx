@@ -18,12 +18,16 @@ export default function SmartInput({
   placeholder = "여기에 쓰세요",
   hint,
   suggestions = [],
+  confirmLabel = "이걸로 할게요",
   onConfirm,
 }: {
+  /** 빈 문자열이면 머리말을 아예 안 보여준다(고를 목록이 없는 화면) */
   label?: string;
   placeholder?: string;
   hint: string;
   suggestions?: string[];
+  /** 확인 버튼 문구. 바로 다음으로 가는 화면이 아니면 바꿔 쓴다(예: "이 장소 찾기") */
+  confirmLabel?: string;
   onConfirm: (value: string) => void;
 }) {
   const router = useRouter();
@@ -42,7 +46,7 @@ export default function SmartInput({
 
   return (
     <div className="w-full border-t border-gray-200 pt-[18px] flex flex-col gap-[9px]">
-      <p className="text-[15px] text-gray-500">{label}</p>
+      {label && <p className="text-[15px] text-gray-500">{label}</p>}
 
       <div
         className={`w-full flex items-stretch border-black ${typing ? "border-2" : "border"}`}
@@ -85,7 +89,7 @@ export default function SmartInput({
             onClick={() => onConfirm(value.trim())}
             className="w-full py-[14px] bg-black text-white text-[15px] font-bold cursor-pointer"
           >
-            이걸로 할게요
+            {confirmLabel}
           </button>
         </>
       )}

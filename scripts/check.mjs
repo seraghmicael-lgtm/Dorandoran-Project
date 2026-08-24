@@ -208,6 +208,22 @@ try {
   const p4 = await searchPlace("공원", NaN, NaN);
   ok(!p4.place && p4.reason === "no-origin", "장소 검색: 위치 없으면 no-origin");
 
+  // 04_어디서 만날까요는 지도+검색으로 바뀌었다. 나머지 화면은 목록형 그대로여야 한다.
+  const html = async (path) => {
+    const res = await fetch(`${BASE}${path}`, { headers: { cookie: "dn_entered=1" } });
+    if (!res.ok) throw new Error(`HTTP ${res.status} ${path}`);
+    return res.text();
+  };
+  const placeHtml = await html("/create/place");
+  ok(!placeHtml.includes("목록에 없으면"), "장소 화면: '목록에 없으면' 머리말 없음");
+  ok(
+    !["송정마을 어귀", "도토리마을 공원", "한마음 경로당"].some((n) => placeHtml.includes(n)),
+    "장소 화면: 고정 카드 3개 제거됨"
+  );
+  for (const p of ["/create/activity", "/create/time", "/create/people"]) {
+    ok((await html(p)).includes("목록에 없으면"), `${p}: 머리말 유지`);
+  }
+
   // 시각은 항상 오전/오후 + 아라비아 숫자 — 뒤 화면의 끝시각 계산이 이 형식에 의존한다
   const r7 = await parse({ transcript: "네 시쯤에 봐요", time: null, location: null, activity: null });
   ok(/^(오전|오후) \d/.test(String(r7.time)) && computeEndClock(r7.time, 60) !== null,
