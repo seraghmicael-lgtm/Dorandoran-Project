@@ -1,6 +1,7 @@
 import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
 import GoogleMap from "@/components/GoogleMap";
+import { prisma } from "@/lib/prisma";
 
 export default async function MeetupDetailPage({
   params,
@@ -9,13 +10,38 @@ export default async function MeetupDetailPage({
 }) {
   const { id } = await params;
 
+  // 06_하실 말씀에서 남긴 한마디를 제목 밑에 건다(Figma: 오늘마실_동행자세히보기 1).
+  // 나머지 값은 아직 와이어프레임 고정값이라 그대로 둔다.
+  let meetup: { activity: string; startTime: string; message: string | null } | null = null;
+  try {
+    meetup = await prisma.meetup.findUnique({
+      where: { id },
+      select: { activity: true, startTime: true, message: true },
+    });
+  } catch (e) {
+    console.error("동행 조회 실패:", e);
+  }
+
   return (
     <WireframeLayout justify="between" className="p-6 flex flex-col justify-between">
       <div className="flex flex-col gap-6">
         {/* Title / Time */}
         <div className="flex flex-col gap-1">
-          <span className="text-sm font-bold text-black">오후 3시 30분</span>
-          <h1 className="text-xl font-bold text-black">도란마트 장보러 가요</h1>
+          <span className="text-sm font-bold text-black">
+            {meetup?.startTime ?? "오후 3시 30분"}
+          </span>
+          <h1 className="text-xl font-bold text-black">
+            {meetup?.activity ?? "도란마트 장보러 가요"}
+          </h1>
+
+          {/* 하실 말씀 한마디 — 제목 바로 밑, 초록 세로선 + 따옴표 인용 */}
+          {meetup?.message && (
+            <blockquote className="mt-3 border-l-[3px] border-[#3D6B5A] pl-3">
+              <p className="text-[15px] leading-[1.5] text-gray-700 whitespace-pre-line">
+                “{meetup.message}”
+              </p>
+            </blockquote>
+          )}
         </div>
 
         {/* Info Grid */}

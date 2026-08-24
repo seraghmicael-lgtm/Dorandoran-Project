@@ -53,7 +53,7 @@ export default function CreateReviewPage() {
             <p className="text-[20px] font-bold text-black">{activity}</p>
           )}
           {message && (
-            <p className="text-[15px] text-gray-500">“{message}”</p>
+            <p className="text-[15px] text-gray-500 whitespace-pre-line">“{message}”</p>
           )}
         </div>
 

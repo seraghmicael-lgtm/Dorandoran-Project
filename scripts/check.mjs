@@ -119,6 +119,25 @@ try {
   ok(r6.time === "오후 3시" && r6.location === "도란공원", "긴 발화가 다른 필드를 흔들지 않음",
     JSON.stringify(r6));
 
+  // 06_하실 말씀: 길게 말해도 문장당 20자 이내 · 최대 2문장으로 줄인다
+  const summarize = async (transcript) => {
+    const res = await fetch(`${BASE}/api/summarize-message`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ transcript }),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return (await res.json()).message;
+  };
+  const m1 = await summarize(
+    "제가 무릎이 좀 안 좋아서 빨리는 못 걸어요. 그냥 천천히 둘러보기만 할 거고 무거운 건 살 생각이 없어요 정말로"
+  );
+  const lines = String(m1).split("\n").filter(Boolean);
+  ok(lines.length >= 1 && lines.length <= 2, "하실 말씀: 최대 2문장", JSON.stringify(m1));
+  ok(lines.every((l) => l.length <= 20), "하실 말씀: 문장당 20자 이내", JSON.stringify(lines));
+  ok(String(m1).includes("천천히"), "하실 말씀: 핵심 남김", JSON.stringify(m1));
+  ok((await summarize("음 그냥 뭐 별거 없어요")) === "", "알맹이 없으면 빈 문자열");
+
   // 시각은 항상 오전/오후 + 아라비아 숫자 — 뒤 화면의 끝시각 계산이 이 형식에 의존한다
   const r7 = await parse({ transcript: "네 시쯤에 봐요", time: null, location: null, activity: null });
   ok(/^(오전|오후) \d/.test(String(r7.time)) && computeEndClock(r7.time, 60) !== null,
