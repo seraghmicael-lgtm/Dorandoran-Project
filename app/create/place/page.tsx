@@ -64,9 +64,9 @@ export default function CreatePlacePage() {
         <div className="h-5" />
 
         {pin ? (
-          <GoogleMap lat={pin.lat} lng={pin.lng} height="h-[210px]" className="border border-gray-300" />
+          <GoogleMap lat={pin.lat} lng={pin.lng} height="h-[420px]" className="border border-gray-300" />
         ) : (
-          <div className="h-[210px] border border-gray-300 flex items-center justify-center text-[15px] text-gray-500 text-center px-6">
+          <div className="h-[420px] border border-gray-300 flex items-center justify-center text-[15px] text-gray-500 text-center px-6">
             {origin === undefined
               ? "지도를 준비하고 있어요..."
               : "위치를 몰라서 지도는 못 보여드려요. 아래에 만날 곳을 적어주세요."}

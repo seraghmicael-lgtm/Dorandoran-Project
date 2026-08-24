@@ -103,7 +103,7 @@ export default async function MeetupDetailPage({
           <GoogleMap
             lat={meetup!.lat!}
             lng={meetup!.lng!}
-            height="h-[149px]"
+            height="h-[298px]"
             className="rounded"
             apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
           />

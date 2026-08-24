@@ -861,7 +861,7 @@ export default function CreateListeningPage() {
               )}
               {place && (
                 <div className="flex flex-col gap-1.5">
-                  <GoogleMap lat={place.lat} lng={place.lng} height="h-[140px]" />
+                  <GoogleMap lat={place.lat} lng={place.lng} height="h-[280px]" />
                   <p className="text-xs text-gray-600">
                     <span className="font-bold text-black">{place.name}</span>
                     {place.address ? ` · ${place.address}` : ""}

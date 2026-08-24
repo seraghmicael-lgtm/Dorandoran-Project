@@ -55,7 +55,7 @@ export default function GoogleMap({
   lat,
   lng,
   width = "w-full",
-  height = "h-[149px]",
+  height = "h-[298px]",
   className = "rounded",
   apiKey: apiKeyProp,
 }: GoogleMapProps) {
