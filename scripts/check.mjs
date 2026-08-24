@@ -1,7 +1,13 @@
 // 회귀 검증: 유닛(koreanTime·meetupDialog) + 파서 계약(/api/parse-meetup).
 // 사용법: 서버 켠 상태에서 `npm run check` (BASE_URL 환경변수로 대상 변경 가능)
 // LLM 응답은 비결정적이므로 계약 검사는 "포함/비어있음" 수준의 느슨한 단언만 쓴다.
-import { computeEndTime, computeEndClock } from "../lib/koreanTime.ts";
+import {
+  computeEndTime,
+  computeEndClock,
+  formatKoreanClock,
+  meetupTimeOptions,
+  seoulNow,
+} from "../lib/koreanTime.ts";
 import { FIELD_QUESTIONS, OPENING_LINE, firstMissing, applyParse } from "../lib/meetupDialog.ts";
 
 const BASE = process.env.BASE_URL || "http://localhost:3000";
@@ -28,6 +34,49 @@ ok(computeEndClock("오후 3시", 60) === "오후 4시", "끝시각(오전/오�
 ok(computeEndClock("오전 11시", 120) === "오후 1시", "끝시각: 정오 경계 뒤집힘");
 ok(computeEndClock("오후 11시 30분", 60) === "오전 12시 30분", "끝시각: 자정 경계");
 ok(computeEndClock("3시", 60) === null, "오전/오후 없으면 null");
+
+// 만날 시각 선택지 — 지금 시각 기준(02_몇 시에 만날까요)
+ok(formatKoreanClock(12, 0) === "오후 12시", "정오는 오후 12시");
+ok(formatKoreanClock(0, 0) === "오전 12시", "자정은 오전 12시");
+ok(formatKoreanClock(13, 30) === "오후 1시 30분", "13:30 → 오후 1시 30분");
+{
+  // 8시 55분에 열면 지금+1시간(9:55)을 정각으로 올려 10시부터 30분 간격
+  const at855 = meetupTimeOptions(new Date(2026, 7, 24, 8, 55));
+  const expected = [
+    "오전 10시",
+    "오전 10시 30분",
+    "오전 11시",
+    "오전 11시 30분",
+    "오후 12시",
+    "오후 12시 30분",
+    "오후 1시",
+    "오후 1시 30분",
+  ];
+  ok(at855.length === 8, "선택지 8개");
+  ok(at855.join("|") === expected.join("|"), "8시 55분 → 10시부터 30분 간격", at855.join(", "));
+  ok(at855.filter((s) => !s.includes("분")).length === 4, "정각 4개");
+  ok(at855.filter((s) => s.includes("30분")).length === 4, "30분 4개");
+  // 지금보다 이른 시각이 섞이면 안 된다
+  ok(computeEndClock(at855[0], 0) === "오전 10시", "첫 선택지가 파싱 가능한 형식", at855[0]);
+
+  // 정각에 열면 바로 1시간 뒤부터
+  ok(meetupTimeOptions(new Date(2026, 7, 24, 9, 0))[0] === "오전 10시", "9시 정각 → 10시부터");
+  // 자정을 넘어가도 오전/오후가 올바르게 뒤집힌다
+  ok(meetupTimeOptions(new Date(2026, 7, 24, 23, 10))[0] === "오전 1시", "23시 10분 → 오전 1시부터");
+  // 10시 5분 → +1h=11:05 → 정각 올림 12시 시작. 다섯째(=+2h)는 오후 2시
+  const at1005 = meetupTimeOptions(new Date(2026, 7, 24, 10, 5));
+  ok(at1005[0] === "오후 12시" && at1005[4] === "오후 2시", "정오 경계도 정각 올림", at1005.join(", "));
+
+  // seoulNow(): 지역 getter 가 서울 벽시계를 가리켜야 한다(서버는 UTC로 돈다)
+  const seoulHour = Number(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: "Asia/Seoul",
+      hour: "numeric",
+      hour12: false,
+    }).format(new Date())
+  );
+  ok(seoulNow().getHours() === seoulHour % 24, "seoulNow 가 한국 시각을 가리킴", `${seoulNow().getHours()} vs ${seoulHour}`);
+}
 
 // ---------- 유닛: meetupDialog ----------
 console.log("[meetupDialog]");
