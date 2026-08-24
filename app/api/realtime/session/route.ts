@@ -23,10 +23,11 @@ export async function POST() {
             input: {
               transcription: { model: "gpt-4o-mini-transcribe", language: "ko" },
               // audio.input을 명시하면 생성 시 VAD가 꺼진 채 만들어질 수 있어
-              // 서버 VAD를 반드시 명시한다. 어르신 말 속도를 감안해 침묵 900ms.
+              // 서버 VAD를 반드시 명시한다. 어르신은 한 문장 안에서도 쉬었다 말하므로
+              // 침묵 1.6초 — lib/realtimeMeetup.ts 의 session.update 값과 맞춘다.
               turn_detection: {
                 type: "server_vad",
-                silence_duration_ms: 900,
+                silence_duration_ms: 1600,
                 create_response: true,
               },
             },
