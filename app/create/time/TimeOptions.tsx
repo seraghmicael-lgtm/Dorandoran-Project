@@ -34,6 +34,7 @@ export default function TimeOptions({ options }: { options: string[] }) {
 
       <div className="h-[18px]" />
       <SmartInput
+        placeholder="여기에 쓰세요 예) 오후 네 시 반"
         hint="“내일 네 시”처럼 쓰거나 말하셔도 돼요"
         suggestions={options}
         onConfirm={choose}

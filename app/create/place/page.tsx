@@ -45,6 +45,7 @@ export default function CreatePlacePage() {
 
         <div className="h-2.5" />
         <SmartInput
+          placeholder="여기에 쓰세요 예) 도란공원 정문"
           hint="“우리 동네”처럼 쓰거나 말하셔도 돼요"
           suggestions={PLACES.map((p) => p.name)}
           onConfirm={choose}

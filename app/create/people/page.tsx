@@ -59,8 +59,8 @@ export default function CreatePeoplePage() {
         <div className="h-2.5" />
         <SmartInput
           label="목록에 없으면"
-          placeholder="몇 분이 모였으면 좋을 지"
-          hint="“우리 동네”처럼 쓰거나 말하셔도 돼요"
+          placeholder="여기에 쓰세요 예) 여섯 명"
+          hint="“여섯 명”처럼 쓰거나 말하셔도 돼요"
           onConfirm={handleCustom}
         />
 
