@@ -32,7 +32,8 @@ export default function MyMeetupsPage() {
         <h2 className="text-lg font-bold text-black pb-3">진행중</h2>
 
         <div className="p-3.5 border border-gray-300 rounded flex flex-col gap-3">
-          <div className="flex flex-col gap-3">
+          {/* 카드를 누르면 동행 자세히 보기. 취소 버튼은 링크 밖에 둔다(중첩 금지) */}
+          <Link href="/meetup/1" className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <span className="text-lg font-bold text-black">오후 3시</span>
               <span className="text-sm font-medium text-gray-500">2 / 3명</span>
@@ -44,7 +45,7 @@ export default function MyMeetupsPage() {
                 동사무소 시민회의실ㆍ걸어서 8분
               </p>
             </div>
-          </div>
+          </Link>
 
           <Link
             href="/my-meetups/cancel"
@@ -61,7 +62,7 @@ export default function MyMeetupsPage() {
         <h2 className="text-lg font-bold text-black pb-3">완료</h2>
 
         <div className="flex flex-col gap-3">
-          <div className="p-3.5 bg-gray-100 border border-gray-100 rounded flex flex-col gap-3">
+          <Link href="/meetup/2" className="p-3.5 bg-gray-100 border border-gray-100 rounded flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <span className="px-1 py-0.5 bg-gray-500 text-sm text-white">
                 2026년 5월 14일 참여했어요!
@@ -74,9 +75,9 @@ export default function MyMeetupsPage() {
               <span className="text-lg font-bold text-black">오후 4시</span>
               <p className="text-xl font-bold text-black">같이 산책 해요</p>
             </div>
-          </div>
+          </Link>
 
-          <div className="p-3.5 bg-gray-100 border border-gray-100 rounded flex flex-col gap-3">
+          <Link href="/meetup/3" className="p-3.5 bg-gray-100 border border-gray-100 rounded flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <span className="px-1 py-0.5 bg-gray-500 text-sm text-white">
                 2026년 3월 12일 참여했어요!
@@ -89,7 +90,7 @@ export default function MyMeetupsPage() {
               <span className="text-lg font-bold text-black">오후 4시</span>
               <p className="text-xl font-bold text-black">같이 산책 해요</p>
             </div>
-          </div>
+          </Link>
         </div>
       </div>
 

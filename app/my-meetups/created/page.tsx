@@ -82,7 +82,8 @@ export default async function MyMeetupsCreatedPage() {
           <div className="flex flex-col gap-3">
             {open.map((m) => (
               <div key={m.id} className="p-3.5 border border-gray-300 rounded flex flex-col gap-3">
-                <div className="flex flex-col gap-3">
+                {/* 카드를 누르면 동행 자세히 보기. 취소 버튼은 링크 밖에 둔다(중첩 금지) */}
+                <Link href={`/meetup/${m.id}`} className="flex flex-col gap-3">
                   <div className="flex items-center justify-between">
                     <span className="text-lg font-bold text-black">{m.startTime}</span>
                     <span className="text-sm font-medium text-gray-500">
@@ -93,7 +94,7 @@ export default async function MyMeetupsCreatedPage() {
                     <p className="text-xl font-bold text-black">{m.activity}</p>
                     <p className="text-sm font-medium text-gray-400">{m.locationName}</p>
                   </div>
-                </div>
+                </Link>
 
                 <CancelCreatedButton meetupId={m.id} />
               </div>
@@ -131,7 +132,11 @@ export default async function MyMeetupsCreatedPage() {
         {cancelled.length > 0 ? (
           <div className="flex flex-col gap-3">
             {cancelled.map((m) => (
-              <div key={m.id} className="p-3.5 bg-gray-100 border border-gray-100 rounded flex flex-col gap-3">
+              <Link
+                key={m.id}
+                href={`/meetup/${m.id}`}
+                className="p-3.5 bg-gray-100 border border-gray-100 rounded flex flex-col gap-3"
+              >
                 <div className="flex items-center justify-between">
                   <span className="px-1 py-0.5 bg-gray-500 text-sm text-white">
                     {fmtCancelDate(m.cancelledAt)} 취소되었어요
@@ -144,7 +149,7 @@ export default async function MyMeetupsCreatedPage() {
                   <span className="text-lg font-bold text-black">{m.startTime}</span>
                   <p className="text-xl font-bold text-black">{m.activity}</p>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         ) : (

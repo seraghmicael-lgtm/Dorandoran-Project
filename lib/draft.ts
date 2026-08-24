@@ -15,6 +15,9 @@ export interface MeetupDraft {
   maxPeople?: number;
   /** 06_하실 말씀 — 게시판에 그대로 보이는 한마디 */
   message?: string;
+  /** 말한 장소를 반경 5km 안에서 찾은 좌표 — 상세 화면의 지도·길찾기가 쓴다 */
+  lat?: number;
+  lng?: number;
 }
 
 const KEY = "dorandoran_meetup_draft";

@@ -46,7 +46,8 @@ npm run dev                  # http://localhost:3000
 |---|:---:|---|
 | `OPENAI_API_KEY` | ✅ | Realtime 세션 발급, Whisper 전사, TTS, 문장 파싱에 모두 사용 |
 | `DATABASE_URL` | ✅ | Prisma 접속 문자열. 로컬은 `file:./dev.db` |
-| `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | | 동행 상세의 지도. 없으면 지도 자리에 회색 박스가 나옵니다 |
+| `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | | 지도 표시 + 장소 검색. 없으면 지도와 핀이 안 나옵니다 |
+| `GOOGLE_MAPS_SERVER_KEY` | | 장소 검색용 서버 키. 안 넣으면 위 공개 키를 씁니다 |
 | `LLM_MODEL` | | 문장 파싱·요약에 쓸 모델. 기본 `gpt-4o` |
 
 키가 없어도 앱은 뜹니다. 다만 음성·파싱 경로가 조용히 폴백으로 빠집니다 —
@@ -120,6 +121,7 @@ docs/기능명세.md       화면·플로우·규칙 상세
 | `/api/tts` | POST | 문장 → mp3 음성 (`tts-1`, alloy) |
 | `/api/parse-meetup` | POST | 발화 → `시간/장소/활동` 추출·정정·요약 |
 | `/api/summarize-message` | POST | 긴 한마디 → 2문장·문장당 20자 이내 요약 |
+| `/api/places/search` | POST | 말한 장소 → 반경 5km 안의 실제 좌표 |
 | `/api/meetups` | POST | 동행 등록 |
 | `/api/meetups/[id]/cancel` | POST | 만든 동행 취소 (작성자 본인만) |
 | `/api/auth/demo` | POST | 데모 로그인 — 랜덤 별명 사용자 생성 + `uid` 쿠키 |
@@ -195,6 +197,11 @@ git push origin main
 
 **`npm run check` 가 "서버가 켜져 있나요?" 로 끝나요**
 계약 검사는 실제 서버에 요청합니다. 다른 터미널에서 `npm run dev` 를 먼저 켜세요.
+
+**말한 장소가 지도에 안 찍혀요**
+`Places API (New)` 가 꺼져 있으면 Geocoding 폴백으로 도는데, 주소 위주라 가게·시장 이름을
+잘 못 찾습니다. Google Cloud Console 에서 **Places API (New)** 를 켜면 코드 변경 없이
+정확도가 올라갑니다. 위치 동의를 안 했으면 애초에 검색하지 않습니다.
 
 **빌드는 되는데 배포에서 500**
 대부분 마이그레이션 누락입니다. `prisma/migrations/` 에 새 폴더가 커밋됐는지 확인하세요.

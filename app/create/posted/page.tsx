@@ -52,28 +52,24 @@ function buildPayload(draft: MeetupDraft) {
     ...(typeof draft.message === "string" && draft.message.trim()
       ? { message: draft.message.trim() }
       : {}),
+    // 장소 검색으로 찾은 좌표 — 상세 화면의 지도·길찾기가 이걸 쓴다
+    ...(typeof draft.lat === "number" && typeof draft.lng === "number"
+      ? { lat: draft.lat, lng: draft.lng }
+      : {}),
   };
 }
+
+type MeetupPayload = ReturnType<typeof buildPayload>;
 
 export default function CreatePostedPage() {
   const [meetup, setMeetup] = useState<MeetupData>(DEFAULT_MEETUP);
   const [status, setStatus] = useState<"idle" | "posting" | "success" | "error">("idle");
-  const [payload, setPayload] = useState<{
-    startTime: string;
-    activity: string;
-    locationName: string;
-    maxPeople?: number;
-  } | null>(null);
+  const [payload, setPayload] = useState<MeetupPayload | null>(null);
   // clearDraft 전 draft에서 보관 — 게시판 카드 표시용
   const [postedDuration, setPostedDuration] = useState<string | null>(null);
   const [postedMessage, setPostedMessage] = useState<string | null>(null);
 
-  const submit = (body: {
-    startTime: string;
-    activity: string;
-    locationName: string;
-    maxPeople?: number;
-  }) => {
+  const submit = (body: MeetupPayload) => {
     setStatus("posting");
     fetch("/api/meetups", {
       method: "POST",
@@ -192,7 +188,7 @@ export default function CreatePostedPage() {
           )}
           <p className="text-[20px] font-bold text-black">{meetup.activity}</p>
           {postedMessage && (
-            <p className="text-[15px] text-gray-500">“{postedMessage}”</p>
+            <p className="text-[15px] text-gray-500 whitespace-pre-line">“{postedMessage}”</p>
           )}
         </div>
       </div>

@@ -22,6 +22,8 @@ import {
 } from "@/lib/meetupDialog";
 import { saveDraft } from "@/lib/draft";
 import BarVisualizer, { VisualizerState } from "@/components/ui/bar-visualizer";
+import GoogleMap from "@/components/GoogleMap";
+import { findNearbyPlace, getCurrentOrigin, PlaceHit } from "@/lib/places";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -47,6 +49,16 @@ export default function CreateListeningPage() {
   const [followUpQuestion, setFollowUpQuestion] = useState<string | null>(null);
   const [isParsing, setIsParsing] = useState(false);
   const [parseNonce, setParseNonce] = useState(0);
+
+  // ---- 장소 → 좌표 (반경 5km) ----
+  // undefined = 아직 위치를 못 물어봄 · null = 위치를 못 씀 · 값 = 지금 계신 곳
+  const [origin, setOrigin] = useState<{ lat: number; lng: number } | null | undefined>(undefined);
+  // 어떤 장소 이름으로 찾은 결과인지 함께 들고 있는다 — 렌더에서 "지금 장소와 맞는지"를 바로 판단한다
+  const [placeResult, setPlaceResult] = useState<{
+    query: string;
+    place: PlaceHit | null;
+    reason?: string;
+  } | null>(null);
 
   // ---- 수동 보정 UI ----
   const [textInput, setTextInput] = useState("");
@@ -477,6 +489,34 @@ export default function CreateListeningPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // 지금 계신 곳 — 진입 때 이미 허용받은 위치를 재사용한다
+  useEffect(() => {
+    getCurrentOrigin().then((o) => {
+      if (!unmountedRef.current) setOrigin(o);
+    });
+  }, []);
+
+  // 말한 장소를 반경 5km 안에서 찾아 핀으로 보여준다.
+  // 어르신이 "여기가 맞나요?"를 눈으로 확인하고 틀리면 고치기로 바로잡을 수 있게 하는 게 목적.
+  useEffect(() => {
+    if (!location || !origin) return;
+    let cancelled = false;
+    findNearbyPlace(location, origin).then((r) => {
+      if (cancelled || unmountedRef.current) return;
+      setPlaceResult({ query: location, place: r.place, reason: r.reason });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [location, origin]);
+
+  // 검색 상태는 상태변수로 따로 두지 않고 결과의 query 와 지금 장소를 비교해 유도한다
+  const placeFresh = placeResult?.query === location;
+  const place = placeFresh ? placeResult.place : null;
+  const searchingPlace = Boolean(location && origin && !placeFresh);
+  const placeNotFound = Boolean(placeFresh && !placeResult.place && placeResult.reason === "out-of-range");
+  const noOrigin = origin === null;
+
   // =====================================================================
   // 사용자 조작
   // =====================================================================
@@ -566,6 +606,8 @@ export default function CreateListeningPage() {
       time: time!,
       location: location!,
       activity: activity!,
+      // 찾은 좌표를 함께 넘긴다 — 상세 화면의 지도·길찾기가 이걸 쓴다
+      ...(place ? { lat: place.lat, lng: place.lng } : {}),
     };
     saveDraft(draftData);
     router.push("/create/duration");
@@ -813,6 +855,37 @@ export default function CreateListeningPage() {
                     </button>
                   ))}
               </div>
+              {/* 말한 장소를 반경 5km 안에서 찾아 핀으로 — 눈으로 확인하고 틀리면 고치기 */}
+              {searchingPlace && (
+                <p className="text-xs text-gray-500">그 근처를 찾고 있어요...</p>
+              )}
+              {place && (
+                <div className="flex flex-col gap-1.5">
+                  <GoogleMap lat={place.lat} lng={place.lng} height="h-[140px]" />
+                  <p className="text-xs text-gray-600">
+                    <span className="font-bold text-black">{place.name}</span>
+                    {place.address ? ` · ${place.address}` : ""}
+                    <span className="text-gray-400">
+                      {" · "}
+                      {place.distanceM < 1000
+                        ? `${place.distanceM}m`
+                        : `${(place.distanceM / 1000).toFixed(1)}km`}
+                    </span>
+                  </p>
+                  <p className="text-xs text-gray-400">여기가 맞나요? 아니면 고치기를 눌러주세요.</p>
+                </div>
+              )}
+              {placeNotFound && (
+                <p className="text-xs text-gray-500">
+                  걸어서 갈 만한 곳(5km 안)에서 못 찾았어요. 그대로 올려도 괜찮아요.
+                </p>
+              )}
+              {location && noOrigin && (
+                <p className="text-xs text-gray-500">
+                  위치를 몰라서 지도는 못 보여드려요. 그대로 올려도 괜찮아요.
+                </p>
+              )}
+
               {mode === "classic" && !location && missingField === "location" && (
                 <div className="mt-1 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center justify-between gap-2">
                   <p className="text-sm font-bold text-black">

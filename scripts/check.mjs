@@ -138,6 +138,27 @@ try {
   ok(String(m1).includes("천천히"), "하실 말씀: 핵심 남김", JSON.stringify(m1));
   ok((await summarize("음 그냥 뭐 별거 없어요")) === "", "알맹이 없으면 빈 문자열");
 
+  // 장소 검색: 반드시 반경 5km 안에서만 찾는다
+  const searchPlace = async (query, lat, lng) => {
+    const res = await fetch(`${BASE}/api/places/search`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query, lat, lng }),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  };
+  const SEOUL = [37.5445, 127.0557]; // 성수동 근처
+  const p1 = await searchPlace("성수동 카페", ...SEOUL);
+  ok(p1.place && p1.place.distanceM <= 5000, "장소 검색: 5km 안에서 찾음", JSON.stringify(p1.place));
+  // 같은 이름이 전국에 있어도 먼 곳은 절대 잡히면 안 된다 (제주에서 서울 장소를 물어봄)
+  const p2 = await searchPlace("성수동 카페", 33.4996, 126.5312);
+  ok(!p2.place, "장소 검색: 반경 밖은 걸러냄", JSON.stringify(p2));
+  const p3 = await searchPlace("", ...SEOUL);
+  ok(!p3.place && p3.reason === "no-query", "장소 검색: 빈 질의는 no-query");
+  const p4 = await searchPlace("공원", NaN, NaN);
+  ok(!p4.place && p4.reason === "no-origin", "장소 검색: 위치 없으면 no-origin");
+
   // 시각은 항상 오전/오후 + 아라비아 숫자 — 뒤 화면의 끝시각 계산이 이 형식에 의존한다
   const r7 = await parse({ transcript: "네 시쯤에 봐요", time: null, location: null, activity: null });
   ok(/^(오전|오후) \d/.test(String(r7.time)) && computeEndClock(r7.time, 60) !== null,

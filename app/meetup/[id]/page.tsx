@@ -2,6 +2,7 @@ import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
 import GoogleMap from "@/components/GoogleMap";
 import { prisma } from "@/lib/prisma";
+import { directionsUrl } from "@/lib/places";
 
 export default async function MeetupDetailPage({
   params,
@@ -11,16 +12,34 @@ export default async function MeetupDetailPage({
   const { id } = await params;
 
   // 06_하실 말씀에서 남긴 한마디를 제목 밑에 건다(Figma: 오늘마실_동행자세히보기 1).
+  // 만나는 곳·좌표가 있으면 지도에 핀을 찍고 길찾기를 연결한다.
   // 나머지 값은 아직 와이어프레임 고정값이라 그대로 둔다.
-  let meetup: { activity: string; startTime: string; message: string | null } | null = null;
+  let meetup: {
+    activity: string;
+    startTime: string;
+    message: string | null;
+    locationName: string | null;
+    lat: number | null;
+    lng: number | null;
+  } | null = null;
   try {
     meetup = await prisma.meetup.findUnique({
       where: { id },
-      select: { activity: true, startTime: true, message: true },
+      select: {
+        activity: true,
+        startTime: true,
+        message: true,
+        locationName: true,
+        lat: true,
+        lng: true,
+      },
     });
   } catch (e) {
     console.error("동행 조회 실패:", e);
   }
+
+  const placeName = meetup?.locationName?.split(" · ")[0] ?? "도란마트 정문 앞";
+  const hasPin = typeof meetup?.lat === "number" && typeof meetup?.lng === "number";
 
   return (
     <WireframeLayout justify="between" className="p-6 flex flex-col justify-between">
@@ -65,23 +84,30 @@ export default async function MeetupDetailPage({
           <div className="flex items-center justify-between">
             <span className="text-gray-500">만나는 곳</span>
             <div className="flex items-center gap-2">
-              <span className="font-medium text-black">도란마트 정문 앞</span>
-              <span className="text-xs text-gray-500 flex items-center">
+              <span className="font-medium text-black">{placeName}</span>
+              {/* 지도 앱으로 넘긴다 — 좌표가 있으면 정확히, 없으면 이름으로라도 */}
+              <a
+                href={directionsUrl({ lat: meetup?.lat, lng: meetup?.lng, name: placeName })}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-[#3D6B5A] font-medium flex items-center underline-offset-2 hover:underline"
+              >
                 길찾기 &gt;
-              </span>
+              </a>
             </div>
           </div>
         </div>
 
-        {/* Map placeholder */}
-        {/* ponytail: 나중에 Geocoding API로 교체 */}
-        <GoogleMap
-          lat={37.38}
-          lng={127.12}
-          height="h-[149px]"
-          className="rounded"
-          apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
-        />
+        {/* 만나는 곳 지도 — 좌표를 못 찾은 동행은 지도 자리를 비운다(가짜 위치를 보여주지 않는다) */}
+        {hasPin && (
+          <GoogleMap
+            lat={meetup!.lat!}
+            lng={meetup!.lng!}
+            height="h-[149px]"
+            className="rounded"
+            apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
+          />
+        )}
       </div>
 
       {/* Action Buttons */}
