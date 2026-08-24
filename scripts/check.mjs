@@ -5,6 +5,8 @@ import {
   computeEndTime,
   computeEndClock,
   formatKoreanClock,
+  formatKoreanClockParts,
+  parseKoreanClock,
   meetupTimeOptions,
   seoulNow,
 } from "../lib/koreanTime.ts";
@@ -92,6 +94,25 @@ ok(formatKoreanClock(13, 30) === "오후 1시 30분", "13:30 → 오후 1시 30�
     u2
   );
   ok(directionsUrl({ lat: 37.5, lng: 127 }, "transit").includes("travelmode=transit"), "길찾기: 이동수단 지정 가능");
+}
+
+// 시각 고르기(TimePicker) — 굴려서 고른 값이 앱 표준 표기로 되돌아와야 한다
+{
+  const rt = (s) => {
+    const c = parseKoreanClock(s);
+    return c ? formatKoreanClockParts(c) : null;
+  };
+  for (const s of ["오후 3시", "오전 10시 30분", "오후 12시", "오전 12시", "오후 12시 55분"]) {
+    ok(rt(s) === s, `시각 왕복: ${s}`, String(rt(s)));
+  }
+  ok(parseKoreanClock("네 시") === null, "시각 파싱: 한글 숫자는 null");
+  ok(parseKoreanClock("3시 30분") === null, "시각 파싱: 오전/오후 없으면 null");
+  ok(parseKoreanClock("오후 13시") === null, "시각 파싱: 13시는 null");
+  ok(parseKoreanClock("오후 3시 60분") === null, "시각 파싱: 60분은 null");
+  // 고른 값이 뒤 화면(끝시각 계산)에서 그대로 쓰인다
+  const picked = formatKoreanClockParts({ meridiem: "오전", hour12: 11, minute: 45 });
+  ok(picked === "오전 11시 45분", "고른 값 표기", picked);
+  ok(computeEndClock(picked, 90) === "오후 1시 15분", "고른 값으로 끝시각 계산", String(computeEndClock(picked, 90)));
 }
 
 // 메모리풍선 — 단계를 지날수록 칩이 하나씩 늘어난다

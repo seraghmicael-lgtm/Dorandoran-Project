@@ -5,6 +5,28 @@ export function formatKoreanClock(h24: number, min: number): string {
   return min === 0 ? `${meridiem} ${h12}시` : `${meridiem} ${h12}시 ${min}분`;
 }
 
+export interface KoreanClock {
+  meridiem: "오전" | "오후";
+  hour12: number;
+  minute: number;
+}
+
+/** "오후 3시 30분" → { 오후, 3, 30 }. 오전/오후가 없거나 못 읽으면 null. */
+export function parseKoreanClock(time: string): KoreanClock | null {
+  const m = time.match(/(오전|오후)\s*(\d{1,2})시(?:\s*(\d{1,2})분)?/);
+  if (!m) return null;
+  const hour12 = parseInt(m[2], 10);
+  const minute = m[3] ? parseInt(m[3], 10) : 0;
+  if (hour12 < 1 || hour12 > 12 || minute > 59) return null;
+  return { meridiem: m[1] as "오전" | "오후", hour12, minute };
+}
+
+/** { 오후, 3, 30 } → "오후 3시 30분" (formatKoreanClock 과 같은 표기) */
+export function formatKoreanClockParts(c: KoreanClock): string {
+  const h24 = (c.hour12 % 12) + (c.meridiem === "오후" ? 12 : 0);
+  return formatKoreanClock(h24, c.minute);
+}
+
 /**
  * 지금의 한국 시각. 반환된 Date 의 **지역 getter**(getHours 등)가 서울 벽시계를 가리킨다.
  * 서버(Railway=UTC)에서 선택지를 만들어도 어르신이 보는 시각과 맞추기 위한 것 —
