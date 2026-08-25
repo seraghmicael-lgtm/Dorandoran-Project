@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import WireframeLayout from "@/components/WireframeLayout";
 import CreateStepHeader from "@/components/CreateStepHeader";
 import MemoryBubbles from "@/components/MemoryBubbles";
+import CreateNavButtons from "@/components/CreateNavButtons";
 import { computeEndClock, computeEndTime } from "@/lib/koreanTime";
 import { MeetupDraft, loadDraft, updateDraft } from "@/lib/draft";
 
@@ -50,7 +51,7 @@ export default function CreateDurationPage() {
 
   return (
     <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
-      <CreateStepHeader step={3} backHref="/create/time" />
+      <CreateStepHeader step={3} backHref="/home" />
 
       <div className="px-[18px] py-[22px] flex flex-col">
         <MemoryBubbles />
@@ -70,6 +71,13 @@ export default function CreateDurationPage() {
             </button>
           ))}
         </div>
+
+        {/* 음성 대화로 장소가 이미 정해졌으면 장소 화면은 건너뛴다 — choose() 와 같은 규칙 */}
+        <CreateNavButtons
+          backHref="/create/time"
+          nextHref={(d) => (d.location ? "/create/people" : "/create/place")}
+          requires="duration"
+        />
       </div>
     </WireframeLayout>
   );

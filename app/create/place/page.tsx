@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import WireframeLayout from "@/components/WireframeLayout";
 import CreateStepHeader from "@/components/CreateStepHeader";
 import MemoryBubbles from "@/components/MemoryBubbles";
+import CreateNavButtons from "@/components/CreateNavButtons";
 import SmartInput from "@/components/SmartInput";
 import GoogleMap from "@/components/GoogleMap";
 import { updateDraft } from "@/lib/draft";
@@ -58,7 +59,7 @@ export default function CreatePlacePage() {
 
   return (
     <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
-      <CreateStepHeader step={4} backHref="/create/duration" />
+      <CreateStepHeader step={4} backHref="/home" />
 
       <div className="px-[18px] py-[22px] flex flex-col">
         <MemoryBubbles />
@@ -150,6 +151,11 @@ export default function CreatePlacePage() {
           </>
         )}
 
+        <CreateNavButtons
+          backHref="/create/duration"
+          nextHref="/create/people"
+          requires="location"
+        />
       </div>
     </WireframeLayout>
   );

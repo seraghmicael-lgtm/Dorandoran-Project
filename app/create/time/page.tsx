@@ -15,7 +15,7 @@ export default function CreateTimePage() {
 
   return (
     <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
-      <CreateStepHeader step={2} backHref="/create/activity" />
+      <CreateStepHeader step={2} backHref="/home" />
 
       <div className="px-[18px] py-[22px] flex flex-col">
         <MemoryBubbles />

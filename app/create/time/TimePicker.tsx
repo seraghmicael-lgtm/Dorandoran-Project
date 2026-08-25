@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import SmartInput from "@/components/SmartInput";
+import CreateNavButtons from "@/components/CreateNavButtons";
 import { updateDraft } from "@/lib/draft";
 import { KoreanClock, formatKoreanClockParts, parseKoreanClock } from "@/lib/koreanTime";
 
@@ -173,6 +174,9 @@ export default function TimePicker({
         suggestions={suggestions}
         onConfirm={choose}
       />
+
+      {/* 휠에 떠 있는 시각은 아직 저장 전이라, 다음이 그걸 확정하고 넘어간다 */}
+      <CreateNavButtons backHref="/create/activity" onNext={() => choose(label)} />
     </>
   );
 }
