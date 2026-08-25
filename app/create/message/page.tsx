@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import WireframeLayout from "@/components/WireframeLayout";
 import CreateStepHeader from "@/components/CreateStepHeader";
 import MemoryBubbles from "@/components/MemoryBubbles";
+import CreateNavButtons from "@/components/CreateNavButtons";
 import { updateDraft } from "@/lib/draft";
 import { listenOnce, unlockAudio, ListenHandle } from "@/lib/voice";
 
@@ -94,11 +95,20 @@ export default function CreateMessagePage() {
     router.push("/create/review");
   };
 
+  // 이 단계는 안 하셔도 되는 곳이라 다음은 늘 열려 있다.
+  // 적어두신 게 있으면 담아가고, 없으면 비운 채로 넘어간다(건너뛸래요와 같다).
+  const goNext = () => {
+    handleRef.current?.cancel();
+    const trimmed = text.trim();
+    updateDraft({ message: trimmed || undefined });
+    router.push("/create/review");
+  };
+
   const hasText = text.trim().length > 0;
 
   return (
     <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
-      <CreateStepHeader step={6} backHref="/create/people" />
+      <CreateStepHeader step={6} backHref="/home" />
 
       <div className="px-[18px] py-[22px] flex flex-col">
         <MemoryBubbles />
@@ -167,6 +177,8 @@ export default function CreateMessagePage() {
         {/* 맨 아래 회색 안내문 */}
         <div className="h-5" />
         <p className="text-[15px] text-gray-500">여기에 남기신 한마디가 게시판에 그대로 보여요.</p>
+
+        <CreateNavButtons backHref="/create/people" onNext={goNext} />
       </div>
     </WireframeLayout>
   );

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import WireframeLayout from "@/components/WireframeLayout";
 import CreateStepHeader from "@/components/CreateStepHeader";
 import MemoryBubbles from "@/components/MemoryBubbles";
+import CreateNavButtons from "@/components/CreateNavButtons";
 import SmartInput from "@/components/SmartInput";
 import { updateDraft } from "@/lib/draft";
 
@@ -33,7 +34,7 @@ export default function CreatePeoplePage() {
 
   return (
     <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
-      <CreateStepHeader step={5} backHref="/create/place" />
+      <CreateStepHeader step={5} backHref="/home" />
 
       <div className="px-[18px] py-[22px] flex flex-col">
         <MemoryBubbles />
@@ -71,6 +72,12 @@ export default function CreatePeoplePage() {
           <p className="text-[15px] font-bold text-black">나 말고 두 분을 기다려요</p>
           <p className="text-[15px] text-gray-500">적게 잡을수록 빨리 만들어져요.</p>
         </div>
+
+        <CreateNavButtons
+          backHref="/create/place"
+          nextHref="/create/message"
+          requires="maxPeople"
+        />
       </div>
     </WireframeLayout>
   );
