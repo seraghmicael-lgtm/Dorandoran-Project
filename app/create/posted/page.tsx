@@ -165,7 +165,10 @@ export default function CreatePostedPage() {
         </div>
 
         {/* 회색 안내문 */}
-        <p className="text-[15px] text-gray-500">사람이 모이면 알려드릴게요. 안 모이면 조용히 사라져요.</p>
+        {/* 두 문장을 한 줄에 붙이면 길어서 눈이 미끄러진다 — 문장마다 줄을 바꾼다 */}
+        <p className="text-[15px] text-gray-500 whitespace-pre-line leading-relaxed">
+          {"사람이 모이면 알려드릴게요.\n안 모이면 조용히 사라져요."}
+        </p>
 
         {/* 좌측 정렬 섹션 제목 */}
         <div className="w-full text-left">

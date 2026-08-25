@@ -31,7 +31,12 @@ export default function WireframeLayout({
 }: WireframeLayoutProps) {
   const pathname = usePathname();
 
-  const effectiveNav = bottomNav ?? "five";
+  // 하단 탭은 Figma 에서 탭바가 있는 화면에만 둔다 — 03_홈, 01/02_내 동행 확인.
+  // 상세 보기·동행 만들기처럼 한 가지 일을 끝내러 들어온 화면에서는 빼서
+  // 하던 일을 놓치지 않게 한다. (bottomNav 를 직접 주면 그 값이 이긴다)
+  const effectiveNav =
+    bottomNav ??
+    (pathname === "/home" || pathname.startsWith("/my-meetups") ? "five" : "none");
 
   return (
     <div className="min-h-screen bg-gray-100 text-black flex justify-center items-start">
