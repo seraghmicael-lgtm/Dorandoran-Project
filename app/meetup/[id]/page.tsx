@@ -78,10 +78,6 @@ export default async function MeetupDetailPage({
             <span className="font-medium text-black">2 / 3명</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-500">거리</span>
-            <span className="font-medium text-black">걸어서 8분</span>
-          </div>
-          <div className="flex items-center justify-between">
             <span className="text-gray-500">만나는 곳</span>
             <div className="flex items-center gap-2">
               <span className="font-medium text-black">{placeName}</span>
@@ -95,6 +91,10 @@ export default async function MeetupDetailPage({
                 길찾기 &gt;
               </a>
             </div>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-gray-500">거리</span>
+            <span className="font-medium text-black">걸어서 8분</span>
           </div>
         </div>
 
