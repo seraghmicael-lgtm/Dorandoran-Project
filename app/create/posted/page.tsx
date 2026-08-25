@@ -148,16 +148,11 @@ export default function CreatePostedPage() {
 
   return (
     <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
-      {/* 상단 navbar — 중앙 올렸어요, 우측 완료 */}
+      {/* 상단 navbar — Figma 08_올렸어요 처럼 제목만 둔다(좌우는 자리만) */}
       <header className="h-[75px] px-5 flex items-center justify-between border-b border-gray-200 bg-white">
         <span className="w-[60px]" />
         <span className="text-[20px] font-bold text-black text-center">올렸어요</span>
-        <Link
-          href="/my-meetups/created"
-          className="text-[15px] text-gray-500 w-[60px] text-right"
-        >
-          완료
-        </Link>
+        <span className="w-[60px]" />
       </header>
 
       <div className="px-[18px] py-[22px] flex flex-col items-center gap-5 text-center">
@@ -191,6 +186,14 @@ export default function CreatePostedPage() {
             <p className="text-[15px] text-gray-500 whitespace-pre-line">“{postedMessage}”</p>
           )}
         </div>
+
+        {/* Figma 971:457 "확인버튼" — 검정 배경 · 흰 글씨 · 모서리 둥글게 */}
+        <Link
+          href="/home"
+          className="w-full h-[60px] bg-[#1A1A1A] text-white rounded-lg flex items-center justify-center text-[17px] font-bold"
+        >
+          확인
+        </Link>
       </div>
     </WireframeLayout>
   );
