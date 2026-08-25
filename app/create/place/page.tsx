@@ -79,7 +79,7 @@ export default function CreatePlacePage() {
 
   return (
     <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
-      <CreateStepHeader step={4} backHref="/home" />
+      <CreateStepHeader step={4} backHref="/home" confirmLeave />
 
       <div className="px-[18px] py-[22px] flex flex-col">
         <MemoryBubbles />

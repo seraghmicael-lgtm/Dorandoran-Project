@@ -51,7 +51,7 @@ export default function CreateDurationPage() {
 
   return (
     <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
-      <CreateStepHeader step={3} backHref="/home" />
+      <CreateStepHeader step={3} backHref="/home" confirmLeave />
 
       <div className="px-[18px] py-[22px] flex flex-col">
         <MemoryBubbles />

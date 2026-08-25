@@ -34,7 +34,7 @@ export default function CreatePeoplePage() {
 
   return (
     <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
-      <CreateStepHeader step={5} backHref="/home" />
+      <CreateStepHeader step={5} backHref="/home" confirmLeave />
 
       <div className="px-[18px] py-[22px] flex flex-col">
         <MemoryBubbles />

@@ -108,7 +108,7 @@ export default function CreateMessagePage() {
 
   return (
     <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
-      <CreateStepHeader step={6} backHref="/home" />
+      <CreateStepHeader step={6} backHref="/home" confirmLeave />
 
       <div className="px-[18px] py-[22px] flex flex-col">
         <MemoryBubbles />
