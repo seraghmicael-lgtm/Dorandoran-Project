@@ -124,20 +124,6 @@ export default function TimePicker({
       <div className="h-3" />
 
       <div className="flex items-stretch gap-2.5 border border-gray-300 px-2 py-1">
-        <Wheel
-          values={HOURS}
-          value={clock.hour12}
-          format={(v) => `${v}시`}
-          onChange={(hour12) => setClock((c) => ({ ...c, hour12 }))}
-          ariaLabel="시"
-        />
-        <Wheel
-          values={MINUTES}
-          value={clock.minute}
-          format={(v) => `${String(v).padStart(2, "0")}분`}
-          onChange={(minute) => setClock((c) => ({ ...c, minute }))}
-          ariaLabel="분"
-        />
         {/* 오전/오후는 두 개뿐이라 굴리지 않고 눌러서 고른다 */}
         <div className="flex-1 flex flex-col gap-1 py-1">
           {(["오전", "오후"] as const).map((m) => (
@@ -156,6 +142,20 @@ export default function TimePicker({
             </button>
           ))}
         </div>
+        <Wheel
+          values={HOURS}
+          value={clock.hour12}
+          format={(v) => `${v}시`}
+          onChange={(hour12) => setClock((c) => ({ ...c, hour12 }))}
+          ariaLabel="시"
+        />
+        <Wheel
+          values={MINUTES}
+          value={clock.minute}
+          format={(v) => `${String(v).padStart(2, "0")}분`}
+          onChange={(minute) => setClock((c) => ({ ...c, minute }))}
+          ariaLabel="분"
+        />
       </div>
 
       <div className="h-3" />
