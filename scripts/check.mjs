@@ -12,7 +12,13 @@ import {
 } from "../lib/koreanTime.ts";
 import { FIELD_QUESTIONS, OPENING_LINE, firstMissing, applyParse } from "../lib/meetupDialog.ts";
 import { directionsUrl } from "../lib/places.ts";
-import { memoryChips } from "../lib/draft.ts";
+import {
+  memoryChips,
+  saveDraft,
+  clearDraft,
+  draftSnapshot,
+  subscribeDraft,
+} from "../lib/draft.ts";
 
 const BASE = process.env.BASE_URL || "http://localhost:3000";
 let pass = 0;
@@ -113,6 +119,38 @@ ok(formatKoreanClock(13, 30) === "오후 1시 30분", "13:30 → 오후 1시 30�
   const picked = formatKoreanClockParts({ meridiem: "오전", hour12: 11, minute: 45 });
   ok(picked === "오전 11시 45분", "고른 값 표기", picked);
   ok(computeEndClock(picked, 90) === "오후 1시 15분", "고른 값으로 끝시각 계산", String(computeEndClock(picked, 90)));
+}
+
+// draft 저장소가 변화를 알리는지 — 안 알리면 메모리풍선이 지운 뒤에도 계속 떠 있다
+{
+  const store = {};
+  globalThis.sessionStorage = {
+    getItem: (k) => (k in store ? store[k] : null),
+    setItem: (k, v) => {
+      store[k] = String(v);
+    },
+    removeItem: (k) => {
+      delete store[k];
+    },
+  };
+  globalThis.window = new EventTarget();
+
+  let fired = 0;
+  const unsubscribe = subscribeDraft(() => fired++);
+
+  ok(draftSnapshot() === null, "draft: 비어있으면 null");
+  saveDraft({ activity: "산책" });
+  ok(fired === 1, "draft: 저장하면 알린다");
+  ok(memoryChips(JSON.parse(draftSnapshot())).join("|") === "산책", "draft: 저장한 값이 칩으로");
+
+  clearDraft();
+  ok(fired === 2, "draft: 비우면 알린다 (만들기 탭 → 풍선이 사라진다)");
+  ok(draftSnapshot() === null, "draft: 비운 뒤 스냅샷 null");
+
+  unsubscribe();
+  saveDraft({ activity: "등산" });
+  ok(fired === 2, "draft: 구독 해제하면 더 안 온다");
+  clearDraft();
 }
 
 // 메모리풍선 — 단계를 지날수록 칩이 하나씩 늘어난다

@@ -1,12 +1,12 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import WireframeLayout from "@/components/WireframeLayout";
 import CreateStepHeader from "@/components/CreateStepHeader";
 import MemoryBubbles from "@/components/MemoryBubbles";
 import SmartInput from "@/components/SmartInput";
-import { loadDraft, updateDraft } from "@/lib/draft";
+import { clearDraft, loadDraft, subscribeDraft, updateDraft } from "@/lib/draft";
 
 // 와이어프레임_v02 01_뭐 하실래요 (활동)
 const OPTIONS = ["산책", "등산", "바둑", "맛집탐방", "장보기", "커피"];
@@ -14,14 +14,22 @@ const FULL_WIDTH_OPTION = "병원";
 
 // sessionStorage 는 브라우저에만 있다 — 서버 렌더에선 null, 마운트 뒤 실제 값.
 // (렌더 중에 읽으면 SSR 이 터지고, 이펙트로 setState 하면 렌더가 한 번 더 돈다)
-const noSubscribe = () => () => {};
 const readChosenActivity = () => loadDraft()?.activity ?? null;
 const noChosenOnServer = () => null;
 
 export default function CreateActivityPage() {
   const router = useRouter();
   // 이미 고른 활동이 있으면(이전으로 돌아온 경우) 다시 고르지 않고도 다음으로 갈 수 있다
-  const chosen = useSyncExternalStore(noSubscribe, readChosenActivity, noChosenOnServer);
+  const chosen = useSyncExternalStore(subscribeDraft, readChosenActivity, noChosenOnServer);
+
+  // 만들기로 새로 들어온 경우(?new=1)에만 앞 회차 기록을 비운다.
+  // 2단계에서 "이전"으로 돌아온 경우엔 표시가 없으니 고른 값이 그대로 남는다.
+  useEffect(() => {
+    if (!new URLSearchParams(window.location.search).has("new")) return;
+    clearDraft();
+    // 표시를 지워둔다 — 안 그러면 뒤로 돌아올 때마다 또 비운다
+    window.history.replaceState(null, "", "/create/activity");
+  }, []);
 
   const choose = (activity: string) => {
     updateDraft({ activity });

@@ -22,6 +22,15 @@ export interface MeetupDraft {
 
 const KEY = "dorandoran_meetup_draft";
 
+// draft 가 바뀌면 알린다 — 메모리풍선처럼 draft 를 보고 있는 화면이 바로 따라오게.
+// storage 이벤트는 "다른 탭"에서만 오므로 같은 탭용으로 직접 쏜다.
+const DRAFT_EVENT = "dorandoran:draft";
+function emitDraftChange() {
+  try {
+    window.dispatchEvent(new Event(DRAFT_EVENT));
+  } catch {}
+}
+
 /** 없거나 깨졌으면 null */
 export function loadDraft(): MeetupDraft | null {
   try {
@@ -34,6 +43,7 @@ export function loadDraft(): MeetupDraft | null {
 
 export function saveDraft(d: MeetupDraft) {
   sessionStorage.setItem(KEY, JSON.stringify(d));
+  emitDraftChange();
 }
 
 export function updateDraft(patch: Partial<MeetupDraft>): MeetupDraft {
@@ -44,6 +54,7 @@ export function updateDraft(patch: Partial<MeetupDraft>): MeetupDraft {
 
 export function clearDraft() {
   sessionStorage.removeItem(KEY);
+  emitDraftChange();
 }
 
 /**
@@ -72,6 +83,9 @@ export function memoryChips(d: MeetupDraft | null | undefined): string[] {
   ].filter((v): v is string => typeof v === "string" && v.trim().length > 0);
 }
 
-/** 이 화면에서 draft 는 안 바뀐다(바뀌면 곧 다음 화면으로 넘어간다) — 구독 없음 */
-export const noDraftSubscribe = () => () => {};
+/** draft 변화를 구독한다(useSyncExternalStore 용) */
+export const subscribeDraft = (onChange: () => void) => {
+  window.addEventListener(DRAFT_EVENT, onChange);
+  return () => window.removeEventListener(DRAFT_EVENT, onChange);
+};
 export const noDraftOnServer = () => null;

@@ -10,7 +10,8 @@ export default function BottomNavFive({ active }: BottomNavFiveProps) {
     { label: "홈", href: "/home", key: "home" },
     { label: "내 동행", href: "/my-meetups", key: "my-meetups" },
     { label: "내정보", href: null, key: "my-info" },
-    { label: "만들기", href: "/create/activity", key: "create" },
+    // 만들기 탭은 늘 새로 시작한다 — ?new=1 이 앞 회차의 초안을 비운다
+    { label: "만들기", href: "/create/activity?new=1", key: "create" },
   ];
 
   return (

@@ -6,14 +6,14 @@ import {
   draftSnapshot,
   noDraftOnServer,
   memoryChips,
-  noDraftSubscribe,
+  subscribeDraft,
 } from "@/lib/draft";
 
 // Figma 941:980 "메모리풍선" — 동행 만들기 각 화면 맨 위에 지금까지 기록한 것을 회색 칩으로 건다.
 // 단계를 지날수록 칩이 하나씩 늘어나서, 어르신이 "내가 뭘 말했더라"를 되짚으러
 // 뒤로 가지 않아도 된다. 기록이 하나도 없으면(첫 화면) 아무것도 안 보여준다.
 export default function MemoryBubbles() {
-  const raw = useSyncExternalStore(noDraftSubscribe, draftSnapshot, noDraftOnServer);
+  const raw = useSyncExternalStore(subscribeDraft, draftSnapshot, noDraftOnServer);
 
   let draft: MeetupDraft | null = null;
   try {
