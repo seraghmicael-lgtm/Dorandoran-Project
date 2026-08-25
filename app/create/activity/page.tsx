@@ -8,6 +8,7 @@ import MemoryBubbles from "@/components/MemoryBubbles";
 import CreateNavButtons from "@/components/CreateNavButtons";
 import SmartInput from "@/components/SmartInput";
 import { clearDraft, updateDraft } from "@/lib/draft";
+import { ACTIVITY_SUGGESTIONS } from "@/lib/activitySuggestions";
 
 // 와이어프레임_v02 01_뭐 하실래요 (활동)
 const OPTIONS = ["산책", "등산", "바둑", "맛집탐방", "장보기", "커피"];
@@ -67,7 +68,7 @@ export default function CreateActivityPage() {
         <SmartInput
           placeholder="예) 함께 장 보기"
           hint="“커피”처럼 쓰거나 말하셔도 돼요"
-          suggestions={[...OPTIONS, FULL_WIDTH_OPTION]}
+          suggestions={ACTIVITY_SUGGESTIONS}
           onConfirm={choose}
         />
 

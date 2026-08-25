@@ -24,10 +24,30 @@ export default function CreatePlacePage() {
     reason?: string;
   } | null>(null);
   const [searching, setSearching] = useState(false);
+  // 타이핑할 때 뜨는 후보 — 지금 계신 곳 둘레의 진짜 지명을 받아둔다
+  const [nearby, setNearby] = useState<string[]>([]);
 
   useEffect(() => {
     getCurrentOrigin().then(setOrigin);
   }, []);
+
+  useEffect(() => {
+    if (!origin) return;
+    let cancelled = false;
+    fetch("/api/places/nearby", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(origin),
+    })
+      .then((r) => (r.ok ? r.json() : { names: [] }))
+      .then((d) => {
+        if (!cancelled) setNearby(Array.isArray(d.names) ? d.names : []);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [origin]);
 
   const search = async (query: string) => {
     const q = query.trim();
@@ -79,6 +99,7 @@ export default function CreatePlacePage() {
           }
           // 위치를 모르면 검색이 아니라 적은 그대로 쓰는 것이므로 문구도 그렇게 말한다
           confirmLabel={searching ? "찾고 있어요..." : origin === null ? "이걸로 할게요" : "이 장소 찾기"}
+          suggestions={nearby}
           onConfirm={search}
         />
 

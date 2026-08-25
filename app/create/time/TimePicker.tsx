@@ -5,12 +5,17 @@ import { useRouter } from "next/navigation";
 import SmartInput from "@/components/SmartInput";
 import CreateNavButtons from "@/components/CreateNavButtons";
 import { updateDraft } from "@/lib/draft";
-import { KoreanClock, formatKoreanClockParts, parseKoreanClock } from "@/lib/koreanTime";
+import {
+  KoreanClock,
+  availableHours,
+  availableMeridiems,
+  availableMinutes,
+  clampToday,
+  formatKoreanClockParts,
+} from "@/lib/koreanTime";
 
-// 정해진 몇 개가 아니라 아무 시각이나 고를 수 있게 — 시·분은 위아래로 굴려서 고른다.
-// 분은 5분 단위: 어르신이 60칸을 굴리게 하지 않으면서 실제로 쓰는 시각은 다 나온다.
-const HOURS = Array.from({ length: 12 }, (_, i) => i + 1);
-const MINUTES = Array.from({ length: 12 }, (_, i) => i * 5);
+// 이 앱은 오늘만 다룬다 — 지난 시각이나 내일은 아예 칸에 넣지 않는다.
+// 그래서 굴려도 기준 시각 앞으로는 넘어가지 않는다.
 const ITEM_H = 52; // 한 칸 높이(px) — 스크롤 위치를 칸 수로 환산하는 기준
 const VISIBLE = 3; // 가운데 한 칸 + 위아래 한 칸씩
 
@@ -30,19 +35,27 @@ function Wheel({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const settleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // 방금 "내가 굴려서" 보고한 값. 그게 되돌아오면 위치를 건드리지 않는다
+  // (굴리는 중에 되감으면 서로 밀치며 튄다).
+  // 목록 자체가 바뀌면(오전↔오후 등) 키가 달라져 다시 맞춘다.
+  const selfRef = useRef<string | null>(null);
+  const key = values.join(",");
 
-  // 첫 렌더에서만 위치를 맞춘다. 그 뒤로는 손이 굴리는 대로 두고 값만 읽는다
-  // (스크롤할 때마다 되돌려 감으면 서로 밀치며 튄다).
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    if (selfRef.current === `${key}|${value}`) return;
     const i = values.indexOf(value);
     if (i >= 0) el.scrollTop = i * ITEM_H;
-    return () => {
-      if (settleRef.current) clearTimeout(settleRef.current);
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [value, key]);
+
+  useEffect(
+    () => () => {
+      if (settleRef.current) clearTimeout(settleRef.current);
+    },
+    []
+  );
 
   const handleScroll = () => {
     const el = ref.current;
@@ -51,7 +64,11 @@ function Wheel({
     // 손을 뗀 뒤(스크롤이 멎은 뒤) 한 번만 읽는다
     settleRef.current = setTimeout(() => {
       const i = Math.min(values.length - 1, Math.max(0, Math.round(el.scrollTop / ITEM_H)));
-      if (values[i] !== value) onChange(values[i]);
+      const v = values[i];
+      if (v !== undefined && v !== value) {
+        selfRef.current = `${key}|${v}`;
+        onChange(v);
+      }
     }, 120);
   };
 
@@ -96,19 +113,23 @@ function Wheel({
 }
 
 export default function TimePicker({
-  defaultTime,
+  floor,
   suggestions,
 }: {
-  defaultTime: string;
+  /** 오늘 고를 수 있는 가장 이른 시각 — 서버가 한국 시각으로 계산해 내려준다 */
+  floor: KoreanClock;
   suggestions: string[];
 }) {
   const router = useRouter();
-  const [clock, setClock] = useState<KoreanClock>(() => {
-    const c = parseKoreanClock(defaultTime) ?? { meridiem: "오후", hour12: 3, minute: 0 };
-    // 칸에 없는 분으로 들어오면 어느 칸도 안 잡힌다 — 가장 가까운 5분 칸으로 맞춘다
-    const snapped = Math.min(55, Math.round(c.minute / 5) * 5);
-    return { ...c, minute: snapped };
-  });
+  const [clock, setClock] = useState<KoreanClock>(() => clampToday(floor, floor));
+
+  // 어느 칸을 돌리든 오늘 남은 범위 밖으로는 못 나간다
+  const set = (patch: Partial<KoreanClock>) =>
+    setClock((c) => clampToday(floor, { ...c, ...patch }));
+
+  const meridiems = availableMeridiems(floor);
+  const hours = availableHours(floor, clock.meridiem);
+  const minutes = availableMinutes(floor, clock.meridiem, clock.hour12);
 
   const choose = (time: string) => {
     updateDraft({ time });
@@ -124,14 +145,14 @@ export default function TimePicker({
       <div className="h-3" />
 
       <div className="flex items-stretch gap-2.5 border border-gray-300 px-2 py-1">
-        {/* 오전/오후는 두 개뿐이라 굴리지 않고 눌러서 고른다 */}
+        {/* 오전/오후는 두 개뿐이라 굴리지 않고 눌러서 고른다. 이미 지난 쪽은 아예 안 나온다 */}
         <div className="flex-1 flex flex-col gap-1 py-1">
-          {(["오전", "오후"] as const).map((m) => (
+          {meridiems.map((m) => (
             <button
               key={m}
               type="button"
               aria-pressed={clock.meridiem === m}
-              onClick={() => setClock((c) => ({ ...c, meridiem: m }))}
+              onClick={() => set({ meridiem: m })}
               className={`flex-1 flex items-center justify-center text-[19px] font-bold cursor-pointer border ${
                 clock.meridiem === m
                   ? "bg-black text-white border-black"
@@ -143,20 +164,22 @@ export default function TimePicker({
           ))}
         </div>
         <Wheel
-          values={HOURS}
+          values={hours}
           value={clock.hour12}
           format={(v) => `${v}시`}
-          onChange={(hour12) => setClock((c) => ({ ...c, hour12 }))}
+          onChange={(hour12) => set({ hour12 })}
           ariaLabel="시"
         />
         <Wheel
-          values={MINUTES}
+          values={minutes}
           value={clock.minute}
           format={(v) => `${String(v).padStart(2, "0")}분`}
-          onChange={(minute) => setClock((c) => ({ ...c, minute }))}
+          onChange={(minute) => set({ minute })}
           ariaLabel="분"
         />
       </div>
+
+      <p className="pt-2 text-[14px] text-gray-500 text-center">오늘 남은 시간만 고를 수 있어요</p>
 
       <div className="h-3" />
       <button
@@ -170,7 +193,7 @@ export default function TimePicker({
       <div className="h-[18px]" />
       <SmartInput
         placeholder="예) 오후 네 시 반"
-        hint="“내일 네 시”처럼 쓰거나 말하셔도 돼요"
+        hint="“네 시 반”처럼 쓰거나 말하셔도 돼요"
         suggestions={suggestions}
         onConfirm={choose}
       />

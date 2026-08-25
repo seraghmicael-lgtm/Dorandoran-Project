@@ -37,9 +37,20 @@ export default function SmartInput({
   const [value, setValue] = useState("");
   const typing = value.trim().length > 0;
 
-  const matched = typing
-    ? suggestions.filter((s) => s.includes(value.trim()) && s !== value.trim()).slice(0, 3)
-    : [];
+  // 후보가 수십~수백 개라 그냥 자르면 엉뚱한 게 먼저 나온다.
+  // 앞글자부터 맞는 것 → 그 다음 어디든 들어간 것, 같은 조건이면 짧은 것 순.
+  const matched = (() => {
+    if (!typing) return [];
+    const q = value.trim();
+    return suggestions
+      .filter((s) => s !== q && s.includes(q))
+      .sort((a, b) => {
+        const byPrefix = Number(b.startsWith(q)) - Number(a.startsWith(q));
+        if (byPrefix) return byPrefix;
+        return a.length - b.length;
+      })
+      .slice(0, 6);
+  })();
 
   const handleVoice = () => {
     unlockAudio();

@@ -9,7 +9,15 @@ import {
   parseKoreanClock,
   meetupTimeOptions,
   seoulNow,
+  earliestToday,
+  availableMeridiems,
+  availableHours,
+  availableMinutes,
+  clampToday,
+  remainingTodayOptions,
+  toHour24,
 } from "../lib/koreanTime.ts";
+import { ACTIVITY_SUGGESTIONS } from "../lib/activitySuggestions.ts";
 import { FIELD_QUESTIONS, OPENING_LINE, firstMissing, applyParse } from "../lib/meetupDialog.ts";
 import { directionsUrl } from "../lib/places.ts";
 import {
@@ -151,6 +159,58 @@ ok(formatKoreanClock(13, 30) === "오후 1시 30분", "13:30 → 오후 1시 30�
   saveDraft({ activity: "등산" });
   ok(fired === 2, "draft: 구독 해제하면 더 안 온다");
   clearDraft();
+}
+
+// 시각 고르기는 오늘 남은 시간만 — 지난 시각·내일은 칸에 아예 없어야 한다
+{
+  const at1440 = earliestToday(new Date(2026, 7, 25, 14, 37)); // 오후 2시 37분
+  ok(
+    at1440.meridiem === "오후" && at1440.hour12 === 2 && at1440.minute === 40,
+    "오늘 기준: 2시 37분 → 오후 2시 40분으로 올림",
+    JSON.stringify(at1440)
+  );
+
+  ok(availableMeridiems(at1440).join("|") === "오후", "오후엔 오전이 사라진다");
+  ok(availableMeridiems(earliestToday(new Date(2026, 7, 25, 9, 0))).join("|") === "오전|오후",
+    "오전엔 둘 다 남아있다");
+
+  // 오후 2시 40분 기준: 오후 2,3,...,11시만 (12시·1시는 지났다)
+  const hrs = availableHours(at1440, "오후");
+  ok(!hrs.includes(12) && !hrs.includes(1) && hrs[0] === 2 && hrs[hrs.length - 1] === 11,
+    "지난 시는 빠진다", hrs.join(","));
+  ok(hrs.every((h) => toHour24("오후", h) >= 14), "남은 시는 전부 기준 이후");
+
+  // 기준 시각과 같은 시엔 분도 잘린다
+  ok(availableMinutes(at1440, "오후", 2)[0] === 40, "같은 시: 기준 분부터");
+  ok(availableMinutes(at1440, "오후", 3)[0] === 0, "다음 시: 0분부터");
+  ok(availableMinutes(at1440, "오후", 3).length === 12, "분은 5분 단위 12칸");
+
+  // 지난 값을 넣어도 오늘 범위 안으로 당겨진다
+  const pulled = clampToday(at1440, { meridiem: "오전", hour12: 9, minute: 0 });
+  ok(toHour24(pulled.meridiem, pulled.hour12) * 60 + pulled.minute >= 14 * 60 + 40,
+    "지난 시각을 넣으면 기준 이후로 당긴다", JSON.stringify(pulled));
+
+  // 자정 직전엔 마지막 눈금으로 버틴다(빈 화면 방지)
+  const late = earliestToday(new Date(2026, 7, 25, 23, 58));
+  ok(late.meridiem === "오후" && late.hour12 === 11 && late.minute === 55,
+    "자정 직전 → 오후 11시 55분", JSON.stringify(late));
+  ok(availableHours(late, "오후").length === 1 && availableMinutes(late, "오후", 11).length === 1,
+    "자정 직전엔 고를 게 하나만 남는다");
+
+  // 타이핑 후보도 오늘 남은 것만, 자정을 안 넘는다
+  const opts = remainingTodayOptions(at1440);
+  ok(opts[0] === "오후 3시", "후보 첫 항목", opts[0]);
+  ok(opts[opts.length - 1] === "오후 11시 30분", "후보 마지막 항목", opts[opts.length - 1]);
+  ok(opts.every((o) => parseKoreanClock(o)), "후보가 전부 표준 표기");
+}
+
+// 활동 후보 — 화면 버튼 7개가 전부 후보에도 들어 있어야 한다
+{
+  ok(ACTIVITY_SUGGESTIONS.length >= 60, "활동 후보 충분히 많다", String(ACTIVITY_SUGGESTIONS.length));
+  const buttons = ["산책", "등산", "바둑", "맛집탐방", "장보기", "커피", "병원"];
+  const missing = buttons.filter((b) => !ACTIVITY_SUGGESTIONS.includes(b));
+  ok(missing.length === 0, "화면 버튼이 후보에도 있다", missing.join(","));
+  ok(new Set(ACTIVITY_SUGGESTIONS).size === ACTIVITY_SUGGESTIONS.length, "활동 후보에 중복 없음");
 }
 
 // 메모리풍선 — 단계를 지날수록 칩이 하나씩 늘어난다
