@@ -155,7 +155,7 @@ export default function CreatePostedPage() {
         <span className="w-[60px]" />
       </header>
 
-      <div className="px-[18px] py-[22px] flex flex-col items-center gap-5 text-center">
+      <div className="flex-1 px-[18px] py-[22px] flex flex-col items-center gap-5 text-center">
         {/* ✓ 원형 배지 + 올렸어요 */}
         <div className="flex flex-col items-center gap-3 pt-4">
           <div className="w-[74px] h-[74px] rounded-full border-2 border-black bg-white flex items-center justify-center text-2xl font-bold text-black">
@@ -190,22 +190,14 @@ export default function CreatePostedPage() {
           )}
         </div>
 
-        {/* Figma 971:457 "확인버튼" — 검정 배경 · 흰 글씨 · 모서리 둥글게 */}
-        <div className="w-full flex flex-col gap-2.5">
-          <Link
-            href="/home"
-            className="w-full h-[60px] bg-[#1A1A1A] text-white rounded-lg flex items-center justify-center text-[17px] font-bold"
-          >
-            확인
-          </Link>
-          {/* 방금 올린 걸 바로 보고 싶은 분들 — 홈까지 갔다가 내 동행 탭을 찾지 않아도 되게 */}
-          <Link
-            href="/my-meetups/created"
-            className="w-full h-[60px] bg-white text-black border border-gray-300 rounded-lg flex items-center justify-center text-[17px] font-bold"
-          >
-            내 동행 보기
-          </Link>
-        </div>
+        {/* Figma 971:457 "확인버튼" — 검정 배경 · 흰 글씨 · 모서리 둥글게.
+            화면 맨 아래에 붙이고, 누르면 방금 올린 동행을 바로 보여준다 */}
+        <Link
+          href="/my-meetups/created"
+          className="mt-auto w-full h-[60px] bg-[#1A1A1A] text-white rounded-lg flex items-center justify-center text-[17px] font-bold"
+        >
+          확인
+        </Link>
       </div>
     </WireframeLayout>
   );
