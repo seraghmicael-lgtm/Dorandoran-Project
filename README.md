@@ -104,7 +104,7 @@ lib/
   session.ts          uid 쿠키 · 현재 사용자
   prisma.ts           Prisma 클라이언트 싱글턴
 components/
-  WireframeLayout.tsx 375×812 모바일 프레임 · 하단 탭
+  WireframeLayout.tsx 360×800 모바일 프레임 · 하단 탭
   CreateStepHeader.tsx 만들기 플로우 공통 헤더 (N / 6)
   ui/bar-visualizer.tsx 말소리 크기 막대
 prisma/schema.prisma  User · Meetup · Participant
