@@ -18,13 +18,6 @@ const DEFAULT_MEETUP: MeetupData = {
   locationName: "송정 오일장 · 걸어서 12분",
 };
 
-// 남은 자리(maxPeople-1)를 한글 수로 — 5 이상이면 숫자 그대로
-const KOREAN_COUNT = ["", "한", "두", "세", "네"];
-function seatWord(remaining: number): string {
-  if (remaining >= 1 && remaining <= 4) return KOREAN_COUNT[remaining];
-  return `${remaining}`;
-}
-
 function buildPayload(draft: MeetupDraft) {
   const rawTime = draft.time || "오후 3시";
   const rawActivity = draft.activity || "오일장 구경";
@@ -142,51 +135,59 @@ export default function CreatePostedPage() {
     );
   }
 
-  // ---- 성공(및 idle) 상태 렌더링 — 와이어프레임_v02 08 ----
+  // ---- 성공(및 idle) 상태 렌더링 — UI디자인 CR-08 (1123:961) ----
   const maxPeople = payload?.maxPeople;
-  const remaining = typeof maxPeople === "number" ? maxPeople - 1 : null;
 
   return (
     <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
-      {/* 상단 navbar — Figma 08_올렸어요 처럼 제목만 둔다(좌우는 자리만) */}
-      <header className="h-[75px] px-5 flex items-center justify-between border-b border-gray-200 bg-white">
-        <span className="w-[60px]" />
-        <span className="text-[20px] font-bold text-black text-center">올렸어요</span>
-        <span className="w-[60px]" />
+      <header className="h-[60px] px-5 flex items-center border-b border-gray-100 bg-white relative">
+        <Link href="/create/review" aria-label="뒤로" className="text-2xl text-black leading-none">
+          ‹
+        </Link>
+        <span className="absolute inset-x-0 text-center text-[17px] font-bold text-black pointer-events-none">
+          올렸어요
+        </span>
       </header>
 
       <div className="flex-1 px-[18px] py-[22px] flex flex-col items-center gap-5 text-center">
         {/* ✓ 원형 배지 + 올렸어요 */}
         <div className="flex flex-col items-center gap-3 pt-4">
-          <div className="w-[74px] h-[74px] rounded-full border-2 border-black bg-white flex items-center justify-center text-2xl font-bold text-black">
-            ✓
+          <div className="w-[74px] h-[74px] rounded-full border-2 border-black bg-white flex items-center justify-center">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M5 12.5l4.5 4.5L19 7.5" stroke="#171717" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </div>
           <h1 className="text-xl font-bold text-black">올렸어요</h1>
         </div>
 
         {/* 회색 안내문 */}
         {/* 두 문장을 한 줄에 붙이면 길어서 눈이 미끄러진다 — 문장마다 줄을 바꾼다 */}
-        <p className="text-[15px] text-gray-500 whitespace-pre-line leading-relaxed">
+        <p className="text-[15px] text-muted whitespace-pre-line leading-relaxed">
           {"사람이 모이면 알려드릴게요.\n안 모이면 조용히 사라져요."}
         </p>
 
         {/* 좌측 정렬 섹션 제목 */}
         <div className="w-full text-left">
-          <p className="text-[15px] font-bold text-black">게시판에는 이렇게 보여요</p>
+          <p className="text-[15px] text-muted">홈에는 이렇게 보여요</p>
         </div>
 
         {/* 게시판 카드 — 회색 테두리, 좌측 정렬 */}
-        <div className="w-full border border-gray-300 px-[18px] py-[15px] flex flex-col gap-2 text-left">
-          <p className="text-[15px] text-gray-500">
-            {meetup.startTime}
-            {remaining != null && ` · ${seatWord(remaining)} 자리`}
-          </p>
+        <div className="w-full rounded-2xl border border-gray-100 bg-white px-4 py-4 shadow-[0_1px_6px_rgba(0,0,0,0.06)] flex flex-col gap-1 text-left">
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-[15px] font-bold text-black">
+              {meetup.startTime.replace(/^오늘\s*/, "").split(" ~ ")[0]}
+            </span>
+            {maxPeople != null && (
+              <span className="text-[14px] text-muted">1 / {maxPeople}명</span>
+            )}
+          </div>
+          <p className="text-[19px] font-bold text-black">{meetup.activity}</p>
           {postedDuration && (
-            <p className="text-[15px] text-gray-500">{postedDuration} 걸려요</p>
+            <p className="text-[14px] text-muted">예상 시간 : {postedDuration}</p>
           )}
-          <p className="text-[20px] font-bold text-black">{meetup.activity}</p>
+          <p className="text-[14px] text-muted">{meetup.locationName}</p>
           {postedMessage && (
-            <p className="text-[15px] text-gray-500 whitespace-pre-line">“{postedMessage}”</p>
+            <p className="mt-1 text-[14px] text-muted whitespace-pre-line">“{postedMessage}”</p>
           )}
         </div>
 
@@ -194,7 +195,7 @@ export default function CreatePostedPage() {
             화면 맨 아래에 붙이고, 누르면 방금 올린 동행을 바로 보여준다 */}
         <Link
           href="/my-meetups/created"
-          className="mt-auto w-full h-[60px] bg-[#1A1A1A] text-white rounded-lg flex items-center justify-center text-[17px] font-bold"
+          className="mt-auto w-full h-[54px] rounded-lg bg-ink text-white flex items-center justify-center text-[17px] font-bold"
         >
           확인
         </Link>
