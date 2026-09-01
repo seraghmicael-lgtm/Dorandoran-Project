@@ -453,6 +453,48 @@ try {
     ok((await html(`/meetup/${meetup.id}/complete`)).includes("참여가 완료됐어요"), "참여 완료 화면");
   }
 
+  // 홈·내 동행이 실제 데이터를 읽는지 (지금까지 고정 카드였다)
+  {
+    const res = await fetch(`${BASE}/api/meetups`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        activity: "회귀검사 홈카드",
+        startTime: "오늘 오후 3시 ~ 4시",
+        locationName: "회귀검사 장소 · 걸어서 8분",
+        maxPeople: 5,
+      }),
+    });
+    const uid = (res.headers.get("set-cookie") ?? "").match(/uid=([^;]+)/)?.[1];
+    const made = await res.json();
+    const withUid = async (path) => {
+      const r = await fetch(`${BASE}${path}`, {
+        headers: { cookie: `dn_entered=1${uid ? `; uid=${uid}` : ""}` },
+      });
+      return r.text();
+    };
+
+    const home = await withUid("/home");
+    ok(home.includes("오늘마실"), "홈: 로고");
+    ok(home.includes("마실 어떠세요"), "홈: 인사말");
+    ok(home.includes("회귀검사 홈카드"), "홈: 올린 동행이 목록에 뜬다");
+    ok(home.includes("1<!-- -->/<!-- -->5"), "홈: 자리 수 표시(1/5)");
+
+    const created = await withUid("/my-meetups/created");
+    ok(created.includes("회귀검사 홈카드"), "만든 동행: 내가 올린 게 보인다");
+    ok(created.includes("만든 동행 취소하기"), "만든 동행: 취소 링크");
+
+    // 내가 만든 것은 "참여한 동행" 탭에 겹쳐 나오면 안 된다
+    const joined = await withUid("/my-meetups");
+    ok(!joined.includes("회귀검사 홈카드"), "참여한 동행: 내가 만든 건 안 겹친다");
+
+    await fetch(`${BASE}/api/meetups/${made.id}/cancel`, {
+      method: "POST",
+      headers: { cookie: `uid=${uid}` },
+    });
+    ok(!(await withUid("/home")).includes("회귀검사 홈카드"), "홈: 취소된 동행은 사라진다");
+  }
+
   // 시각은 항상 오전/오후 + 아라비아 숫자 — 뒤 화면의 끝시각 계산이 이 형식에 의존한다
   const r7 = await parse({ transcript: "네 시쯤에 봐요", time: null, location: null, activity: null });
   ok(/^(오전|오후) \d/.test(String(r7.time)) && computeEndClock(r7.time, 60) !== null,

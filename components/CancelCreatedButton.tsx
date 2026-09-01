@@ -33,9 +33,9 @@ export default function CancelCreatedButton({ meetupId }: { meetupId: string }) 
       <button
         type="button"
         onClick={() => setStage("confirm")}
-        className="w-full py-4 bg-white border border-gray-300 rounded-[10px] flex items-center justify-center cursor-pointer hover:bg-gray-50"
+        className="text-[14px] text-muted underline-offset-2 hover:underline cursor-pointer"
       >
-        <span className="text-base font-medium text-black">만든 동행 취소하기</span>
+        만든 동행 취소하기
       </button>
 
       {stage !== "closed" && (
@@ -45,7 +45,7 @@ export default function CancelCreatedButton({ meetupId }: { meetupId: string }) 
           aria-modal="true"
           aria-labelledby="cancel-created-title"
         >
-          <div className="w-full max-w-[330px] my-auto bg-white border border-black rounded-lg p-5 flex flex-col gap-4 text-left">
+          <div className="w-full max-w-[320px] my-auto bg-white rounded-2xl p-5 flex flex-col gap-4 text-left">
             {stage === "done" ? (
               /* Figma 732:525 "처리 완료" */
               <>
@@ -53,12 +53,12 @@ export default function CancelCreatedButton({ meetupId }: { meetupId: string }) 
                   <h2 id="cancel-created-title" className="text-[19px] font-bold text-black">
                     동행이 취소되었어요
                   </h2>
-                  <p className="text-[15px] text-gray-600">다른 동행도 찾아보세요.</p>
+                  <p className="text-[15px] text-muted">다른 동행도 찾아보세요.</p>
                 </div>
                 <button
                   type="button"
                   onClick={close}
-                  className="w-full h-[54px] bg-black text-white flex items-center justify-center rounded text-[17px] font-bold cursor-pointer"
+                  className="w-full h-[54px] rounded-lg bg-ink text-white flex items-center justify-center text-[17px] font-bold cursor-pointer"
                 >
                   확인
                 </button>
@@ -70,7 +70,7 @@ export default function CancelCreatedButton({ meetupId }: { meetupId: string }) 
                   <h2 id="cancel-created-title" className="text-[19px] font-bold text-black">
                     못 가시는군요
                   </h2>
-                  <p className="text-[15px] text-gray-600 leading-relaxed">
+                  <p className="text-[15px] text-muted leading-relaxed">
                     다른 분들께는 &quot;한 분이 못 오시게 됐어요&quot;만 전해요.
                   </p>
                   {stage === "error" && (
@@ -85,7 +85,7 @@ export default function CancelCreatedButton({ meetupId }: { meetupId: string }) 
                     type="button"
                     onClick={cancel}
                     disabled={stage === "working"}
-                    className="w-full h-[54px] bg-black text-white flex items-center justify-center rounded text-[17px] font-bold cursor-pointer disabled:bg-gray-400 disabled:cursor-default"
+                    className="w-full h-[54px] rounded-lg bg-ink text-white flex items-center justify-center text-[17px] font-bold cursor-pointer disabled:bg-gray-300 disabled:cursor-default"
                   >
                     {stage === "working" ? "알리는 중이에요..." : "못 간다고 알리기"}
                   </button>
@@ -93,7 +93,7 @@ export default function CancelCreatedButton({ meetupId }: { meetupId: string }) 
                     type="button"
                     onClick={() => setStage("closed")}
                     disabled={stage === "working"}
-                    className="w-full h-[54px] bg-white text-black border border-black flex items-center justify-center rounded text-[17px] font-medium cursor-pointer disabled:text-gray-400 disabled:border-gray-300 disabled:cursor-default"
+                    className="w-full h-[54px] rounded-lg bg-white text-black border border-gray-300 flex items-center justify-center text-[17px] font-medium cursor-pointer disabled:text-gray-400 disabled:cursor-default"
                   >
                     그냥 갈게요
                   </button>

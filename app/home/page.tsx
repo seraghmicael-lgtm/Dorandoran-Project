@@ -1,100 +1,113 @@
+import { cookies } from "next/headers";
 import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
-import HeaderNav from "@/components/HeaderNav";
-import PlaceholderBox from "@/components/PlaceholderBox";
+import MeetupCard from "@/components/ds/MeetupCard";
+import BrandMark from "@/components/ds/BrandMark";
+import { prisma } from "@/lib/prisma";
+import { UID_COOKIE } from "@/lib/session";
 
-export default function HomePage() {
+// UI디자인 on-06 (1089:7978) — 홈. 오늘 열린 동행을 카드로 늘어놓는다.
+// 지금까지 고정 카드였는데, 실제로 올린 동행을 읽어 온다.
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const uid = (await cookies()).get(UID_COOKIE)?.value;
+
+  let neighborhood = "우리 동네";
+  let meetups: {
+    id: string;
+    startTime: string;
+    activity: string;
+    locationName: string | null;
+    maxPeople: number;
+    _count: { participants: number };
+  }[] = [];
+
+  try {
+    if (uid) {
+      const me = await prisma.user.findUnique({ where: { id: uid }, select: { neighborhood: true } });
+      if (me?.neighborhood) neighborhood = me.neighborhood;
+    }
+    meetups = await prisma.meetup.findMany({
+      where: { status: "open" },
+      orderBy: { createdAt: "desc" },
+      take: 20,
+      select: {
+        id: true,
+        startTime: true,
+        activity: true,
+        locationName: true,
+        maxPeople: true,
+        _count: { select: { participants: true } },
+      },
+    });
+  } catch (e) {
+    console.error("동행 목록 조회 실패:", e);
+  }
+
   return (
     <WireframeLayout justify="start" className="flex flex-col">
-      <HeaderNav />
+      <header className="h-[60px] px-5 flex items-center justify-between border-b border-gray-100 bg-white">
+        <span className="flex items-center gap-1.5">
+          <BrandMark size={26} />
+          <span className="text-[19px] font-bold text-brand-light">오늘마실</span>
+        </span>
+        <span aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M18 16V11a6 6 0 1 0-12 0v5l-1.5 2.5h15L18 16Z"
+              stroke="#171717"
+              strokeWidth="1.8"
+              strokeLinejoin="round"
+            />
+            <path d="M10 19.5a2 2 0 0 0 4 0" stroke="#171717" strokeWidth="1.8" strokeLinecap="round" />
+          </svg>
+        </span>
+      </header>
 
-      <div className="p-4 flex flex-col gap-4 pb-6">
-        <h1 className="text-base font-bold text-black py-1">
-          오늘, 송정동 마실 어떠세요?
-        </h1>
+      <div className="flex-1 px-5 pt-6 flex flex-col">
+        <p className="text-[19px] font-bold text-black flex items-center gap-1">
+          오늘
+          <span className="inline-flex items-center gap-0.5 text-accent">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11Z" stroke="currentColor" strokeWidth="2" />
+              <circle cx="12" cy="10" r="2.5" stroke="currentColor" strokeWidth="2" />
+            </svg>
+            {neighborhood}
+          </span>
+          마실 어떠세요?
+        </p>
 
-        <div className="flex flex-col gap-3">
-          {/* 카드 1: 뜨개질 같이 해요 */}
-          <Link
-            href="/meetup/1"
-            className="p-4 border border-gray-200 rounded flex flex-col gap-2 bg-white"
-          >
-            <div className="flex items-center justify-between text-xs text-gray-600">
-              <span className="font-bold text-black">오후 3시</span>
-              <span>2 / 3명</span>
-            </div>
-            <h2 className="text-base font-bold text-black">뜨개질 같이 해요</h2>
-            <p className="text-xs text-gray-600">예상 시간 : 1시간</p>
-            <p className="text-xs text-gray-500">
-              동사무소 시민회의실 ㆍ 걸어서 8분
-            </p>
-          </Link>
-
-          {/* 카드 2: 강아지 산책하러 가요 */}
-          <Link
-            href="/meetup/2"
-            className="p-4 border border-gray-200 rounded flex flex-col gap-2 bg-white"
-          >
-            <div className="flex items-center justify-between text-xs text-gray-600">
-              <span className="font-bold text-black">오후 3시 30분</span>
-              <span>2 / 3명</span>
-            </div>
-            <h2 className="text-base font-bold text-black">
-              강아지 산책하러 가요
-            </h2>
-            <p className="text-xs text-gray-600">예상 시간 : 1시간</p>
-            <p className="text-xs text-gray-500">
-              도토리공원 ㆍ 걸어서 5분
-            </p>
-          </Link>
-
-          {/* 카드 3: 도란마트 장보러 가요 */}
-          <Link
-            href="/meetup/3"
-            className="p-4 border border-gray-200 rounded flex flex-col gap-2 bg-white"
-          >
-            <div className="flex items-center justify-between text-xs text-gray-600">
-              <span className="font-bold text-black">오후 3시 30분</span>
-              <span>2 / 3명</span>
-            </div>
-            <h2 className="text-base font-bold text-black">
-              도란마트 장보러 가요
-            </h2>
-            <p className="text-xs text-gray-600">예상 시간 : 1시간</p>
-            <p className="text-xs text-gray-500">
-              도란마트 정문 앞 ㆍ 걸어서 4분
-            </p>
-          </Link>
-
-          {/* 카드 4: Adㆍ동네광고 */}
-          <div className="p-4 border border-gray-200 rounded flex items-center justify-between bg-white">
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] text-gray-500 border border-gray-300 px-1.5 py-0.5 rounded w-fit">
-                Adㆍ동네광고
-              </span>
-              <h2 className="text-sm font-bold text-black">
-                아픈 허리 잘 낫는 병원
-              </h2>
-              <p className="text-xs text-gray-500">우리동네병원 정형외과</p>
-            </div>
-            <PlaceholderBox width="w-[87px]" height="h-[94px]" className="rounded" />
+        {meetups.length > 0 ? (
+          <div className="mt-4 flex flex-col gap-3 pb-6">
+            {meetups.map((m) => (
+              <MeetupCard
+                key={m.id}
+                id={m.id}
+                startTime={m.startTime}
+                activity={m.activity}
+                locationName={m.locationName}
+                joined={m._count.participants}
+                maxPeople={m.maxPeople}
+              />
+            ))}
           </div>
-
-          {/* 카드 5: 반찬 나눔 */}
-          <Link
-            href="/meetup/4"
-            className="p-4 border border-gray-200 rounded flex flex-col gap-2 bg-white"
-          >
-            <div className="flex items-center justify-between text-xs text-gray-600">
-              <span className="font-bold text-black">오후 5시 ~ 5시 30분</span>
-              <span>2 / 3명</span>
+        ) : (
+          /* on-06_2 빈 상태 */
+          <div className="flex-1 flex flex-col items-center justify-center text-center gap-6 pb-16">
+            <BrandMark size={120} />
+            <div className="flex flex-col gap-2">
+              <p className="text-[20px] font-bold text-black">아직 열린 동행이 없어요</p>
+              <p className="text-[15px] text-muted">먼저 하나 열어보실래요?</p>
             </div>
-            <h2 className="text-base font-bold text-black">반찬나눔</h2>
-            <p className="text-xs text-gray-500">
-              105동 앞 ㆍ 걸어서 1분
-            </p>
-          </Link>
-        </div>
+            <Link
+              href="/create/activity?new=1"
+              className="w-full h-[54px] rounded-lg bg-brand text-white flex items-center justify-center text-[17px] font-bold"
+            >
+              동행 만들기
+            </Link>
+          </div>
+        )}
       </div>
     </WireframeLayout>
   );
