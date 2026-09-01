@@ -1,28 +1,52 @@
 import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
+import BrandMark from "@/components/ds/BrandMark";
 
-export default async function MeetupApplyCompletePage({
+// UI디자인 jn-04 (1084:5213) — 참여가 완료됐어요!
+export default async function MeetupCompletePage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await params;
+  const { id } = await params;
 
   return (
-    <WireframeLayout className="p-6 flex flex-col justify-between">
-      <div className="flex-1 flex flex-col justify-center items-center text-center gap-4 py-12">
-        <h1 className="text-2xl font-bold text-black">참여 완료!</h1>
-        <p className="text-sm text-gray-600 leading-relaxed max-w-[280px]">
-          오후 3시 30분 도란마트 정문 앞에서 만나요 30분 전에 알려드릴게요
+    <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
+      <div className="flex-1 px-5 flex flex-col items-center justify-center text-center">
+        <div className="relative">
+          <BrandMark size={120} />
+          {/* 완료 체크 — 마스코트 오른쪽 아래에 겹친다 */}
+          <span className="absolute -right-2 -bottom-1 w-11 h-11 rounded-full bg-accent-soft flex items-center justify-center">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M5 12.5l4.5 4.5L19 7.5"
+                stroke="#45B83C"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+        </div>
+
+        <h1 className="mt-8 text-[24px] font-bold text-black">참여가 완료됐어요!</h1>
+        <p className="mt-3 text-[15px] text-muted leading-[1.6] whitespace-pre-line">
+          {"참여 내역은\n내 정보에서 볼 수 있어요"}
         </p>
       </div>
 
-      <div className="pb-8">
+      <div className="px-5 pt-5 pb-6 flex flex-col gap-2.5">
         <Link
-          href="/my-meetups"
-          className="w-full h-[60px] bg-black text-white flex items-center justify-center rounded text-base font-medium"
+          href="/home"
+          className="w-full h-[54px] rounded-lg bg-brand text-white flex items-center justify-center text-[17px] font-bold"
         >
-          확인
+          다른 동행 보기
+        </Link>
+        <Link
+          href={`/meetup/${id}`}
+          className="w-full h-[54px] rounded-lg border border-gray-300 bg-white text-black flex items-center justify-center text-[17px] font-medium"
+        >
+          이전
         </Link>
       </div>
     </WireframeLayout>

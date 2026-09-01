@@ -1,8 +1,30 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import WireframeLayout from "@/components/WireframeLayout";
-import GoogleMap from "@/components/GoogleMap";
 import { prisma } from "@/lib/prisma";
 import { directionsUrl } from "@/lib/places";
+import { UID_COOKIE } from "@/lib/session";
+
+// UI디자인 JN-02 (1084:4847) — 자세히 보기
+// 라벨-값 표가 아니라 아이콘 한 줄씩. 한마디도 그 줄 안에 들어간다.
+const ROW_ICON = "w-[22px] h-[22px] shrink-0 mt-0.5 text-[#555]";
+
+function Row({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div className="flex items-start gap-2.5">
+      <span className={ROW_ICON}>{icon}</span>
+      <div className="flex-1 text-[16px] text-black leading-[1.5]">{children}</div>
+    </div>
+  );
+}
+
+/** 자리·시간 상태 — 문구는 UI디자인의 상태 변형에서 가져왔다 */
+function statusOf(count: number, max: number, joined: boolean) {
+  if (joined) return { label: "나 포함", tone: "bg-accent-soft text-accent" };
+  if (count >= max) return { label: "다 찼어요", tone: "bg-gray-100 text-gray-500" };
+  if (count === max - 1) return { label: "한 자리 남았어요", tone: "bg-chip text-[#8A6D1F]" };
+  return { label: "참여 가능", tone: "bg-accent-soft text-accent" };
+}
 
 export default async function MeetupDetailPage({
   params,
@@ -10,119 +32,184 @@ export default async function MeetupDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const uid = (await cookies()).get(UID_COOKIE)?.value;
 
-  // 06_하실 말씀에서 남긴 한마디를 제목 밑에 건다(Figma: 오늘마실_동행자세히보기 1).
-  // 만나는 곳·좌표가 있으면 지도에 핀을 찍고 길찾기를 연결한다.
-  // 나머지 값은 아직 와이어프레임 고정값이라 그대로 둔다.
-  let meetup: {
+  interface Detail {
     activity: string;
     startTime: string;
-    message: string | null;
     locationName: string | null;
+    maxPeople: number;
+    message: string | null;
     lat: number | null;
     lng: number | null;
-  } | null = null;
+    creatorId: string;
+    participants: { userId: string; user: { nickname: string } }[];
+  }
+
+  let meetup: Detail | null = null;
   try {
     meetup = await prisma.meetup.findUnique({
       where: { id },
       select: {
         activity: true,
         startTime: true,
-        message: true,
         locationName: true,
+        maxPeople: true,
+        message: true,
         lat: true,
         lng: true,
+        creatorId: true,
+        participants: {
+          select: { userId: true, user: { select: { nickname: true } } },
+          orderBy: { joinedAt: "asc" },
+        },
       },
     });
   } catch (e) {
     console.error("동행 조회 실패:", e);
   }
 
-  const placeName = meetup?.locationName?.split(" · ")[0] ?? "도란마트 정문 앞";
-  const hasPin = typeof meetup?.lat === "number" && typeof meetup?.lng === "number";
+  const activity = meetup?.activity ?? "뜨개질 같이 해요";
+  const startTime = meetup?.startTime ?? "오늘 오후 3시 ~ 4시";
+  const placeName = meetup?.locationName?.split(" · ")[0] ?? "동사무소 시민 회의실";
+  const maxPeople = meetup?.maxPeople ?? 3;
+  const people = meetup?.participants ?? [];
+  const joined = Boolean(uid && people.some((p) => p.userId === uid));
+  const status = statusOf(people.length, maxPeople, joined);
+  const startClock = startTime.replace(/^오늘\s*/, "").split(" ~ ")[0];
 
   return (
-    <WireframeLayout justify="between" className="p-6 flex flex-col justify-between">
-      <div className="flex flex-col gap-6">
-        {/* Title / Time */}
-        <div className="flex flex-col gap-1">
-          <span className="text-sm font-bold text-black">
-            {meetup?.startTime ?? "오후 3시 30분"}
-          </span>
-          <h1 className="text-xl font-bold text-black">
-            {meetup?.activity ?? "도란마트 장보러 가요"}
-          </h1>
+    <WireframeLayout justify="start" className="flex flex-col">
+      <header className="h-[60px] px-5 flex items-center border-b border-gray-100 bg-white relative">
+        <Link href="/home" aria-label="뒤로" className="text-2xl text-black leading-none">
+          ‹
+        </Link>
+        <span className="absolute inset-x-0 text-center text-[17px] font-bold text-black pointer-events-none">
+          자세히 보기
+        </span>
+      </header>
 
-          {/* 하실 말씀 한마디 — 제목 바로 밑, 초록 세로선 + 따옴표 인용 */}
+      <div className="flex-1 px-5 pt-7 flex flex-col">
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-[17px] font-bold text-black">{startClock}</span>
+          <span className={`px-2.5 py-1 rounded-full text-[13px] font-bold ${status.tone}`}>
+            {status.label}
+          </span>
+        </div>
+        <h1 className="mt-1 text-[24px] font-bold text-black">{activity}</h1>
+
+        <div className="mt-6 flex flex-col gap-4">
+          <Row
+            icon={
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8" />
+                <path d="M12 7v5l3 2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              </svg>
+            }
+          >
+            {startTime}
+          </Row>
+
+          <Link
+            href={directionsUrl({ lat: meetup?.lat, lng: meetup?.lng, name: placeName })}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-start gap-2.5"
+          >
+            <span className={ROW_ICON}>
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11Z"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                />
+                <circle cx="12" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.8" />
+              </svg>
+            </span>
+            <span className="flex-1 text-[16px] text-black leading-[1.5]">
+              {meetup?.locationName ?? "동사무소 시민 회의실 앞 주민센터 (걸어서 8분)"}
+            </span>
+            <span className="text-xl text-gray-400 leading-none mt-0.5">›</span>
+          </Link>
+
+          <Row
+            icon={
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="8" r="3.4" stroke="currentColor" strokeWidth="1.8" />
+                <path
+                  d="M5 19c.8-3.5 3.5-5.4 7-5.4s6.2 1.9 7 5.4"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                />
+              </svg>
+            }
+          >
+            {maxPeople}명 모여요
+          </Row>
+
           {meetup?.message && (
-            <blockquote className="mt-3 border-l-[3px] border-[#3D6B5A] pl-3">
-              <p className="text-[15px] leading-[1.5] text-gray-700 whitespace-pre-line">
-                “{meetup.message}”
-              </p>
-            </blockquote>
+            <Row
+              icon={
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M20 12a7 7 0 0 1-7 7H8l-4 3v-4.6A7 7 0 0 1 4 12a7 7 0 0 1 7-7h2a7 7 0 0 1 7 7Z"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                  />
+                </svg>
+              }
+            >
+              <span className="whitespace-pre-line">{meetup.message}</span>
+            </Row>
           )}
         </div>
 
-        {/* Info Grid */}
-        <div className="flex flex-col border-y border-gray-200 py-3 text-sm gap-3">
-          <div className="flex items-center justify-between">
-            <span className="text-gray-500">만드신 분</span>
-            <span className="font-medium text-black">봄날의햇살 님</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-gray-500">걸리는 시간</span>
-            <span className="font-medium text-black">1시간 이상</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-gray-500">모임인원</span>
-            <span className="font-medium text-black">2 / 3명</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-gray-500">만나는 곳</span>
-            <div className="flex items-center gap-2">
-              <span className="font-medium text-black">{placeName}</span>
-              {/* 지도 앱으로 넘긴다 — 좌표가 있으면 정확히, 없으면 이름으로라도 */}
-              <a
-                href={directionsUrl({ lat: meetup?.lat, lng: meetup?.lng, name: placeName })}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-[#3D6B5A] font-medium flex items-center underline-offset-2 hover:underline"
-              >
-                길찾기 &gt;
-              </a>
-            </div>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-gray-500">거리</span>
-            <span className="font-medium text-black">걸어서 8분</span>
-          </div>
+        <div className="mt-8">
+          <p className="text-[17px] font-bold text-black">
+            참여자 <span className="text-accent">{people.length}</span>
+          </p>
+          <ul className="mt-3 flex flex-col gap-3">
+            {people.length === 0 && (
+              <li className="text-[15px] text-muted">아직 아무도 없어요. 첫 번째가 되어 주세요.</li>
+            )}
+            {people.map((p) => (
+              <li key={p.userId} className="flex items-center gap-2.5">
+                <span className="w-7 h-7 rounded-full bg-accent-soft" aria-hidden="true" />
+                <span className="text-[16px] text-black">{p.user.nickname}</span>
+                {meetup?.creatorId === p.userId && (
+                  <span className="px-2 py-0.5 rounded bg-accent-soft text-accent text-[12px] font-bold">
+                    개설자
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
         </div>
-
-        {/* 만나는 곳 지도 — 좌표를 못 찾은 동행은 지도 자리를 비운다(가짜 위치를 보여주지 않는다) */}
-        {hasPin && (
-          <GoogleMap
-            lat={meetup!.lat!}
-            lng={meetup!.lng!}
-            height="h-[298px]"
-            className="rounded"
-            apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
-          />
-        )}
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex flex-col gap-3 pt-4 pb-4">
-        <Link
-          href={`/meetup/${id}/complete`}
-          className="w-full h-[60px] bg-black text-white flex items-center justify-center rounded text-base font-medium"
-        >
-          참여하기
-        </Link>
+      <div className="px-5 pt-5 pb-4 flex flex-col gap-2.5">
+        {joined ? (
+          <span className="w-full h-[54px] rounded-lg bg-gray-200 text-gray-500 flex items-center justify-center text-[17px] font-bold">
+            이미 참여했어요
+          </span>
+        ) : people.length >= maxPeople ? (
+          <span className="w-full h-[54px] rounded-lg bg-gray-200 text-gray-500 flex items-center justify-center text-[17px] font-bold">
+            자리가 다 찼어요
+          </span>
+        ) : (
+          <Link
+            href={`/meetup/${id}/join`}
+            className="w-full h-[54px] rounded-lg bg-brand text-white flex items-center justify-center text-[17px] font-bold"
+          >
+            참여하기
+          </Link>
+        )}
         <Link
           href="/home"
-          className="w-full h-[60px] bg-white text-black border border-black flex items-center justify-center rounded text-base font-medium"
+          className="w-full h-[54px] rounded-lg border border-gray-300 bg-white text-black flex items-center justify-center text-[17px] font-medium"
         >
-          다른 동행 보기
+          이전
         </Link>
       </div>
     </WireframeLayout>

@@ -417,6 +417,42 @@ try {
     ok(h.includes(`>${step}<!-- --> / 6</span>`), `${path}: 단계 배지 ${step}/6`);
   }
 
+  // JN 그룹: 상세 → 참여 확인 → 참여. 참여가 실제로 기록돼야 참여자 목록이 의미를 갖는다
+  {
+    const made = await fetch(`${BASE}/api/meetups`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ activity: "회귀검사 동행", startTime: "오늘 오후 3시", maxPeople: 3 }),
+    });
+    const meetup = await made.json();
+    ok(!!meetup.id, "동행 생성");
+
+    const detail = await html(`/meetup/${meetup.id}`);
+    ok(detail.includes("자세히 보기"), "상세: 새 제목줄");
+    ok(detail.includes("회귀검사 동행"), "상세: 활동 이름");
+    ok(detail.includes("참여자"), "상세: 참여자 목록");
+    ok(/참여 가능|한 자리 남았어요|다 찼어요|나 포함/.test(detail), "상세: 상태 배지");
+
+    ok((await html(`/meetup/${meetup.id}/join`)).includes("참여할까요?"), "참여 확인 화면");
+
+    // 같은 사람이 두 번 눌러도 한 번만 들어간다.
+    // uid 쿠키를 직접 이어줘야 "같은 사람"이 된다(fetch 는 쿠키를 안 물고 다닌다).
+    const j1 = await fetch(`${BASE}/api/meetups/${meetup.id}/join`, { method: "POST" });
+    const uid = (j1.headers.get("set-cookie") ?? "").match(/uid=([^;]+)/)?.[1];
+    ok(j1.ok && !!uid, "참여 1회차: uid 발급", String(uid));
+    const j2 = await fetch(`${BASE}/api/meetups/${meetup.id}/join`, {
+      method: "POST",
+      headers: { cookie: `uid=${uid}` },
+    });
+    ok(j2.ok && (await j2.json()).already === true, "같은 사람 두 번째는 already");
+
+    // 참여자 목록이 한 명만 늘어난다(개설자 + 참여자 1)
+    const after = await html(`/meetup/${meetup.id}`);
+    ok(/참여자 <span[^>]*>2</.test(after), "참여자 수가 2 (중복 안 쌓임)");
+
+    ok((await html(`/meetup/${meetup.id}/complete`)).includes("참여가 완료됐어요"), "참여 완료 화면");
+  }
+
   // 시각은 항상 오전/오후 + 아라비아 숫자 — 뒤 화면의 끝시각 계산이 이 형식에 의존한다
   const r7 = await parse({ transcript: "네 시쯤에 봐요", time: null, location: null, activity: null });
   ok(/^(오전|오후) \d/.test(String(r7.time)) && computeEndClock(r7.time, 60) !== null,
