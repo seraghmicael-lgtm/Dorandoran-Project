@@ -1,7 +1,8 @@
-import Link from "next/link";
-import WireframeLayout from "@/components/WireframeLayout";
+import StepScreen from "@/components/ds/StepScreen";
+import StepFooter from "@/components/ds/StepFooter";
 import { safeInternalPath } from "@/lib/safePath";
 
+// UI디자인 on-04 (1083:4166) — 알림 허용
 export default async function NotificationPermissionPage({
   searchParams,
 }: {
@@ -11,30 +12,35 @@ export default async function NotificationPermissionPage({
   const nextHref = safeInternalPath(next, "/welcome");
 
   return (
-    <WireframeLayout justify="between" bottomNav="none" className="p-6">
-      <div className="flex-1 flex flex-col justify-center gap-4 py-12">
-        <h1 className="text-xl font-bold text-black leading-tight">
-          나가실 때 알려드릴게요
-        </h1>
-        <p className="text-sm text-gray-600 leading-relaxed">
-          만나기 30분 전에 알려드려요. 알림은 언제든 끄실 수 있어요.
-        </p>
+    <StepScreen
+      title={"나가실 때\n알려드릴게요"}
+      subtitle={"만나기 30분 전에 알려드려요\n알림은 언제든 끄실 수 있어요"}
+      footer={
+        <StepFooter
+          primary={{ label: "알림 허용", href: nextHref }}
+          secondary={{ label: "이전", href: "/signup" }}
+        />
+      }
+    >
+      {/* 종 + 확인 표시 (on-04 일러스트) */}
+      <div className="mt-10 flex items-center justify-center">
+        <svg width="188" height="159" viewBox="0 0 188 159" role="img" aria-label="알림">
+          <path
+            d="M84 22c0-9 7-16 16-16s16 7 16 16c22 7 33 24 33 46v27l12 18H39l12-18V68c0-22 11-39 33-46Z"
+            fill="#F5C93B"
+          />
+          <path d="M86 122h28c0 8-6 14-14 14s-14-6-14-14Z" fill="#E8B71F" />
+          <circle cx="150" cy="118" r="30" fill="#3EA832" />
+          <path
+            d="M137 118l9 9 17-17"
+            stroke="#fff"
+            strokeWidth="6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          />
+        </svg>
       </div>
-
-      <div className="flex flex-col gap-3 pb-8">
-        <Link
-          href={nextHref}
-          className="w-full h-[60px] bg-black text-white flex items-center justify-center rounded text-base font-medium"
-        >
-          허용
-        </Link>
-        <Link
-          href={nextHref}
-          className="w-full h-[60px] bg-white text-black border border-black flex items-center justify-center rounded text-base font-medium"
-        >
-          허용 안함
-        </Link>
-      </div>
-    </WireframeLayout>
+    </StepScreen>
   );
 }
