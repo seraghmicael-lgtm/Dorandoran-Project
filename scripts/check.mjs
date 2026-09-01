@@ -229,7 +229,7 @@ ok(formatKoreanClock(13, 30) === "오후 1시 30분", "13:30 → 오후 1시 30�
     maxPeople: 4,
   });
   ok(
-    full.join("|") === "산책|오후 3시|1시간 걸려요|도토리마을 공원 입구|4명",
+    full.join("|") === "산책|오후 3시|1시간 동안|도토리마을 공원 입구|4명",
     "메모리풍선: Figma 순서·문구 그대로",
     full.join(" / ")
   );
@@ -397,13 +397,24 @@ try {
     return res.text();
   };
   const placeHtml = await html("/create/place");
-  ok(!placeHtml.includes("목록에 없으면"), "장소 화면: '목록에 없으면' 머리말 없음");
   ok(
     !["송정마을 어귀", "도토리마을 공원", "한마음 경로당"].some((n) => placeHtml.includes(n)),
     "장소 화면: 고정 카드 3개 제거됨"
   );
-  for (const p of ["/create/activity", "/create/time", "/create/people"]) {
-    ok((await html(p)).includes("목록에 없으면"), `${p}: 머리말 유지`);
+  // 새 UI디자인에는 "목록에 없으면" 머리말이 없다 — 어느 화면에도 남아 있으면 안 된다
+  const stepPages = [
+    ["/create/activity", 1, "어떤 활동을"],
+    ["/create/time", 2, "동행과 몇 시에"],
+    ["/create/duration", 3, "얼마나 걸릴까요"],
+    ["/create/place", 4, "어디서 만날까요"],
+    ["/create/people", 5, "몇 명이 함께할까요"],
+    ["/create/message", 6, "추가로 남길"],
+  ];
+  for (const [path, step, heading] of stepPages) {
+    const h = await html(path);
+    ok(!h.includes("목록에 없으면"), `${path}: 옛 머리말 없음`);
+    ok(h.includes(heading), `${path}: 새 제목`, heading);
+    ok(h.includes(`>${step}<!-- --> / 6</span>`), `${path}: 단계 배지 ${step}/6`);
   }
 
   // 시각은 항상 오전/오후 + 아라비아 숫자 — 뒤 화면의 끝시각 계산이 이 형식에 의존한다

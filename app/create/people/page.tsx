@@ -1,84 +1,85 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
-import WireframeLayout from "@/components/WireframeLayout";
-import CreateStepHeader from "@/components/CreateStepHeader";
-import MemoryBubbles from "@/components/MemoryBubbles";
-import CreateNavButtons from "@/components/CreateNavButtons";
-import SmartInput from "@/components/SmartInput";
-import { updateDraft } from "@/lib/draft";
+import CreateStep from "@/components/ds/CreateStep";
+import PrevNext from "@/components/ds/PrevNext";
+import OptionButton from "@/components/ds/OptionButton";
+import {
+  MeetupDraft,
+  draftSnapshot,
+  noDraftOnServer,
+  subscribeDraft,
+  updateDraft,
+} from "@/lib/draft";
 
-// 와이어프레임_v02 05_몇 분이 함께할까요
-const OPTIONS = [2, 3, 4, 5];
+// UI디자인 cr-05 (1089:7637) — 몇 명이 함께할까요?
+const OPTIONS = [3, 4, 5, 6, 7, 8];
 
 export default function CreatePeoplePage() {
   const router = useRouter();
+  const raw = useSyncExternalStore(subscribeDraft, draftSnapshot, noDraftOnServer);
+  let draft: MeetupDraft = {};
+  try {
+    if (raw) draft = JSON.parse(raw) as MeetupDraft;
+  } catch {
+    draft = {};
+  }
 
   const choose = (n: number) => {
     updateDraft({ maxPeople: n });
     router.push("/create/message");
   };
 
-  const handleCustom = (value: string) => {
-    // 입력 문자열에서 첫 정수(2~10)를 추출해 maxPeople로 저장 후 이동.
-    // 정수를 못 찾으면 maxPeople을 저장하지 않고 그냥 이동.
-    const m = value.match(/\d+/);
-    if (m) {
-      const n = parseInt(m[0], 10);
-      if (n >= 2 && n <= 10) {
-        updateDraft({ maxPeople: n });
-      }
-    }
-    router.push("/create/message");
-  };
+  // 최소 인원이 안 모여도 그냥 나갈지 — 켜두면 인원과 상관없이 성사된다
+  const goAnyway = draft.goAnyway ?? true;
+  const need = draft.maxPeople ?? 0;
 
   return (
-    <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
-      <CreateStepHeader step={5} backHref="/home" confirmLeave />
+    <CreateStep
+      step={5}
+      title={"몇 명이 함께할까요?"}
+      footer={<PrevNext backHref="/create/place" nextHref="/create/message" requires="maxPeople" />}
+    >
+      <p className="mt-8 text-[15px] text-muted text-center">나를 포함한 숫자예요</p>
 
-      <div className="px-[18px] py-[22px] flex flex-col">
-        <MemoryBubbles />
-        <h1 className="text-[22px] font-bold text-black">몇 분이 함께할까요?</h1>
-        <p className="text-[15px] text-gray-500 mt-1">나를 포함한 숫자예요.</p>
-        <div className="h-5" />
-
-        <div className="flex flex-col gap-2.5">
-          {[0, 2].map((i) => (
-            <div key={i} className="flex gap-2.5">
-              {[OPTIONS[i], OPTIONS[i + 1]].map((n) => (
-                <button
-                  key={n}
-                  type="button"
-                  onClick={() => choose(n)}
-                  className="flex-1 border border-gray-300 py-[22px] flex justify-center text-[19px] font-bold text-black cursor-pointer hover:bg-gray-50 active:bg-gray-100"
-                >
-                  {n}명
-                </button>
-              ))}
-            </div>
-          ))}
-        </div>
-
-        <div className="h-2.5" />
-        <SmartInput
-          label="목록에 없으면"
-          placeholder="예) 여섯 명"
-          hint="“여섯 명”처럼 쓰거나 말하셔도 돼요"
-          onConfirm={handleCustom}
-        />
-
-        <div className="h-5" />
-        <div className="border border-gray-300 px-[18px] py-[15px] flex flex-col gap-1 text-left">
-          <p className="text-[15px] font-bold text-black">나 말고 두 분을 기다려요</p>
-          <p className="text-[15px] text-gray-500">적게 잡을수록 빨리 만들어져요.</p>
-        </div>
-
-        <CreateNavButtons
-          backHref="/create/place"
-          nextHref="/create/message"
-          requires="maxPeople"
-        />
+      <div className="mt-4 flex flex-col gap-3">
+        {[0, 2, 4].map((i) => (
+          <div key={i} className="flex gap-3">
+            {[OPTIONS[i], OPTIONS[i + 1]].map((n) => (
+              <OptionButton
+                key={n}
+                label={`${n}명`}
+                selected={draft.maxPeople === n}
+                onClick={() => choose(n)}
+              />
+            ))}
+          </div>
+        ))}
       </div>
-    </WireframeLayout>
+
+      {/* cr-05 의 토글 — 최소 인원이 모여야 성사되는지 */}
+      <div className="mt-6 rounded-xl border border-gray-200 px-4 py-4 flex items-center justify-between gap-3">
+        <div className="flex flex-col gap-1">
+          <span className="text-[17px] font-bold text-black">
+            {need ? `${need}명 ` : ""}
+            {goAnyway ? "안 모여도 갈게요" : "모여야 갈게요"}
+          </span>
+          <span className="text-[14px] text-muted">최소 인원이 모여야 동행이 성사돼요</span>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={goAnyway}
+          aria-label="최소 인원이 안 모여도 갈지"
+          onClick={() => updateDraft({ goAnyway: !goAnyway })}
+          className={`w-[52px] h-[30px] shrink-0 rounded-full p-[3px] flex cursor-pointer transition-colors ${
+            goAnyway ? "bg-accent justify-end" : "bg-gray-300 justify-start"
+          }`}
+        >
+          <span className="w-6 h-6 rounded-full bg-white" />
+        </button>
+      </div>
+    </CreateStep>
   );
 }

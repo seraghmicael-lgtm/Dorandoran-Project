@@ -5,11 +5,23 @@
   --foreground: #171717;
 }
 
+/* UI디자인 캔버스(919:30)에서 실측한 색. 화면마다 값을 박아 넣지 않고 여기서만 정의한다. */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --color-brand: #32952d; /* 온보딩 기본 버튼 */
+  --color-brand-light: #5bc236; /* 로고 */
+  --color-accent: #45b83c; /* 고른 상태의 테두리·글씨·토글 */
+  --color-accent-soft: #eaf7e4; /* 고른 상태의 배경 */
+  --color-accent-faint: #f3fbf2; /* 단계 배지 배경 */
+  --color-chip: #fffbea; /* 메모리 칩(지금까지 정한 것) */
+  --color-surface: #f8f8f6; /* 고르지 않은 선택지·입력칸 */
+  --color-ink: #171717; /* 만들기 흐름의 기본 버튼 */
+  --color-muted: #999999; /* 부제·안내문 */
+  --color-kakao: #f3d74f;
 }
 
 @media (prefers-color-scheme: dark) {

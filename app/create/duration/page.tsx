@@ -1,30 +1,36 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
-import WireframeLayout from "@/components/WireframeLayout";
-import CreateStepHeader from "@/components/CreateStepHeader";
-import MemoryBubbles from "@/components/MemoryBubbles";
-import CreateNavButtons from "@/components/CreateNavButtons";
+import CreateStep from "@/components/ds/CreateStep";
+import PrevNext from "@/components/ds/PrevNext";
+import OptionButton from "@/components/ds/OptionButton";
 import { computeEndClock, computeEndTime } from "@/lib/koreanTime";
-import { MeetupDraft, loadDraft, updateDraft } from "@/lib/draft";
+import {
+  MeetupDraft,
+  draftSnapshot,
+  noDraftOnServer,
+  subscribeDraft,
+  updateDraft,
+} from "@/lib/draft";
 
-// 와이어프레임_v02 03_얼마나 걸릴까요 — 선택한 시간 기준으로 끝나는 시각을 보여준다
+// UI디자인 cr-03 (1089:5933) — 활동은 얼마나 걸릴까요?
 const OPTIONS: { label: string; minutes: number | null }[] = [
-  { label: "30분", minutes: 30 },
-  { label: "1시간", minutes: 60 },
-  { label: "2시간", minutes: 120 },
+  { label: "30분 소요", minutes: 30 },
+  { label: "1시간 소요", minutes: 60 },
+  { label: "2시간 소요", minutes: 120 },
   { label: "2시간 이상", minutes: null }, // 끝나는 시각을 안 정해요
 ];
 
 export default function CreateDurationPage() {
   const router = useRouter();
-  const [draft, setDraft] = useState<MeetupDraft>({});
-
-  useEffect(() => {
-    const d = loadDraft();
-    if (d) setDraft(d);
-  }, []);
+  const raw = useSyncExternalStore(subscribeDraft, draftSnapshot, noDraftOnServer);
+  let draft: MeetupDraft = {};
+  try {
+    if (raw) draft = JSON.parse(raw) as MeetupDraft;
+  } catch {
+    draft = {};
+  }
 
   const time = draft.time || "오후 3시";
   const dayPrefix = time.includes("오늘") || time.includes("내일") ? "" : "오늘 ";
@@ -39,46 +45,39 @@ export default function CreateDurationPage() {
     }
     updateDraft({ duration: opt.label, startTime });
     // 음성 대화로 이미 장소가 정해졌으면 장소 화면은 건너뛴다
-    const d = loadDraft();
-    router.push(d?.location ? "/create/people" : "/create/place");
-  };
-
-  const endLabel = (minutes: number | null): string => {
-    if (minutes == null) return "끝나는 시각을 안 정해요";
-    const end = computeEndClock(time, minutes);
-    return end ? `${end}에 끝나요` : "";
+    router.push(draft.location ? "/create/people" : "/create/place");
   };
 
   return (
-    <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
-      <CreateStepHeader step={3} backHref="/home" confirmLeave />
-
-      <div className="px-[18px] py-[22px] flex flex-col">
-        <MemoryBubbles />
-        <h1 className="text-[22px] font-bold text-black">얼마나 걸릴까요?</h1>
-        <div className="h-5" />
-
-        <div className="flex flex-col gap-2.5">
-          {OPTIONS.map((opt) => (
-            <button
-              key={opt.label}
-              type="button"
-              onClick={() => choose(opt)}
-              className="w-full border border-gray-300 px-[18px] py-[19px] flex items-center justify-between cursor-pointer hover:bg-gray-50 active:bg-gray-100"
-            >
-              <span className="text-[20px] font-bold text-black">{opt.label}</span>
-              <span className="text-[15px] text-gray-500">{endLabel(opt.minutes)}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* 음성 대화로 장소가 이미 정해졌으면 장소 화면은 건너뛴다 — choose() 와 같은 규칙 */}
-        <CreateNavButtons
+    <CreateStep
+      step={3}
+      title={"활동은\n얼마나 걸릴까요?"}
+      footer={
+        <PrevNext
           backHref="/create/time"
           nextHref={(d) => (d.location ? "/create/people" : "/create/place")}
           requires="duration"
         />
+      }
+    >
+      <div className="mt-6 flex flex-col gap-3">
+        {OPTIONS.map((opt) => (
+          <OptionButton
+            key={opt.label}
+            full
+            label={opt.label}
+            sub={
+              opt.minutes == null
+                ? undefined
+                : computeEndClock(time, opt.minutes)
+                ? `${computeEndClock(time, opt.minutes)}에 끝나요`
+                : undefined
+            }
+            selected={draft.duration === opt.label}
+            onClick={() => choose(opt)}
+          />
+        ))}
       </div>
-    </WireframeLayout>
+    </CreateStep>
   );
 }

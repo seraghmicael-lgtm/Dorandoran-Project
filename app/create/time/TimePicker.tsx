@@ -2,8 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import SmartInput from "@/components/SmartInput";
-import CreateNavButtons from "@/components/CreateNavButtons";
+import PrevNext from "@/components/ds/PrevNext";
 import { updateDraft } from "@/lib/draft";
 import {
   KoreanClock,
@@ -76,7 +75,7 @@ function Wheel({
     <div className="relative flex-1">
       {/* 가운데 칸 표시 — 여기 있는 값이 고른 값이다 */}
       <div
-        className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 border-y-2 border-black"
+        className="pointer-events-none absolute inset-x-1 top-1/2 -translate-y-1/2 rounded-lg bg-accent-soft"
         style={{ height: ITEM_H }}
       />
       <div
@@ -98,8 +97,8 @@ function Wheel({
             onClick={() => {
               ref.current?.scrollTo({ top: values.indexOf(v) * ITEM_H, behavior: "smooth" });
             }}
-            className={`w-full snap-center flex items-center justify-center text-[24px] tabular-nums cursor-pointer ${
-              v === value ? "font-bold text-black" : "text-gray-400"
+            className={`relative w-full snap-center flex items-center justify-center text-[20px] tabular-nums cursor-pointer ${
+              v === value ? "font-bold text-accent" : "text-gray-400"
             }`}
             style={{ height: ITEM_H }}
           >
@@ -114,11 +113,9 @@ function Wheel({
 
 export default function TimePicker({
   floor,
-  suggestions,
 }: {
   /** 오늘 고를 수 있는 가장 이른 시각 — 서버가 한국 시각으로 계산해 내려준다 */
   floor: KoreanClock;
-  suggestions: string[];
 }) {
   const router = useRouter();
   const [clock, setClock] = useState<KoreanClock>(() => clampToday(floor, floor));
@@ -141,22 +138,21 @@ export default function TimePicker({
   return (
     <>
       {/* 고른 시각 — 굴릴 때마다 여기 글씨가 같이 바뀐다 */}
-      <p className="text-[22px] font-bold text-black text-center">{label}</p>
-      <div className="h-3" />
+      <p className="mt-8 text-[26px] font-bold text-black text-center">{label}</p>
 
-      <div className="flex items-stretch gap-2.5 border border-gray-300 px-2 py-1">
+      <div className="mt-5 flex items-stretch gap-1 rounded-2xl border border-gray-200 px-3 py-2">
         {/* 오전/오후는 두 개뿐이라 굴리지 않고 눌러서 고른다. 이미 지난 쪽은 아예 안 나온다 */}
-        <div className="flex-1 flex flex-col gap-1 py-1">
+        <div className="flex-1 flex flex-col justify-center gap-1 py-1">
           {meridiems.map((m) => (
             <button
               key={m}
               type="button"
               aria-pressed={clock.meridiem === m}
               onClick={() => set({ meridiem: m })}
-              className={`flex-1 flex items-center justify-center text-[19px] font-bold cursor-pointer border ${
+              className={`h-[48px] rounded-lg flex items-center justify-center text-[20px] cursor-pointer ${
                 clock.meridiem === m
-                  ? "bg-black text-white border-black"
-                  : "bg-white text-gray-500 border-gray-300 hover:bg-gray-50"
+                  ? "bg-accent-soft text-accent font-bold"
+                  : "text-gray-400"
               }`}
             >
               {m}
@@ -166,40 +162,27 @@ export default function TimePicker({
         <Wheel
           values={hours}
           value={clock.hour12}
-          format={(v) => `${v}시`}
+          format={(v) => `${v}`}
           onChange={(hour12) => set({ hour12 })}
           ariaLabel="시"
         />
         <Wheel
           values={minutes}
           value={clock.minute}
-          format={(v) => `${String(v).padStart(2, "0")}분`}
+          format={(v) => String(v).padStart(2, "0")}
           onChange={(minute) => set({ minute })}
           ariaLabel="분"
         />
       </div>
 
-      <p className="pt-2 text-[14px] text-gray-500 text-center">오늘 남은 시간만 고를 수 있어요</p>
-
-      <div className="h-3" />
-      <button
-        type="button"
-        onClick={() => choose(label)}
-        className="w-full h-[60px] bg-black text-white flex items-center justify-center text-[19px] font-bold cursor-pointer"
-      >
-        이 시간으로 할게요
-      </button>
-
-      <div className="h-[18px]" />
-      <SmartInput
-        placeholder="예) 오후 네 시 반"
-        hint="“네 시 반”처럼 쓰거나 말하셔도 돼요"
-        suggestions={suggestions}
-        onConfirm={choose}
-      />
+      <p className="mt-4 text-[15px] text-muted text-center">
+        오늘 남은 시간 중에서만 고를 수 있어요
+      </p>
 
       {/* 휠에 떠 있는 시각은 아직 저장 전이라, 다음이 그걸 확정하고 넘어간다 */}
-      <CreateNavButtons backHref="/create/activity" onNext={() => choose(label)} />
+      <div className="-mx-5 mt-auto">
+        <PrevNext backHref="/create/activity" onNext={() => choose(label)} />
+      </div>
     </>
   );
 }

@@ -18,6 +18,8 @@ export interface MeetupDraft {
   /** 말한 장소를 반경 5km 안에서 찾은 좌표 — 상세 화면의 지도·길찾기가 쓴다 */
   lat?: number;
   lng?: number;
+  /** cr-05 토글 — 최소 인원이 안 모여도 그냥 나갈지. 기본은 "간다" */
+  goAnyway?: boolean;
 }
 
 const KEY = "dorandoran_meetup_draft";
@@ -71,14 +73,14 @@ export function draftSnapshot(): string | null {
 
 /**
  * 메모리풍선에 걸 칩 목록 (Figma 941:980 순서: 할일 → 시간 → 모임시간 → 장소 → 인원).
- * 소요시간 문구는 "1시간 걸려요" — 올렸어요 화면의 카드와 같은 말이다.
+ * 소요시간 칩은 "1시간 동안" (UI디자인 cr-04). 선택지 라벨의 "소요"는 떼고 붙인다.
  * 아직 안 정한 항목은 빼고, 하나도 없으면 빈 배열 — 화면은 아무것도 안 그린다.
  */
 export function memoryChips(d: MeetupDraft | null | undefined): string[] {
   return [
     d?.activity,
     d?.time,
-    d?.duration ? `${d.duration} 걸려요` : null,
+    d?.duration ? `${d.duration.replace(" 소요", "")} 동안` : null,
     d?.location,
     typeof d?.maxPeople === "number" ? `${d.maxPeople}명` : null,
   ].filter((v): v is string => typeof v === "string" && v.trim().length > 0);

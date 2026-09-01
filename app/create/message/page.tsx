@@ -2,14 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import WireframeLayout from "@/components/WireframeLayout";
-import CreateStepHeader from "@/components/CreateStepHeader";
-import MemoryBubbles from "@/components/MemoryBubbles";
-import CreateNavButtons from "@/components/CreateNavButtons";
+import CreateStep from "@/components/ds/CreateStep";
+import PrevNext from "@/components/ds/PrevNext";
 import { updateDraft } from "@/lib/draft";
 import { listenOnce, unlockAudio, ListenHandle } from "@/lib/voice";
 
-// 와이어프레임_v02 06_하실 말씀 있으세요
+// UI디자인 cr-06 (1089:7757) — 추가로 남길 얘기가 있나요?
 export default function CreateMessagePage() {
   const router = useRouter();
   const [text, setText] = useState("");
@@ -82,19 +80,6 @@ export default function CreateMessagePage() {
       ? "짧게 줄이고 있어요..."
       : "누르고 말하기";
 
-  const handleConfirm = () => {
-    const trimmed = text.trim();
-    if (!trimmed) return;
-    updateDraft({ message: trimmed });
-    router.push("/create/review");
-  };
-
-  const handleSkip = () => {
-    handleRef.current?.cancel();
-    updateDraft({ message: undefined }); // 앞서 넣었던 한마디가 남지 않게
-    router.push("/create/review");
-  };
-
   // 이 단계는 안 하셔도 되는 곳이라 다음은 늘 열려 있다.
   // 적어두신 게 있으면 담아가고, 없으면 비운 채로 넘어간다(건너뛸래요와 같다).
   const goNext = () => {
@@ -104,29 +89,24 @@ export default function CreateMessagePage() {
     router.push("/create/review");
   };
 
-  const hasText = text.trim().length > 0;
-
   return (
-    <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
-      <CreateStepHeader step={6} backHref="/home" confirmLeave />
-
-      <div className="px-[18px] py-[22px] flex flex-col">
-        <MemoryBubbles />
-        <h1 className="text-[22px] font-bold text-black">하실 말씀 있으세요?</h1>
-        <p className="text-[15px] text-gray-500 mt-1">안 하셔도 괜찮아요</p>
-        <div className="h-5" />
-
-        {/* 큰 입력 박스 — 검정 1px 테두리 하나로 묶임 */}
-        <div className="border border-black flex flex-col">
+    <CreateStep
+      step={6}
+      title={"추가로 남길\n얘기가 있나요?"}
+      footer={<PrevNext backHref="/create/people" onNext={goNext} stack />}
+    >
+      <div className="mt-6 flex flex-col">
+        {/* 큰 입력 박스 — 라운드 회색 필드 안에 말하기 줄이 붙는다 */}
+        <div className="rounded-xl border border-gray-200 overflow-hidden flex flex-col">
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="예) 천천히 걸을게요"
+            placeholder="예) 초보 환영합니다. 편하게 오세요"
             rows={4}
-            className="w-full p-4 text-base font-bold text-black placeholder:font-normal placeholder:text-gray-500 focus:outline-none resize-none"
+            className="w-full p-4 text-[16px] text-black placeholder:text-muted focus:outline-none resize-none"
           />
-          {/* 검정 상단 보더로 구분된 행 — 중앙 누르고 말하기 */}
-          <div className="border-t border-black flex justify-center">
+          {/* 아래 줄에 붙은 누르고 말하기 */}
+          <div className="border-t border-gray-200 bg-surface flex justify-center">
             <button
               type="button"
               onClick={handleVoice}
@@ -146,40 +126,11 @@ export default function CreateMessagePage() {
         {voiceError && (
           <>
             <div className="h-2" />
-            <p className="text-[14px] text-gray-500">{voiceError}</p>
+            <p className="text-[14px] text-muted">{voiceError}</p>
           </>
         )}
 
-        {/* 텍스트가 비어있지 않으면 검정 배경 흰 글씨 이걸로 할게요 */}
-        {hasText && (
-          <>
-            <div className="h-2.5" />
-            <button
-              type="button"
-              onClick={handleConfirm}
-              className="w-full py-[14px] bg-black text-white text-[15px] font-bold cursor-pointer"
-            >
-              이걸로 할게요
-            </button>
-          </>
-        )}
-
-        {/* 항상 표시 — 회색 테두리 건너뛸래요 */}
-        <div className="h-2.5" />
-        <button
-          type="button"
-          onClick={handleSkip}
-          className="w-full border border-gray-300 py-[14px] flex justify-center text-[15px] font-bold text-black cursor-pointer hover:bg-gray-50 active:bg-gray-100"
-        >
-          건너뛸래요
-        </button>
-
-        {/* 맨 아래 회색 안내문 */}
-        <div className="h-5" />
-        <p className="text-[15px] text-gray-500">여기에 남기신 한마디가 게시판에 그대로 보여요.</p>
-
-        <CreateNavButtons backHref="/create/people" onNext={goNext} />
       </div>
-    </WireframeLayout>
+    </CreateStep>
   );
 }

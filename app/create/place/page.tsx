@@ -2,18 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import WireframeLayout from "@/components/WireframeLayout";
-import CreateStepHeader from "@/components/CreateStepHeader";
-import MemoryBubbles from "@/components/MemoryBubbles";
-import CreateNavButtons from "@/components/CreateNavButtons";
+import CreateStep from "@/components/ds/CreateStep";
+import PrevNext from "@/components/ds/PrevNext";
 import SmartInput from "@/components/SmartInput";
 import GoogleMap from "@/components/GoogleMap";
 import { updateDraft } from "@/lib/draft";
 import { directionsUrl, findNearbyPlace, getCurrentOrigin, PlaceHit } from "@/lib/places";
 
-// 와이어프레임_v02 04_어디서 만날까요
-// 고정 카드 3개(송정마을 어귀 등) 대신 지도 + 검색으로 바꿨다 — 어느 동네에서 열든
-// 실제로 만날 수 있는 곳을 고르게 하려면 미리 박아둔 목록으로는 안 된다.
+// UI디자인 cr-04 (1089:7455) — 어디서 만날까요?
+// 미리 박아둔 목록이 아니라 지도 + 검색이다. 어느 동네에서 열든 실제로 만날 수 있는
+// 곳을 고르게 하려면 고정 목록으로는 안 된다.
 export default function CreatePlacePage() {
   const router = useRouter();
 
@@ -78,24 +76,19 @@ export default function CreatePlacePage() {
   const pin = result?.place ?? (origin ?? null);
 
   return (
-    <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
-      <CreateStepHeader step={4} backHref="/home" confirmLeave />
-
-      <div className="px-[18px] py-[22px] flex flex-col">
-        <MemoryBubbles />
-        <h1 className="text-[22px] font-bold text-black">어디서 만날까요?</h1>
-        <div className="h-5" />
-
-        {/* 검색칸을 제목 바로 밑에 둔다 — 이 화면의 첫 할 일이 "어디를 찾을지 말하기"다.
-            고를 목록이 없으니 "목록에 없으면" 머리말과 위 구분선도 뺀다. */}
+    <CreateStep
+      step={4}
+      title="어디서 만날까요?"
+      footer={<PrevNext backHref="/create/duration" nextHref="/create/people" requires="location" />}
+    >
+      <div className="mt-5 flex flex-col">
+        {/* 검색칸을 제목 바로 밑에 둔다 — 이 화면의 첫 할 일이 "어디를 찾을지 말하기"다 */}
         <SmartInput
-          label=""
-          divider={false}
-          placeholder="예) 도란공원 정문"
+          placeholder="예) 도란공원"
           hint={
             origin === null
-              ? "“도란공원 정문”처럼 만날 곳을 적어주세요"
-              : "“도란공원”처럼 쓰거나 말하시면 지도에서 찾아드려요"
+              ? "‘도란공원 정문’처럼 만날 곳을 적어주세요"
+              : "‘도란공원’처럼 쓰거나 말하면\n지도에서 찾아드릴게요"
           }
           // 위치를 모르면 검색이 아니라 적은 그대로 쓰는 것이므로 문구도 그렇게 말한다
           confirmLabel={searching ? "찾고 있어요..." : origin === null ? "이걸로 할게요" : "이 장소 찾기"}
@@ -103,12 +96,12 @@ export default function CreatePlacePage() {
           onConfirm={search}
         />
 
-        <div className="h-[18px]" />
+        <div className="h-4" />
 
         {pin ? (
-          <GoogleMap lat={pin.lat} lng={pin.lng} height="h-[420px]" className="border border-gray-300" />
+          <GoogleMap lat={pin.lat} lng={pin.lng} height="h-[300px]" className="rounded-xl" />
         ) : (
-          <div className="h-[420px] border border-gray-300 flex items-center justify-center text-[15px] text-gray-500 text-center px-6">
+          <div className="h-[300px] rounded-xl bg-surface flex items-center justify-center text-[15px] text-muted text-center px-6">
             {origin === undefined
               ? "지도를 준비하고 있어요..."
               : "위치를 몰라서 지도는 못 보여드려요. 위 칸에 만날 곳을 적어주세요."}
@@ -119,13 +112,13 @@ export default function CreatePlacePage() {
         {result?.place && (
           <>
             <div className="h-2.5" />
-            <div className="border border-black px-[18px] py-[15px] flex flex-col gap-0.5">
+            <div className="rounded-xl border border-accent bg-accent-soft px-4 py-4 flex flex-col gap-0.5">
               <span className="text-[19px] font-bold text-black">{result.place.name}</span>
               {result.place.address && (
-                <span className="text-[15px] text-gray-500">{result.place.address}</span>
+                <span className="text-[15px] text-muted">{result.place.address}</span>
               )}
               <div className="flex items-center justify-between gap-2">
-                <span className="text-[15px] text-gray-500">
+                <span className="text-[15px] text-muted">
                   {result.place.distanceM < 1000
                     ? `여기서 ${result.place.distanceM}m`
                     : `여기서 ${(result.place.distanceM / 1000).toFixed(1)}km`}
@@ -135,7 +128,7 @@ export default function CreatePlacePage() {
                   href={directionsUrl(result.place)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[15px] font-bold text-[#3D6B5A] underline-offset-2 hover:underline shrink-0"
+                  className="text-[15px] font-bold text-accent underline-offset-2 hover:underline shrink-0"
                 >
                   길찾기 &gt;
                 </a>
@@ -145,7 +138,7 @@ export default function CreatePlacePage() {
             <button
               type="button"
               onClick={() => choose(result.place!.name, result.place)}
-              className="w-full py-[18px] bg-black text-white text-[17px] font-bold cursor-pointer"
+              className="w-full h-[54px] rounded-lg bg-ink text-white text-[17px] font-bold cursor-pointer"
             >
               여기서 만날게요
             </button>
@@ -156,7 +149,7 @@ export default function CreatePlacePage() {
         {result && !result.place && (
           <>
             <div className="h-2.5" />
-            <div className="border border-gray-300 bg-gray-50 px-[18px] py-[15px] flex flex-col gap-2">
+            <div className="rounded-xl bg-surface px-4 py-4 flex flex-col gap-2">
               <p className="text-[15px] text-black">
                 <span className="font-bold">{result.query}</span> 은(는) 걸어서 갈 만한 곳(5km 안)에서
                 못 찾았어요.
@@ -164,7 +157,7 @@ export default function CreatePlacePage() {
               <button
                 type="button"
                 onClick={() => choose(result.query, null)}
-                className="w-full py-[14px] border border-black bg-white text-[15px] font-bold text-black cursor-pointer"
+                className="w-full h-[50px] rounded-lg border border-gray-300 bg-white text-[16px] font-bold text-black cursor-pointer"
               >
                 적은 그대로 쓸게요
               </button>
@@ -172,12 +165,7 @@ export default function CreatePlacePage() {
           </>
         )}
 
-        <CreateNavButtons
-          backHref="/create/duration"
-          nextHref="/create/people"
-          requires="location"
-        />
       </div>
-    </WireframeLayout>
+    </CreateStep>
   );
 }
