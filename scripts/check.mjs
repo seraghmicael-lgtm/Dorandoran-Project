@@ -495,6 +495,27 @@ try {
     ok(!(await withUid("/home")).includes("회귀검사 홈카드"), "홈: 취소된 동행은 사라진다");
   }
 
+  // 일러스트가 Figma 내보내기로 붙어 있는지 — 파일이 없으면 화면에 구멍이 난다
+  {
+    const assets = ["symbol", "logo", "welcome", "shield", "bell", "joined", "empty"];
+    for (const a of assets) {
+      const r = await fetch(`${BASE}/illust/${a}.svg`);
+      const body = r.ok ? await r.text() : "";
+      ok(r.ok && body.includes("<svg"), `일러스트 ${a}.svg 있음`);
+      // 내보내기 회색 배경(#626262)이 남아 있으면 그림 뒤에 회색 사각형이 깔린다
+      ok(!body.includes("#626262"), `일러스트 ${a}.svg 배경 아티팩트 없음`);
+    }
+    const uses = [
+      ["/splash", "symbol"],
+      ["/signup", "shield"],
+      ["/notification-permission", "bell"],
+      ["/welcome", "welcome"],
+    ];
+    for (const [path, asset] of uses) {
+      ok((await html(path)).includes(`/illust/${asset}.svg`), `${path}: ${asset} 사용`);
+    }
+  }
+
   // 시각은 항상 오전/오후 + 아라비아 숫자 — 뒤 화면의 끝시각 계산이 이 형식에 의존한다
   const r7 = await parse({ transcript: "네 시쯤에 봐요", time: null, location: null, activity: null });
   ok(/^(오전|오후) \d/.test(String(r7.time)) && computeEndClock(r7.time, 60) !== null,

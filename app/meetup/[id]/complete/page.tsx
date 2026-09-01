@@ -1,6 +1,6 @@
 import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
-import BrandMark from "@/components/ds/BrandMark";
+import { Illust } from "@/components/ds/BrandMark";
 
 // UI디자인 jn-04 (1084:5213) — 참여가 완료됐어요!
 export default async function MeetupCompletePage({
@@ -13,21 +13,7 @@ export default async function MeetupCompletePage({
   return (
     <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
       <div className="flex-1 px-5 flex flex-col items-center justify-center text-center">
-        <div className="relative">
-          <BrandMark size={120} />
-          {/* 완료 체크 — 마스코트 오른쪽 아래에 겹친다 */}
-          <span className="absolute -right-2 -bottom-1 w-11 h-11 rounded-full bg-accent-soft flex items-center justify-center">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path
-                d="M5 12.5l4.5 4.5L19 7.5"
-                stroke="#45B83C"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </span>
-        </div>
+        <Illust name="joined" size={160} />
 
         <h1 className="mt-8 text-[24px] font-bold text-black">참여가 완료됐어요!</h1>
         <p className="mt-3 text-[15px] text-muted leading-[1.6] whitespace-pre-line">

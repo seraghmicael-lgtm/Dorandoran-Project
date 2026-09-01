@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
 import MeetupCard from "@/components/ds/MeetupCard";
-import BrandMark from "@/components/ds/BrandMark";
+import BrandMark, { BrandWordmark, Illust } from "@/components/ds/BrandMark";
 import { prisma } from "@/lib/prisma";
 import { UID_COOKIE } from "@/lib/session";
 
@@ -50,7 +50,7 @@ export default async function HomePage() {
       <header className="h-[60px] px-5 flex items-center justify-between border-b border-gray-100 bg-white">
         <span className="flex items-center gap-1.5">
           <BrandMark size={26} />
-          <span className="text-[19px] font-bold text-brand-light">오늘마실</span>
+          <BrandWordmark width={86} />
         </span>
         <span aria-hidden="true">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -95,7 +95,7 @@ export default async function HomePage() {
         ) : (
           /* on-06_2 빈 상태 */
           <div className="flex-1 flex flex-col items-center justify-center text-center gap-6 pb-16">
-            <BrandMark size={120} />
+            <Illust name="empty" size={160} />
             <div className="flex flex-col gap-2">
               <p className="text-[20px] font-bold text-black">아직 열린 동행이 없어요</p>
               <p className="text-[15px] text-muted">먼저 하나 열어보실래요?</p>

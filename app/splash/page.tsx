@@ -1,13 +1,13 @@
 import WireframeLayout from "@/components/WireframeLayout";
 import StepFooter from "@/components/ds/StepFooter";
-import BrandMark from "@/components/ds/BrandMark";
+import BrandMark, { BrandWordmark } from "@/components/ds/BrandMark";
 
 // UI디자인 on-01 (1083:3746) — 첫 화면
 export default function SplashPage() {
   return (
     <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
       <div className="flex-1 px-5 flex flex-col items-center justify-center text-center gap-6">
-        <span className="text-[34px] font-bold text-[#5BC236] tracking-tight">오늘마실</span>
+        <BrandWordmark width={140} />
         <BrandMark size={100} />
         <div className="flex flex-col gap-3">
           <h1 className="text-[24px] font-bold text-black">오늘 같이할 사람 찾기</h1>
