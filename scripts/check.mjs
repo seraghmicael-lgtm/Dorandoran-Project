@@ -516,6 +516,23 @@ try {
     }
   }
 
+  // 위치 권한 화면의 지도 — 진짜 구글 지도(Static Maps)를 디자인 톤으로 깎아 쓴다
+  {
+    const h = await html("/location-permission");
+    const m = h.match(/https:\/\/maps\.googleapis\.com\/maps\/api\/staticmap[^"]*/);
+    ok(!!m, "위치 화면: Static Maps 이미지");
+    if (m) {
+      const url = m[0].replace(/&amp;/g, "&");
+      ok(url.includes("size=320x170") && url.includes("scale=2"), "지도: 디자인 크기(320x170@2x)");
+      ok((url.match(/&style=/g) ?? []).length >= 8, "지도: 디자인 스타일 적용");
+      ok(url.includes("key="), "지도: 키 포함");
+      // 실제로 이미지가 내려오는지 — 키·API 가 막히면 여기서 걸린다
+      const img = await fetch(url);
+      ok(img.ok && (img.headers.get("content-type") ?? "").startsWith("image/"), "지도: 이미지가 실제로 내려온다", String(img.status));
+    }
+    ok(h.includes("#4A90E2"), "지도: 위치 점 오버레이");
+  }
+
   // 시각은 항상 오전/오후 + 아라비아 숫자 — 뒤 화면의 끝시각 계산이 이 형식에 의존한다
   const r7 = await parse({ transcript: "네 시쯤에 봐요", time: null, location: null, activity: null });
   ok(/^(오전|오후) \d/.test(String(r7.time)) && computeEndClock(r7.time, 60) !== null,
