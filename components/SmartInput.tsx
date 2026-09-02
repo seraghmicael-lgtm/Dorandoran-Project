@@ -15,6 +15,7 @@ export default function SmartInput({
   confirmLabel = "이걸로 할게요",
   divider = false,
   onConfirm,
+  onVoice,
 }: {
   /** 빈 문자열이면 머리말을 아예 안 보여준다(디자인 기본) */
   label?: string;
@@ -25,6 +26,8 @@ export default function SmartInput({
   confirmLabel?: string;
   divider?: boolean;
   onConfirm: (value: string) => void;
+  /** 주면 말하기를 이 화면에서 처리한다(드롭업). 없으면 말하기 화면으로 넘어간다. */
+  onVoice?: () => void;
 }) {
   const router = useRouter();
   const [value, setValue] = useState("");
@@ -47,6 +50,11 @@ export default function SmartInput({
 
   const handleVoice = () => {
     unlockAudio();
+    if (onVoice) {
+      // 화면을 떠나지 않는다 — 이 자리에서 듣고 이 칸을 채운다
+      onVoice();
+      return;
+    }
     unlockAgentAudio();
     router.push("/create/listening");
   };

@@ -51,13 +51,13 @@ body {
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
 }
-@keyframes bar {
-  0%, 100% { transform: scaleY(0.45); }
-  50% { transform: scaleY(1); }
+@keyframes ring {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
 }
 @media (prefers-reduced-motion: reduce) {
   .animate-\[dropup_180ms_ease-out\],
-  .animate-\[bar_900ms_ease-in-out_infinite\] {
+  .animate-\[ring_1400ms_ease-in-out_infinite\] {
     animation: none;
   }
 }

@@ -20,7 +20,7 @@ import {
 } from "../lib/koreanTime.ts";
 import { ACTIVITY_SUGGESTIONS } from "../lib/activitySuggestions.ts";
 import { FIELD_QUESTIONS, OPENING_LINE, firstMissing, applyParse } from "../lib/meetupDialog.ts";
-import { directionsUrl } from "../lib/places.ts";
+import { directionsUrl, matchNearbyName } from "../lib/places.ts";
 import {
   memoryChips,
   saveDraft,
@@ -391,6 +391,17 @@ try {
   const p4 = await searchPlace("공원", NaN, NaN);
   ok(!p4.place && p4.reason === "no-origin", "장소 검색: 위치 없으면 no-origin");
 
+  // 말한 장소를 둘레의 진짜 지명에 맞춘다 — 음성 인식이 흘린 글자를 건진다
+  {
+    const near = ["도란공원", "행복나눔노인보호센터", "송정마을회관", "동네카페"];
+    ok(matchNearbyName("도란공원", near) === "도란공원", "지명 맞추기: 그대로 맞으면 그대로");
+    ok(matchNearbyName("도란 공원", near) === "도란공원", "지명 맞추기: 띄어쓰기 무시");
+    ok(matchNearbyName("행복나눔 노인보호센터", near) === "행복나눔노인보호센터", "지명 맞추기: 긴 이름");
+    ok(matchNearbyName("도란콩원", near) === "도란공원", "지명 맞추기: 한 글자 잘못 들어도");
+    ok(matchNearbyName("서울역", near) === null, "지명 맞추기: 다른 곳이면 건드리지 않는다");
+    ok(matchNearbyName("도란공원", []) === null, "지명 맞추기: 둘레 목록이 없으면 그대로");
+  }
+
   // 첫 진입 게이트 — 브라우저가 사이트를 새로 열면 어떤 주소든 스플래시부터다
   {
     // fetch 는 sec-fetch-* 를 못 붙인다(브라우저 전용 머리말) — 날것으로 요청한다
@@ -573,6 +584,11 @@ try {
     }
     // 하실 말씀 화면의 말하기도 같은 시트를 쓴다
     ok((await html("/create/message")).includes("누르고 말하기"), "하실 말씀: 마이크 버튼");
+
+    // 04_어디서 만날까요 — 마이크는 화면을 떠나지 않고 그 자리에서 듣는다
+    const place = await html("/create/place");
+    ok(!place.includes('href="/create/listening"'), "장소: 마이크가 말하기 화면으로 넘기지 않는다");
+    ok(place.includes('aria-label="말하기"'), "장소: 마이크 버튼");
   }
 
   // 시각은 항상 오전/오후 + 아라비아 숫자 — 뒤 화면의 끝시각 계산이 이 형식에 의존한다

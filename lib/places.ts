@@ -66,3 +66,43 @@ export function directionsUrl(
     `&travelmode=${travelmode}`
   );
 }
+
+/**
+ * 말씀하신 것을 둘레의 진짜 지명에 맞춰준다.
+ *
+ * 음성 인식은 동네 이름을 자주 놓친다("도란공원" → "도란 공원", "도란 콩원").
+ * 지금 계신 곳 둘레에서 받아둔 이름 목록(/api/places/nearby)에 가까운 것이 있으면
+ * 그것으로 바꿔 검색한다. 비슷한 게 없으면 말씀하신 그대로 둔다 — 마음대로 고쳐
+ * 엉뚱한 곳을 찾아주는 것이 못 찾는 것보다 나쁘다.
+ */
+export function matchNearbyName(spoken: string, names: string[]): string | null {
+  const norm = (s: string) => s.replace(/[\s.,·()]/g, "");
+  const q = norm(spoken);
+  if (q.length < 2 || names.length === 0) return null;
+
+  let best: { name: string; score: number } | null = null;
+  for (const name of names) {
+    const n = norm(name);
+    if (!n) continue;
+    let score: number;
+    if (n === q) score = 1;
+    else if (n.includes(q) || q.includes(n)) score = Math.min(n.length, q.length) / Math.max(n.length, q.length);
+    else {
+      // 글자가 얼마나 겹치는지 — 한두 글자 잘못 들은 것을 건진다
+      const rest = [...n];
+      let hit = 0;
+      for (const ch of q) {
+        const i = rest.indexOf(ch);
+        if (i >= 0) {
+          rest.splice(i, 1);
+          hit += 1;
+        }
+      }
+      score = hit / Math.max(n.length, q.length);
+    }
+    if (!best || score > best.score) best = { name, score };
+  }
+
+  // 절반도 안 겹치면 다른 곳을 말씀하신 것이다
+  return best && best.score >= 0.6 ? best.name : null;
+}

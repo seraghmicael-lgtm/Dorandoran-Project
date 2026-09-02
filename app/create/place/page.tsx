@@ -6,8 +6,15 @@ import CreateStep from "@/components/ds/CreateStep";
 import PrevNext from "@/components/ds/PrevNext";
 import SmartInput from "@/components/SmartInput";
 import GoogleMap from "@/components/GoogleMap";
+import VoiceSheet from "@/components/ds/VoiceSheet";
 import { updateDraft } from "@/lib/draft";
-import { directionsUrl, findNearbyPlace, getCurrentOrigin, PlaceHit } from "@/lib/places";
+import {
+  directionsUrl,
+  findNearbyPlace,
+  getCurrentOrigin,
+  matchNearbyName,
+  PlaceHit,
+} from "@/lib/places";
 
 // UI디자인 cr-04 (1089:7455) — 어디서 만날까요?
 // 미리 박아둔 목록이 아니라 지도 + 검색이다. 어느 동네에서 열든 실제로 만날 수 있는
@@ -24,6 +31,8 @@ export default function CreatePlacePage() {
   const [searching, setSearching] = useState(false);
   // 타이핑할 때 뜨는 후보 — 지금 계신 곳 둘레의 진짜 지명을 받아둔다
   const [nearby, setNearby] = useState<string[]>([]);
+  // 말하기는 이 화면 안에서 — 아래에서 올라오는 시트로 듣는다(cr-04)
+  const [voiceOpen, setVoiceOpen] = useState(false);
 
   useEffect(() => {
     getCurrentOrigin().then(setOrigin);
@@ -64,6 +73,9 @@ export default function CreatePlacePage() {
     }
   };
 
+  // 음성은 동네 이름을 자주 놓친다. 둘레의 진짜 지명 중 가까운 것이 있으면 그걸로 찾는다.
+  const searchSpoken = (spoken: string) => search(matchNearbyName(spoken, nearby) ?? spoken);
+
   const choose = (location: string, place: PlaceHit | null) => {
     updateDraft({
       location,
@@ -94,6 +106,7 @@ export default function CreatePlacePage() {
           confirmLabel={searching ? "찾고 있어요..." : origin === null ? "이걸로 할게요" : "이 장소 찾기"}
           suggestions={nearby}
           onConfirm={search}
+          onVoice={() => setVoiceOpen(true)}
         />
 
         <div className="h-4" />
@@ -166,6 +179,13 @@ export default function CreatePlacePage() {
         )}
 
       </div>
+
+      <VoiceSheet
+        open={voiceOpen}
+        onClose={() => setVoiceOpen(false)}
+        onResult={searchSpoken}
+        hint="만날 곳을 말씀하세요"
+      />
     </CreateStep>
   );
 }
