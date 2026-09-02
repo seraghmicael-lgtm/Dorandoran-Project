@@ -45,3 +45,19 @@ body {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* 말하기 시트 — 아래에서 올라오고, 듣는 동안 막대가 뛴다 */
+@keyframes dropup {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes bar {
+  0%, 100% { transform: scaleY(0.45); }
+  50% { transform: scaleY(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-\[dropup_180ms_ease-out\],
+  .animate-\[bar_900ms_ease-in-out_infinite\] {
+    animation: none;
+  }
+}

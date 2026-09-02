@@ -535,6 +535,18 @@ try {
     ok(h.includes("#4A90E2"), "지도: 위치 점 오버레이");
   }
 
+  // 말하기 화면 — cr-01 껍데기에 마이크 하나. 옛 음성 화면의 잡다한 조작은 없어야 한다
+  {
+    const h = await html("/create/listening");
+    ok(h.includes("어떤 활동을"), "말하기: cr-01 제목");
+    ok(h.includes("누르고 말하기"), "말하기: 마이크 버튼");
+    for (const gone of ["글자로 입력하셔도 돼요", "다시 말할래요", "고치기", "올리기"]) {
+      ok(!h.includes(gone), `말하기: 옛 조작 제거(${gone})`);
+    }
+    // 하실 말씀 화면의 말하기도 같은 시트를 쓴다
+    ok((await html("/create/message")).includes("누르고 말하기"), "하실 말씀: 마이크 버튼");
+  }
+
   // 시각은 항상 오전/오후 + 아라비아 숫자 — 뒤 화면의 끝시각 계산이 이 형식에 의존한다
   const r7 = await parse({ transcript: "네 시쯤에 봐요", time: null, location: null, activity: null });
   ok(/^(오전|오후) \d/.test(String(r7.time)) && computeEndClock(r7.time, 60) !== null,
