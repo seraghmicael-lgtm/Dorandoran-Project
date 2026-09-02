@@ -1,21 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// 첫 진입 게이트: 어떤 주소로 들어와도 이 브라우저 세션에서 아직 01_스플래시를
-// 거치지 않았다면 /splash 로 보낸다. /splash 방문 시 세션 쿠키를 심어 이후
-// 01→02→03 순서대로 자유롭게 이동할 수 있다. (세션 쿠키라 브라우저를 새로 열면
-// 앱 실행처럼 다시 스플래시부터 시작한다.)
-const ENTRY_COOKIE = "dn_entered";
-
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
-  if (pathname === "/splash") {
-    const res = NextResponse.next();
-    res.cookies.set(ENTRY_COOKIE, "1", { path: "/", sameSite: "lax" });
-    return res;
+// 첫 진입 게이트: 주소창·북마크·바깥 링크로 이 사이트를 새로 열면 어떤 주소든
+// 무조건 01_스플래시부터 보여준다. 앱을 켜면 늘 첫 화면이 뜨는 것과 같다.
+// 사이트 안에서 눌러 넘어가는 것(같은 출처)은 그대로 통과시킨다.
+function isSiteEntry(request: NextRequest): boolean {
+  const mode = request.headers.get("sec-fetch-mode");
+  if (mode) {
+    // 요즘 브라우저 — 문서를 새로 여는 이동인데 우리 사이트에서 온 게 아니면 첫 진입
+    return mode === "navigate" && request.headers.get("sec-fetch-site") !== "same-origin";
   }
 
-  if (!request.cookies.has(ENTRY_COOKIE)) {
+  // Sec-Fetch-* 를 안 보내는 예전 브라우저 대비.
+  // 화면(HTML)을 달라는 요청만 따진다 — 데이터 요청은 게이트 대상이 아니다.
+  if (!(request.headers.get("accept") ?? "").includes("text/html")) return false;
+  const referer = request.headers.get("referer");
+  if (!referer) return true;
+  try {
+    return new URL(referer).host !== request.headers.get("host");
+  } catch {
+    return true;
+  }
+}
+
+export function middleware(request: NextRequest) {
+  if (request.nextUrl.pathname === "/splash") return NextResponse.next();
+
+  if (isSiteEntry(request)) {
     const url = request.nextUrl.clone();
     url.pathname = "/splash";
     url.search = "";

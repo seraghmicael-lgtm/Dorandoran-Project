@@ -1,6 +1,7 @@
 // 회귀 검증: 유닛(koreanTime·meetupDialog) + 파서 계약(/api/parse-meetup).
 // 사용법: 서버 켠 상태에서 `npm run check` (BASE_URL 환경변수로 대상 변경 가능)
 // LLM 응답은 비결정적이므로 계약 검사는 "포함/비어있음" 수준의 느슨한 단언만 쓴다.
+import http from "node:http";
 import {
   computeEndTime,
   computeEndClock,
@@ -390,9 +391,36 @@ try {
   const p4 = await searchPlace("공원", NaN, NaN);
   ok(!p4.place && p4.reason === "no-origin", "장소 검색: 위치 없으면 no-origin");
 
+  // 첫 진입 게이트 — 브라우저가 사이트를 새로 열면 어떤 주소든 스플래시부터다
+  {
+    // fetch 는 sec-fetch-* 를 못 붙인다(브라우저 전용 머리말) — 날것으로 요청한다
+    const raw = (headers) =>
+      new Promise((resolve, reject) => {
+        const url = new URL(`${BASE}/home`);
+        const req = http.request(
+          { hostname: url.hostname, port: url.port, path: url.pathname, headers },
+          (res) => {
+            res.resume();
+            resolve({ status: res.statusCode, location: res.headers.location ?? "" });
+          },
+        );
+        req.on("error", reject);
+        req.end();
+      });
+    const nav = (site) =>
+      raw({ "sec-fetch-mode": "navigate", "sec-fetch-site": site, accept: "text/html" });
+    for (const site of ["none", "cross-site", "same-site"]) {
+      const res = await nav(site);
+      ok(res.status === 307 && res.location.endsWith("/splash"), `첫 진입(${site}): 스플래시로 보낸다`);
+    }
+    ok((await nav("same-origin")).status === 200, "사이트 안 이동: 그대로 통과");
+    const oldBrowser = await raw({ accept: "text/html", referer: `${BASE}/splash` });
+    ok(oldBrowser.status === 200, "예전 브라우저: 우리 화면에서 온 이동은 통과");
+  }
+
   // 04_어디서 만날까요는 지도+검색으로 바뀌었다. 나머지 화면은 목록형 그대로여야 한다.
   const html = async (path) => {
-    const res = await fetch(`${BASE}${path}`, { headers: { cookie: "dn_entered=1" } });
+    const res = await fetch(`${BASE}${path}`);
     if (!res.ok) throw new Error(`HTTP ${res.status} ${path}`);
     return res.text();
   };
@@ -469,7 +497,7 @@ try {
     const made = await res.json();
     const withUid = async (path) => {
       const r = await fetch(`${BASE}${path}`, {
-        headers: { cookie: `dn_entered=1${uid ? `; uid=${uid}` : ""}` },
+        headers: uid ? { cookie: `uid=${uid}` } : {},
       });
       return r.text();
     };
