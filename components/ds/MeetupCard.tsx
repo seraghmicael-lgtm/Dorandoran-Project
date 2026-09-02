@@ -24,6 +24,8 @@ export default function MeetupCard({
   footer?: React.ReactNode;
 }) {
   const clock = startTime.replace(/^오늘\s*/, "").split(" ~ ")[0];
+  // "도란공원 정문 · 걸어서 8분" — 도보 시간은 연초록 배지로 떼어낸다(새 디자인)
+  const [place, walk] = (locationName ?? "").split(" · ");
 
   const body = (
     <>
@@ -48,13 +50,18 @@ export default function MeetupCard({
             예상 시간 {duration}
           </span>
         )}
-        {locationName && (
+        {place && (
           <span className="flex items-center gap-1.5">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11Z" stroke="currentColor" strokeWidth="2" />
               <circle cx="12" cy="10" r="2.5" stroke="currentColor" strokeWidth="2" />
             </svg>
-            {locationName}
+            {place}
+            {walk && (
+              <span className="px-1.5 py-0.5 rounded bg-accent-soft text-accent text-[13px] font-bold">
+                {walk}
+              </span>
+            )}
           </span>
         )}
       </div>

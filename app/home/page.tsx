@@ -3,6 +3,7 @@ import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
 import MeetupCard from "@/components/ds/MeetupCard";
 import BrandMark, { BrandWordmark, Illust } from "@/components/ds/BrandMark";
+import AdBanner from "@/components/ds/AdBanner";
 import { prisma } from "@/lib/prisma";
 import { UID_COOKIE } from "@/lib/session";
 
@@ -80,16 +81,19 @@ export default async function HomePage() {
 
         {meetups.length > 0 ? (
           <div className="mt-4 flex flex-col gap-3 pb-6">
-            {meetups.map((m) => (
-              <MeetupCard
-                key={m.id}
-                id={m.id}
-                startTime={m.startTime}
-                activity={m.activity}
-                locationName={m.locationName}
-                joined={m._count.participants}
-                maxPeople={m.maxPeople}
-              />
+            {meetups.map((m, i) => (
+              <div key={m.id} className="contents">
+                <MeetupCard
+                  id={m.id}
+                  startTime={m.startTime}
+                  activity={m.activity}
+                  locationName={m.locationName}
+                  joined={m._count.participants}
+                  maxPeople={m.maxPeople}
+                />
+                {/* 카드 세 장마다 동네광고 한 자리 (on-06) */}
+                {i % 3 === 2 && <AdBanner />}
+              </div>
             ))}
           </div>
         ) : (

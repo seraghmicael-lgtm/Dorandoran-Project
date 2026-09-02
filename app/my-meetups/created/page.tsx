@@ -2,11 +2,12 @@ import { cookies } from "next/headers";
 import WireframeLayout from "@/components/WireframeLayout";
 import MeetupCard from "@/components/ds/MeetupCard";
 import MyMeetupTabs from "@/components/ds/MyMeetupTabs";
-import CancelCreatedButton from "@/components/CancelCreatedButton";
+import AdBanner from "@/components/ds/AdBanner";
+import PastCard from "@/components/ds/PastCard";
 import { prisma } from "@/lib/prisma";
 import { UID_COOKIE } from "@/lib/session";
 
-// UI디자인 MY-02 (1100:10455) — 만든 동행
+// UI디자인 MY-02 (1123:3153) — 만든 동행
 export const dynamic = "force-dynamic";
 
 const fmtCancelDate = (d: Date | null) =>
@@ -71,7 +72,6 @@ export default async function MyMeetupsCreatedPage() {
                 locationName={m.locationName}
                 joined={m._count.participants}
                 maxPeople={m.maxPeople}
-                footer={<CancelCreatedButton meetupId={m.id} />}
               />
             ))
           ) : (
@@ -79,22 +79,18 @@ export default async function MyMeetupsCreatedPage() {
           )}
         </section>
 
+        <AdBanner />
+
         {closed.length > 0 && (
           <section className="flex flex-col gap-3">
-            <h2 className="text-[17px] font-bold text-black">완료</h2>
+            <h2 className="text-[17px] font-bold text-black">지난 동행</h2>
             {closed.map((m) => (
-              <div key={m.id} className="flex flex-col gap-1.5">
-                <span className="text-[14px] font-bold text-accent">
-                  {fmtCancelDate(m.cancelledAt)} 취소되었어요
-                </span>
-                <MeetupCard
-                  id={m.id}
-                  startTime={m.startTime}
-                  activity={m.activity}
-                  joined={m._count.participants}
-                  maxPeople={m.maxPeople}
-                />
-              </div>
+              <PastCard
+                key={m.id}
+                id={m.id}
+                activity={m.activity}
+                note={`${fmtCancelDate(m.cancelledAt)} 취소하셨어요`}
+              />
             ))}
           </section>
         )}

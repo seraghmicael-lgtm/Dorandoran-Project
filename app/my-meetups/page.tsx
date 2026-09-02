@@ -1,12 +1,13 @@
-import Link from "next/link";
 import { cookies } from "next/headers";
 import WireframeLayout from "@/components/WireframeLayout";
 import MeetupCard from "@/components/ds/MeetupCard";
 import MyMeetupTabs from "@/components/ds/MyMeetupTabs";
+import AdBanner from "@/components/ds/AdBanner";
+import PastCard from "@/components/ds/PastCard";
 import { prisma } from "@/lib/prisma";
 import { UID_COOKIE } from "@/lib/session";
 
-// UI디자인 MY-01 (1100:10410) — 참여한 동행
+// UI디자인 MY-01 (1123:2189) — 참여한 동행
 export const dynamic = "force-dynamic";
 
 export default async function MyMeetupsPage() {
@@ -62,14 +63,6 @@ export default async function MyMeetupsPage() {
                 locationName={m.locationName}
                 joined={m._count.participants}
                 maxPeople={m.maxPeople}
-                footer={
-                  <Link
-                    href="/my-meetups/cancel"
-                    className="text-[14px] text-muted underline-offset-2 hover:underline"
-                  >
-                    참여 취소하기
-                  </Link>
-                }
               />
             ))
           ) : (
@@ -77,18 +70,13 @@ export default async function MyMeetupsPage() {
           )}
         </section>
 
+        <AdBanner />
+
         {past.length > 0 && (
           <section className="flex flex-col gap-3">
             <h2 className="text-[17px] font-bold text-black">지난 동행</h2>
             {past.map((m) => (
-              <MeetupCard
-                key={m.id}
-                id={m.id}
-                startTime={m.startTime}
-                activity={m.activity}
-                joined={m._count.participants}
-                maxPeople={m.maxPeople}
-              />
+              <PastCard key={m.id} id={m.id} activity={m.activity} note="다녀오셨어요" />
             ))}
           </section>
         )}

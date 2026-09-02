@@ -33,7 +33,7 @@ export default function CancelCreatedButton({ meetupId }: { meetupId: string }) 
       <button
         type="button"
         onClick={() => setStage("confirm")}
-        className="text-[14px] text-muted underline-offset-2 hover:underline cursor-pointer"
+        className="w-full h-[54px] rounded-lg border border-gray-300 bg-white text-black flex items-center justify-center text-[17px] font-medium cursor-pointer"
       >
         만든 동행 취소하기
       </button>

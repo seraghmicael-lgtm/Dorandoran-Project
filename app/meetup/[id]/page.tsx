@@ -4,8 +4,11 @@ import WireframeLayout from "@/components/WireframeLayout";
 import { prisma } from "@/lib/prisma";
 import { directionsUrl } from "@/lib/places";
 import { UID_COOKIE } from "@/lib/session";
+import LeaveMeetupButton from "@/components/LeaveMeetupButton";
+import CancelCreatedButton from "@/components/CancelCreatedButton";
 
-// UI디자인 JN-02 (1084:4847) — 자세히 보기
+// UI디자인 JN-02 (1187:2902) — 자세히 보기
+// 정보 줄과 참여자 목록을 각각 연회색 라운드 상자로 묶는다(갱신된 디자인).
 // 라벨-값 표가 아니라 아이콘 한 줄씩. 한마디도 그 줄 안에 들어간다.
 const ROW_ICON = "w-[22px] h-[22px] shrink-0 mt-0.5 text-[#555]";
 
@@ -98,7 +101,7 @@ export default async function MeetupDetailPage({
         </div>
         <h1 className="mt-1 text-[24px] font-bold text-black">{activity}</h1>
 
-        <div className="mt-6 flex flex-col gap-4">
+        <div className="mt-6 rounded-2xl bg-surface px-4 py-4 flex flex-col gap-4">
           <Row
             icon={
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -165,7 +168,7 @@ export default async function MeetupDetailPage({
           )}
         </div>
 
-        <div className="mt-8">
+        <div className="mt-3 rounded-2xl bg-surface px-4 py-4">
           <p className="text-[17px] font-bold text-black">
             참여자 <span className="text-accent">{people.length}</span>
           </p>
@@ -190,28 +193,35 @@ export default async function MeetupDetailPage({
 
       <div className="px-5 pt-5 pb-4 flex flex-col gap-2.5">
         {joined ? (
-          <span className="w-full h-[54px] rounded-lg bg-gray-200 text-gray-500 flex items-center justify-center text-[17px] font-bold">
-            이미 참여했어요
-          </span>
+          // 개설자는 여기서 못 빠진다 — 동행 자체를 취소하는 것과 다르다
+          meetup?.creatorId === uid ? (
+            // 목록 카드에서 취소 링크가 빠졌으니(새 디자인) 개설자의 취소는 여기가 유일한 길이다
+            <CancelCreatedButton meetupId={id} />
+          ) : (
+            <LeaveMeetupButton meetupId={id} />
+          )
         ) : people.length >= maxPeople ? (
           <span className="w-full h-[54px] rounded-lg bg-gray-200 text-gray-500 flex items-center justify-center text-[17px] font-bold">
             자리가 다 찼어요
           </span>
         ) : (
-          <Link
-            href={`/meetup/${id}/join`}
-            className="w-full h-[54px] rounded-lg bg-brand text-white flex items-center justify-center text-[17px] font-bold"
-          >
-            참여하기
-          </Link>
+          <>
+            <Link
+              href={`/meetup/${id}/join`}
+              className="w-full h-[54px] rounded-lg bg-brand text-white flex items-center justify-center text-[17px] font-bold"
+            >
+              참여하기
+            </Link>
+            <Link
+              href="/home"
+              className="w-full h-[54px] rounded-lg border border-gray-300 bg-white text-black flex items-center justify-center text-[17px] font-medium"
+            >
+              이전
+            </Link>
+          </>
         )}
-        <Link
-          href="/home"
-          className="w-full h-[54px] rounded-lg border border-gray-300 bg-white text-black flex items-center justify-center text-[17px] font-medium"
-        >
-          이전
-        </Link>
       </div>
+
     </WireframeLayout>
   );
 }

@@ -482,7 +482,9 @@ try {
 
     const created = await withUid("/my-meetups/created");
     ok(created.includes("회귀검사 홈카드"), "만든 동행: 내가 올린 게 보인다");
-    ok(created.includes("만든 동행 취소하기"), "만든 동행: 취소 링크");
+    // 새 디자인은 목록 카드에서 취소를 뺐다 — 취소는 상세 화면에서만
+    ok(!created.includes("만든 동행 취소하기"), "만든 동행: 카드에 취소 링크 없음");
+    ok((await withUid(`/meetup/${made.id}`)).includes("만든 동행 취소하기"), "상세: 개설자에게 취소 버튼");
 
     // 내가 만든 것은 "참여한 동행" 탭에 겹쳐 나오면 안 된다
     const joined = await withUid("/my-meetups");
