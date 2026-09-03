@@ -585,6 +585,21 @@ try {
     // 하실 말씀 화면의 말하기도 같은 시트를 쓴다
     ok((await html("/create/message")).includes("누르고 말하기"), "하실 말씀: 마이크 버튼");
 
+    // 버튼 크기 — 줄마다 flex 로 나누면 짝 없는 칸·세로로 쌓은 칸이 혼자 다른 크기가 된다
+    {
+      const act = await html("/create/activity");
+      ok(act.includes("grid grid-cols-2"), "활동: 선택칸은 두 칸 격자(혼자 남는 병원도 같은 너비)");
+      ok(!act.includes('<span class="flex-1"></span>'), "활동: 빈 자리채움 없음");
+
+      const msg = await html("/create/message");
+      const stacked = [...msg.matchAll(/class="([^"]*h-\[54px\][^"]*)"/g)].map((m) => m[1]);
+      ok(stacked.length === 2, "하실 말씀: 이전·다음 두 개");
+      ok(
+        stacked.every((c) => c.includes("w-full") && !c.includes("flex-1")),
+        "하실 말씀: 세로로 쌓아도 납작해지지 않는다",
+      );
+    }
+
     // 04_어디서 만날까요 — 마이크는 화면을 떠나지 않고 그 자리에서 듣는다
     const place = await html("/create/place");
     ok(!place.includes('href="/create/listening"'), "장소: 마이크가 말하기 화면으로 넘기지 않는다");

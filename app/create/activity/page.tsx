@@ -56,29 +56,18 @@ export default function CreateActivityPage() {
         />
       </div>
 
-      <div className="mt-4 flex flex-col gap-3">
-        {[0, 2, 4].map((i) => (
-          <div key={i} className="flex gap-3">
-            <OptionButton
-              label={OPTIONS[i]}
-              selected={chosen === OPTIONS[i]}
-              onClick={() => choose(OPTIONS[i])}
-            />
-            <OptionButton
-              label={OPTIONS[i + 1]}
-              selected={chosen === OPTIONS[i + 1]}
-              onClick={() => choose(OPTIONS[i + 1])}
-            />
-          </div>
-        ))}
-        <div className="flex gap-3">
+      {/* 두 칸 격자 — 홀수라 혼자 남는 마지막 칸(병원)도 나머지와 같은 너비다.
+          줄마다 flex 로 나누면 짝이 없는 칸이 padding 만큼 넓어진다. */}
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        {OPTIONS.map((option) => (
           <OptionButton
-            label={OPTIONS[6]}
-            selected={chosen === OPTIONS[6]}
-            onClick={() => choose(OPTIONS[6])}
+            key={option}
+            label={option}
+            full
+            selected={chosen === option}
+            onClick={() => choose(option)}
           />
-          <span className="flex-1" />
-        </div>
+        ))}
       </div>
     </CreateStep>
   );

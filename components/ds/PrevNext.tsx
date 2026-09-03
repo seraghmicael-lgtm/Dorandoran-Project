@@ -44,15 +44,19 @@ export default function PrevNext({
       ? true
       : typeof value === "string" && value.trim().length > 0;
 
+  // 세로로 쌓을 땐 flex-1 이 세로 축에 걸려 버튼이 납작해진다 — 그때는 가로만 채운다
+  const shape = stack ? "w-full" : "flex-1";
+
   const prev = (
     <button
       type="button"
       onClick={() => router.push(backHref)}
-      className="flex-1 h-[54px] rounded-lg border border-gray-300 bg-white text-black flex items-center justify-center text-[17px] font-medium cursor-pointer"
+      className={`${shape} h-[54px] rounded-lg border border-gray-300 bg-white text-black flex items-center justify-center text-[17px] font-medium cursor-pointer`}
     >
       이전
     </button>
   );
+  // [이전]에 테두리가 있어 그만큼 넓다 — [다음]에도 투명 테두리를 줘 폭을 맞춘다
   const next = (
     <button
       type="button"
@@ -62,7 +66,7 @@ export default function PrevNext({
         if (nextHref) router.push(typeof nextHref === "function" ? nextHref(draft) : nextHref);
       }}
       disabled={!canGoNext}
-      className="flex-1 h-[54px] rounded-lg bg-ink text-white flex items-center justify-center text-[17px] font-bold cursor-pointer disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+      className={`${shape} h-[54px] rounded-lg border border-transparent bg-ink text-white flex items-center justify-center text-[17px] font-bold cursor-pointer disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed`}
     >
       다음
     </button>
