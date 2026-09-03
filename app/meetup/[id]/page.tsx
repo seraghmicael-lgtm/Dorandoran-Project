@@ -1,25 +1,45 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import WireframeLayout from "@/components/WireframeLayout";
+import Field from "@/components/ds/Field";
 import { prisma } from "@/lib/prisma";
 import { directionsUrl } from "@/lib/places";
 import { UID_COOKIE } from "@/lib/session";
 import LeaveMeetupButton from "@/components/LeaveMeetupButton";
 import CancelCreatedButton from "@/components/CancelCreatedButton";
 
-// UI디자인 JN-02 (1187:2902) — 자세히 보기
-// 정보 줄과 참여자 목록을 각각 연회색 라운드 상자로 묶는다(갱신된 디자인).
-// 라벨-값 표가 아니라 아이콘 한 줄씩. 한마디도 그 줄 안에 들어간다.
-const ROW_ICON = "w-[22px] h-[22px] shrink-0 mt-0.5 text-[#555]";
+// UI디자인 JN-02 갱신분(1220:2291) — 자세히 보기
+// 라벨-값 한 줄 표 대신, 필드마다 "아이콘+라벨(+보조정보) → 굵은 값" 두 줄.
+// 한 회색 상자 안에 구분선으로 필드를 나눈다(검토 화면은 필드마다 상자가 따로다).
+const ICON_CLASS = "w-[15px] h-[15px] shrink-0";
 
-function Row({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
-  return (
-    <div className="flex items-start gap-2.5">
-      <span className={ROW_ICON}>{icon}</span>
-      <div className="flex-1 text-[16px] text-black leading-[1.5]">{children}</div>
-    </div>
-  );
-}
+const CLOCK = (
+  <svg className={ICON_CLASS} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
+    <path d="M12 7v5l3 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+  </svg>
+);
+const PIN = (
+  <svg className={ICON_CLASS} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11Z" stroke="currentColor" strokeWidth="2" />
+    <circle cx="12" cy="10" r="2.5" stroke="currentColor" strokeWidth="2" />
+  </svg>
+);
+const PEOPLE = (
+  <svg className={ICON_CLASS} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="12" cy="8" r="3.4" stroke="currentColor" strokeWidth="2" />
+    <path d="M5 19c.8-3.5 3.5-5.4 7-5.4s6.2 1.9 7 5.4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+  </svg>
+);
+const SPEECH = (
+  <svg className={ICON_CLASS} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M20 12a7 7 0 0 1-7 7H8l-4 3v-4.6A7 7 0 0 1 4 12a7 7 0 0 1 7-7h2a7 7 0 0 1 7 7Z"
+      stroke="currentColor"
+      strokeWidth="2"
+    />
+  </svg>
+);
 
 /** 자리·시간 상태 — 문구는 UI디자인의 상태 변형에서 가져왔다 */
 function statusOf(count: number, max: number, joined: boolean) {
@@ -42,6 +62,8 @@ export default async function MeetupDetailPage({
     startTime: string;
     locationName: string | null;
     maxPeople: number;
+    duration: string | null;
+    goAnyway: boolean;
     message: string | null;
     lat: number | null;
     lng: number | null;
@@ -58,6 +80,8 @@ export default async function MeetupDetailPage({
         startTime: true,
         locationName: true,
         maxPeople: true,
+        duration: true,
+        goAnyway: true,
         message: true,
         lat: true,
         lng: true,
@@ -74,8 +98,9 @@ export default async function MeetupDetailPage({
 
   const activity = meetup?.activity ?? "뜨개질 같이 해요";
   const startTime = meetup?.startTime ?? "오늘 오후 3시 ~ 4시";
-  const placeName = meetup?.locationName?.split(" · ")[0] ?? "동사무소 시민 회의실";
+  const [placeName, walk] = (meetup?.locationName ?? "동사무소 시민 회의실 · 걸어서 8분").split(" · ");
   const maxPeople = meetup?.maxPeople ?? 3;
+  const goAnyway = meetup?.goAnyway ?? true;
   const people = meetup?.participants ?? [];
   const joined = Boolean(uid && people.some((p) => p.userId === uid));
   const status = statusOf(people.length, maxPeople, joined);
@@ -101,70 +126,37 @@ export default async function MeetupDetailPage({
         </div>
         <h1 className="mt-1 text-[24px] font-bold text-black">{activity}</h1>
 
-        <div className="mt-6 rounded-2xl bg-surface px-4 py-4 flex flex-col gap-4">
-          <Row
-            icon={
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8" />
-                <path d="M12 7v5l3 2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-              </svg>
-            }
-          >
-            {startTime}
-          </Row>
+        <div className="mt-6 rounded-2xl bg-surface px-4 py-3 flex flex-col divide-y divide-gray-200">
+          <div className="py-2.5">
+            <Field icon={CLOCK} label="걸리는 시간" meta={startTime} value={meetup?.duration ?? "미정"} />
+          </div>
 
-          <Link
-            href={directionsUrl({ lat: meetup?.lat, lng: meetup?.lng, name: placeName })}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-start gap-2.5"
-          >
-            <span className={ROW_ICON}>
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path
-                  d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11Z"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                />
-                <circle cx="12" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.8" />
-              </svg>
-            </span>
-            <span className="flex-1 text-[16px] text-black leading-[1.5]">
-              {meetup?.locationName ?? "동사무소 시민 회의실 앞 주민센터 (걸어서 8분)"}
-            </span>
-            <span className="text-xl text-gray-400 leading-none mt-0.5">›</span>
-          </Link>
+          <div className="py-2.5">
+            <Field icon={PIN} label="만나는 곳" meta={walk} value={placeName}>
+              <Link
+                href={directionsUrl({ lat: meetup?.lat, lng: meetup?.lng, name: placeName })}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-flex items-center gap-1 px-3 h-8 rounded-lg bg-white border border-gray-200 text-[14px] font-bold text-black w-fit"
+              >
+                길찾기 ›
+              </Link>
+            </Field>
+          </div>
 
-          <Row
-            icon={
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <circle cx="12" cy="8" r="3.4" stroke="currentColor" strokeWidth="1.8" />
-                <path
-                  d="M5 19c.8-3.5 3.5-5.4 7-5.4s6.2 1.9 7 5.4"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                />
-              </svg>
-            }
-          >
-            {maxPeople}명 모여요
-          </Row>
+          <div className="py-2.5">
+            <Field
+              icon={PEOPLE}
+              label="모임인원"
+              meta={goAnyway ? "모두 안 모여도 함께해요" : "다 모여야 함께해요"}
+              value={`${maxPeople}명`}
+            />
+          </div>
 
           {meetup?.message && (
-            <Row
-              icon={
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path
-                    d="M20 12a7 7 0 0 1-7 7H8l-4 3v-4.6A7 7 0 0 1 4 12a7 7 0 0 1 7-7h2a7 7 0 0 1 7 7Z"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                  />
-                </svg>
-              }
-            >
-              <span className="whitespace-pre-line">{meetup.message}</span>
-            </Row>
+            <div className="py-2.5">
+              <Field icon={SPEECH} label="한마디" value={meetup.message} />
+            </div>
           )}
         </div>
 

@@ -42,6 +42,10 @@ function buildPayload(draft: MeetupDraft) {
     activity,
     locationName,
     ...(typeof draft.maxPeople === "number" ? { maxPeople: draft.maxPeople } : {}),
+    ...(typeof draft.duration === "string" && draft.duration.trim()
+      ? { duration: draft.duration.trim() }
+      : {}),
+    ...(typeof draft.goAnyway === "boolean" ? { goAnyway: draft.goAnyway } : {}),
     ...(typeof draft.message === "string" && draft.message.trim()
       ? { message: draft.message.trim() }
       : {}),

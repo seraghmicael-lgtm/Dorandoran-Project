@@ -68,6 +68,8 @@ export default function CreatePlacePage() {
     try {
       const r = await findNearbyPlace(q, origin);
       setResult({ query: q, place: r.place, reason: r.reason });
+      // 찾았으면 바로 확정한다 — 확인 버튼 없이 하단 [다음]이 곧장 켜진다
+      if (r.place) updateDraft({ location: r.place.name, lat: r.place.lat, lng: r.place.lng });
     } finally {
       setSearching(false);
     }
@@ -91,6 +93,7 @@ export default function CreatePlacePage() {
     <CreateStep
       step={4}
       title="어디서 만날까요?"
+      backHref="/create/duration"
       footer={<PrevNext backHref="/create/duration" nextHref="/create/people" requires="location" />}
     >
       <div className="mt-5 flex flex-col">
@@ -112,7 +115,13 @@ export default function CreatePlacePage() {
         <div className="h-4" />
 
         {pin ? (
-          <GoogleMap lat={pin.lat} lng={pin.lng} height="h-[300px]" className="rounded-xl" />
+          <GoogleMap
+            lat={pin.lat}
+            lng={pin.lng}
+            origin={origin ?? undefined}
+            height="h-[300px]"
+            className="rounded-xl"
+          />
         ) : (
           <div className="h-[300px] rounded-xl bg-surface flex items-center justify-center text-[15px] text-muted text-center px-6">
             {origin === undefined
@@ -121,11 +130,11 @@ export default function CreatePlacePage() {
           </div>
         )}
 
-        {/* 찾은 장소 확인 — 어르신이 눈으로 보고 결정한다 */}
+        {/* 찾은 장소 — 이미 확정됐다. 하단 [다음]을 누르면 그대로 넘어간다 */}
         {result?.place && (
           <>
             <div className="h-2.5" />
-            <div className="rounded-xl border border-accent bg-accent-soft px-4 py-4 flex flex-col gap-0.5">
+            <div className="rounded-xl bg-surface px-4 py-4 flex flex-col gap-0.5">
               <span className="text-[19px] font-bold text-black">{result.place.name}</span>
               {result.place.address && (
                 <span className="text-[15px] text-muted">{result.place.address}</span>
@@ -147,14 +156,6 @@ export default function CreatePlacePage() {
                 </a>
               </div>
             </div>
-            <div className="h-2.5" />
-            <button
-              type="button"
-              onClick={() => choose(result.place!.name, result.place)}
-              className="w-full h-[54px] rounded-lg bg-ink text-white text-[17px] font-bold cursor-pointer"
-            >
-              여기서 만날게요
-            </button>
           </>
         )}
 

@@ -46,6 +46,7 @@ export default function CreateActivityPage() {
     <CreateStep
       step={1}
       title={"어떤 활동을\n하고 싶으세요?"}
+      backHref="/home"
       footer={<PrevNext backHref="/home" nextHref="/create/time" requires="activity" />}
     >
       <div className="mt-5">

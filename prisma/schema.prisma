@@ -27,6 +27,8 @@ model Meetup {
   lat           Float?
   lng           Float?
   maxPeople     Int      @default(3)
+  duration      String?  // 03_얼마나 걸릴까요에서 고른 소요 시간 표기("1시간 소요")
+  goAnyway      Boolean  @default(true) // 05_몇 명이 함께할까요의 토글 — 최소 인원 미달이어도 성사할지
   status        String   @default("open") // open | matched | expired | cancelled
   message       String?  // 06_하실 말씀 — 게시판에 그대로 보이는 한마디
   cancelledAt   DateTime?

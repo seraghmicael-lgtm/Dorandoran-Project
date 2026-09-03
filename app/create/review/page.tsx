@@ -4,6 +4,7 @@ import { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import WireframeLayout from "@/components/WireframeLayout";
+import Field from "@/components/ds/Field";
 import {
   MeetupDraft,
   draftSnapshot,
@@ -11,13 +12,12 @@ import {
   subscribeDraft,
 } from "@/lib/draft";
 
-// UI디자인 CR-07 (1123:933) — 이렇게 올릴까요?
-// 라벨-값 한 줄씩 늘어놓고 마지막에 [이대로 올릴게요] / [고칠래요].
-function Row({ label, value }: { label: string; value: string }) {
+// UI디자인 CR-07 갱신분(1219:3583) — 이렇게 올릴까요?
+// 필드마다 연회색 둥근 박스 하나 — 상세보기(JN-02)와 같은 값 표시 방식.
+function FieldBox({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-start justify-between gap-4 py-3 border-b border-gray-100">
-      <span className="text-[15px] text-muted shrink-0">{label}</span>
-      <span className="text-[16px] text-black text-right whitespace-pre-line">{value}</span>
+    <div className="rounded-xl bg-surface px-4 py-3">
+      <Field label={label} value={value} />
     </div>
   );
 }
@@ -57,11 +57,11 @@ export default function CreateReviewPage() {
           <h1 className="text-[24px] font-bold text-black">{activity}</h1>
         </div>
 
-        <div className="mt-6 flex flex-col">
-          {draft.startTime && <Row label="걸리는 시간" value={draft.duration ?? draft.startTime} />}
-          {draft.maxPeople != null && <Row label="모임인원" value={`${draft.maxPeople}명`} />}
-          {draft.location && <Row label="만나는 곳" value={draft.location} />}
-          {draft.message && <Row label="한마디" value={draft.message} />}
+        <div className="mt-6 flex flex-col gap-3">
+          {draft.startTime && <FieldBox label="걸리는 시간" value={draft.duration ?? draft.startTime} />}
+          {draft.location && <FieldBox label="만나는 곳" value={draft.location} />}
+          {draft.maxPeople != null && <FieldBox label="모임인원" value={`${draft.maxPeople}명`} />}
+          {draft.message && <FieldBox label="한마디" value={draft.message} />}
         </div>
       </div>
 
@@ -71,7 +71,7 @@ export default function CreateReviewPage() {
           onClick={() => router.push("/create/posted")}
           className="w-full h-[54px] rounded-lg bg-ink text-white flex items-center justify-center text-[17px] font-bold cursor-pointer"
         >
-          이대로 올릴게요
+          다음
         </button>
         <Link
           href="/create/activity"

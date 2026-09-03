@@ -1,7 +1,6 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { useRouter } from "next/navigation";
 import CreateStep from "@/components/ds/CreateStep";
 import PrevNext from "@/components/ds/PrevNext";
 import OptionButton from "@/components/ds/OptionButton";
@@ -17,7 +16,6 @@ import {
 const OPTIONS = [3, 4, 5, 6, 7, 8];
 
 export default function CreatePeoplePage() {
-  const router = useRouter();
   const raw = useSyncExternalStore(subscribeDraft, draftSnapshot, noDraftOnServer);
   let draft: MeetupDraft = {};
   try {
@@ -26,10 +24,8 @@ export default function CreatePeoplePage() {
     draft = {};
   }
 
-  const choose = (n: number) => {
-    updateDraft({ maxPeople: n });
-    router.push("/create/message");
-  };
+  // 인원만 고르고 바로 넘기지 않는다 — 토글을 만질 시간을 준다. 다음은 하단 버튼으로.
+  const choose = (n: number) => updateDraft({ maxPeople: n });
 
   // 최소 인원이 안 모여도 그냥 나갈지 — 켜두면 인원과 상관없이 성사된다
   const goAnyway = draft.goAnyway ?? true;
@@ -39,6 +35,7 @@ export default function CreatePeoplePage() {
     <CreateStep
       step={5}
       title={"몇 명이 함께할까요?"}
+      backHref="/create/place"
       footer={<PrevNext backHref="/create/place" nextHref="/create/message" requires="maxPeople" />}
     >
       <p className="mt-8 text-[15px] text-muted text-center">나를 포함한 숫자예요</p>

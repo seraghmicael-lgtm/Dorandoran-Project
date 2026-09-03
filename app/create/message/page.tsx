@@ -26,37 +26,28 @@ export default function CreateMessagePage() {
     <CreateStep
       step={6}
       title={"추가로 남길\n얘기가 있나요?"}
+      backHref="/create/people"
       footer={<PrevNext backHref="/create/people" onNext={goNext} stack />}
     >
-      <p className="mt-2 text-[15px] text-muted">안 하셔도 괜찮아요</p>
-
-      <div className="mt-5 flex flex-col">
-        <div className="rounded-xl border border-gray-200 overflow-hidden flex flex-col">
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="예) 초보 환영합니다. 편하게 오세요"
-            rows={4}
-            className="w-full p-4 text-[16px] text-black placeholder:text-muted focus:outline-none resize-none"
-          />
-          <div className="border-t border-gray-200 bg-surface flex justify-center">
-            <button
-              type="button"
-              onClick={() => setSheetOpen(true)}
-              className="flex items-center gap-2 py-[14px] cursor-pointer"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <rect x="9" y="2" width="6" height="12" rx="3" fill="#555" />
-                <path d="M5 11a7 7 0 0 0 14 0M12 18v4" stroke="#555" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-              <span className="text-[15px] font-bold text-black">누르고 말하기</span>
-            </button>
-          </div>
-        </div>
-
-        <p className="mt-3 text-[15px] text-muted">
-          여기에 남기신 한마디가 게시판에 그대로 보여요.
-        </p>
+      <div className="mt-5 flex flex-col gap-3">
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="예) 초보 환영합니다. 편하게 오세요"
+          rows={4}
+          className="w-full p-4 rounded-xl border border-gray-200 text-[16px] text-black placeholder:text-muted focus:outline-none focus:border-accent resize-none"
+        />
+        <button
+          type="button"
+          onClick={() => setSheetOpen(true)}
+          className="w-full h-12 rounded-xl bg-brand flex items-center justify-center gap-2 cursor-pointer"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="9" y="2" width="6" height="12" rx="3" fill="#fff" />
+            <path d="M5 11a7 7 0 0 0 14 0M12 18v4" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+          <span className="text-[16px] font-bold text-white">말하기</span>
+        </button>
       </div>
 
       <VoiceSheet

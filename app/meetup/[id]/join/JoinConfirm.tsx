@@ -10,11 +10,13 @@ export default function JoinConfirm({
   activity,
   startTime,
   locationName,
+  duration,
 }: {
   id: string;
   activity: string;
   startTime: string;
   locationName: string;
+  duration?: string | null;
 }) {
   const router = useRouter();
   const [state, setState] = useState<"idle" | "sending" | "error">("idle");
@@ -54,7 +56,12 @@ export default function JoinConfirm({
         <div className="mt-7 w-full rounded-2xl border border-gray-200 px-4 py-4 flex flex-col gap-1">
           <span className="text-[15px] text-black">{startClock}</span>
           <span className="text-[20px] font-bold text-black">{activity}</span>
-          <span className="mt-2 text-[14px] text-muted">{startTime}</span>
+          {duration && (
+            <span className="mt-2 text-[14px] text-muted">예상 시간 {duration}</span>
+          )}
+          <span className={duration ? "text-[14px] text-muted" : "mt-2 text-[14px] text-muted"}>
+            {startTime}
+          </span>
           <span className="text-[14px] text-muted">{locationName}</span>
         </div>
 

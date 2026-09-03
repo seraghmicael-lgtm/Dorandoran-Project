@@ -453,7 +453,14 @@ try {
     const h = await html(path);
     ok(!h.includes("목록에 없으면"), `${path}: 옛 머리말 없음`);
     ok(h.includes(heading), `${path}: 새 제목`, heading);
-    ok(h.includes(`>${step}<!-- --> / 6</span>`), `${path}: 단계 배지 ${step}/6`);
+    // 진행 표시는 초록 알약("N/6")이 아니라 6칸 세그먼트 막대 — 지나온 칸까지 채워진다
+    const segs = [...h.matchAll(/rounded-full (bg-accent|bg-gray-100)"/g)].map((m) => m[1]).slice(0, 6);
+    ok(
+      segs.length === 6 &&
+        segs.every((c, i) => c === (i < step ? "bg-accent" : "bg-gray-100")),
+      `${path}: 진행 막대 ${step}/6 칸 채워짐`,
+      JSON.stringify(segs)
+    );
   }
 
   // JN 그룹: 상세 → 참여 확인 → 참여. 참여가 실제로 기록돼야 참여자 목록이 의미를 갖는다
@@ -582,8 +589,11 @@ try {
     for (const gone of ["글자로 입력하셔도 돼요", "다시 말할래요", "고치기", "올리기"]) {
       ok(!h.includes(gone), `말하기: 옛 조작 제거(${gone})`);
     }
-    // 하실 말씀 화면의 말하기도 같은 시트를 쓴다
-    ok((await html("/create/message")).includes("누르고 말하기"), "하실 말씀: 마이크 버튼");
+    // 하실 말씀 화면의 말하기도 같은 시트를 쓴다 — 새 디자인은 텍스트박스 밖 분리된 초록 버튼
+    const msgHtml = await html("/create/message");
+    ok(msgHtml.includes(">말하기<"), "하실 말씀: 마이크 버튼");
+    ok(!msgHtml.includes("안 하셔도 괜찮아요"), "하실 말씀: 옛 서브텍스트 제거");
+    ok(!msgHtml.includes("여기에 남기신 한마디"), "하실 말씀: 옛 안내문 제거");
 
     // 버튼 크기 — 줄마다 flex 로 나누면 짝 없는 칸·세로로 쌓은 칸이 혼자 다른 크기가 된다
     {
@@ -591,8 +601,7 @@ try {
       ok(act.includes("grid grid-cols-2"), "활동: 선택칸은 두 칸 격자(혼자 남는 병원도 같은 너비)");
       ok(!act.includes('<span class="flex-1"></span>'), "활동: 빈 자리채움 없음");
 
-      const msg = await html("/create/message");
-      const stacked = [...msg.matchAll(/class="([^"]*h-\[54px\][^"]*)"/g)].map((m) => m[1]);
+      const stacked = [...msgHtml.matchAll(/class="([^"]*h-\[54px\][^"]*)"/g)].map((m) => m[1]);
       ok(stacked.length === 2, "하실 말씀: 이전·다음 두 개");
       ok(
         stacked.every((c) => c.includes("w-full") && !c.includes("flex-1")),

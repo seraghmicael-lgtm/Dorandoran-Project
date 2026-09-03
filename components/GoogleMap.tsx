@@ -17,6 +17,8 @@ interface GoogleMapProps {
   className?: string;
   /** 서버 컴포넌트가 런타임 env에서 읽어 내려주는 키. 빌드타임 인라인에 의존하지 않는다. */
   apiKey?: string;
+  /** 지금 계신 곳 — 있으면 파란 반경 원(내 위치)을 함께 그린다 */
+  origin?: { lat: number; lng: number };
 }
 
 let scriptPromise: Promise<void> | null = null;
@@ -58,6 +60,7 @@ export default function GoogleMap({
   height = "h-[298px]",
   className = "rounded",
   apiKey: apiKeyProp,
+  origin,
 }: GoogleMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const [mapError, setMapError] = useState(false);
@@ -93,14 +96,42 @@ export default function GoogleMap({
         zoomControl: true,
       });
 
-      new window.google.maps.Marker({
-        position: location,
-        map,
-      });
+      // 찾은 장소가 지금 계신 곳과 다르면 빨간 핀으로 짚어준다
+      const isDestination =
+        origin && (Math.abs(origin.lat - lat) > 1e-6 || Math.abs(origin.lng - lng) > 1e-6);
+      if (isDestination) {
+        new window.google.maps.Marker({ position: location, map });
+      }
+
+      // 지금 계신 곳 — 구글 지도의 "내 위치" 표시(파란 점 + 반경 원)
+      if (origin) {
+        new window.google.maps.Circle({
+          center: origin,
+          radius: 80,
+          map,
+          strokeColor: "#4285F4",
+          strokeOpacity: 0.9,
+          strokeWeight: 1,
+          fillColor: "#4285F4",
+          fillOpacity: 0.18,
+        });
+        new window.google.maps.Marker({
+          position: origin,
+          map,
+          icon: {
+            path: window.google.maps.SymbolPath.CIRCLE,
+            scale: 7,
+            fillColor: "#4285F4",
+            fillOpacity: 1,
+            strokeColor: "#fff",
+            strokeWeight: 2,
+          },
+        });
+      }
     } catch {
       setMapError(true);
     }
-  }, [isLoaded, mapError, lat, lng]);
+  }, [isLoaded, mapError, lat, lng, origin]);
 
   if (!apiKey || mapError || lat == null || lng == null) {
     return (

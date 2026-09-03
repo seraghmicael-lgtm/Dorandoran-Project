@@ -52,6 +52,7 @@ export default function CreateDurationPage() {
     <CreateStep
       step={3}
       title={"활동은\n얼마나 걸릴까요?"}
+      backHref="/create/time"
       footer={
         <PrevNext
           backHref="/create/time"

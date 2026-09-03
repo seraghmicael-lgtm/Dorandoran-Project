@@ -51,6 +51,7 @@ export default function CreateListeningPage() {
     <CreateStep
       step={1}
       title={"어떤 활동을\n하고 싶으세요?"}
+      backHref="/create/activity"
       footer={<PrevNext backHref="/create/activity" nextHref="/create/time" requires="activity" />}
     >
       <div className="flex-1 flex flex-col items-center justify-center gap-6 py-10">

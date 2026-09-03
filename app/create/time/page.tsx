@@ -11,7 +11,7 @@ export default function CreateTimePage() {
   const floor = earliestToday(seoulNow());
 
   return (
-    <CreateStep step={2} title={"동행과 몇 시에\n만날까요?"} footer={null}>
+    <CreateStep step={2} title={"동행과 몇 시에\n만날까요?"} backHref="/create/activity" footer={null}>
       <TimePicker floor={floor} />
     </CreateStep>
   );
