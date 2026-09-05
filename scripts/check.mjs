@@ -532,6 +532,14 @@ try {
     ok(!created.includes("만든 동행 취소하기"), "만든 동행: 카드에 취소 링크 없음");
     ok((await withUid(`/meetup/${made.id}`)).includes("만든 동행 취소하기"), "상세: 개설자에게 취소 버튼");
 
+    // 상세보기 필드 갱신분(MY-01-01·MY-02-01·JN-02 1235:3022) — 아이콘 없이 라벨(소요시간) 표기,
+    // 길찾기가 값과 같은 줄에 붙는다
+    ok(created.includes("모두 모임") && created.includes("일부 모임") && created.includes("취소"), "만든 동행: 알림 팝업 프로토타입 트리거 3개");
+    const detailHtml = await withUid(`/meetup/${made.id}`);
+    ok(detailHtml.includes("걸리는 시간(소요시간)"), "상세: 라벨에 (소요시간) 표기");
+    ok(!/<svg[^>]*viewBox="0 0 24 24"[^>]*>\s*<circle cx="12" cy="12" r="9"/.test(detailHtml), "상세: 시계 아이콘 제거");
+    ok(detailHtml.includes("avatar-1.svg"), "상세: 참여자 아바타(Figma 내보내기)");
+
     // 내가 만든 것은 "참여한 동행" 탭에 겹쳐 나오면 안 된다
     const joined = await withUid("/my-meetups");
     ok(!joined.includes("회귀검사 홈카드"), "참여한 동행: 내가 만든 건 안 겹친다");

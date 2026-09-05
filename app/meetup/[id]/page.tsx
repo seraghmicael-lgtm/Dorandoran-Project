@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import WireframeLayout from "@/components/WireframeLayout";
@@ -8,38 +9,10 @@ import { UID_COOKIE } from "@/lib/session";
 import LeaveMeetupButton from "@/components/LeaveMeetupButton";
 import CancelCreatedButton from "@/components/CancelCreatedButton";
 
-// UI디자인 JN-02 갱신분(1220:2291) — 자세히 보기
-// 라벨-값 한 줄 표 대신, 필드마다 "아이콘+라벨(+보조정보) → 굵은 값" 두 줄.
-// 한 회색 상자 안에 구분선으로 필드를 나눈다(검토 화면은 필드마다 상자가 따로다).
-const ICON_CLASS = "w-[15px] h-[15px] shrink-0";
-
-const CLOCK = (
-  <svg className={ICON_CLASS} viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
-    <path d="M12 7v5l3 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-  </svg>
-);
-const PIN = (
-  <svg className={ICON_CLASS} viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11Z" stroke="currentColor" strokeWidth="2" />
-    <circle cx="12" cy="10" r="2.5" stroke="currentColor" strokeWidth="2" />
-  </svg>
-);
-const PEOPLE = (
-  <svg className={ICON_CLASS} viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <circle cx="12" cy="8" r="3.4" stroke="currentColor" strokeWidth="2" />
-    <path d="M5 19c.8-3.5 3.5-5.4 7-5.4s6.2 1.9 7 5.4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-  </svg>
-);
-const SPEECH = (
-  <svg className={ICON_CLASS} viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path
-      d="M20 12a7 7 0 0 1-7 7H8l-4 3v-4.6A7 7 0 0 1 4 12a7 7 0 0 1 7-7h2a7 7 0 0 1 7 7Z"
-      stroke="currentColor"
-      strokeWidth="2"
-    />
-  </svg>
-);
+// UI디자인 JN-02 갱신분(1235:3022 · MY-01-01 · MY-02-01) — 자세히 보기
+// 필드마다 "라벨(+보조정보) → 굵은 값" 두 줄, 라벨 앞 아이콘은 없다.
+// 참여자 아바타는 Figma 내보내기 그대로(색만 돌려 쓴다 — 역할과는 무관한 장식).
+const AVATARS = ["/illust/avatar-1.svg", "/illust/avatar-2.svg", "/illust/avatar-3.svg"];
 
 /** 자리·시간 상태 — 문구는 UI디자인의 상태 변형에서 가져왔다 */
 function statusOf(count: number, max: number, joined: boolean) {
@@ -128,52 +101,63 @@ export default async function MeetupDetailPage({
 
         <div className="mt-6 rounded-2xl bg-surface px-4 py-3 flex flex-col divide-y divide-gray-200">
           <div className="py-2.5">
-            <Field icon={CLOCK} label="걸리는 시간" meta={startTime} value={meetup?.duration ?? "미정"} />
-          </div>
-
-          <div className="py-2.5">
-            <Field icon={PIN} label="만나는 곳" meta={walk} value={placeName}>
-              <Link
-                href={directionsUrl({ lat: meetup?.lat, lng: meetup?.lng, name: placeName })}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-2 inline-flex items-center gap-1 px-3 h-8 rounded-lg bg-white border border-gray-200 text-[14px] font-bold text-black w-fit"
-              >
-                길찾기 ›
-              </Link>
-            </Field>
+            <Field label="걸리는 시간(소요시간)" meta={startTime} value={meetup?.duration ?? "미정"} />
           </div>
 
           <div className="py-2.5">
             <Field
-              icon={PEOPLE}
+              label="만나는 곳"
+              meta={walk}
+              value={placeName}
+              trailing={
+                <Link
+                  href={directionsUrl({ lat: meetup?.lat, lng: meetup?.lng, name: placeName })}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 inline-flex items-center gap-1 px-3 h-9 min-w-[90px] justify-center rounded-lg bg-white border border-gray-200 text-[14px] font-bold text-[#5b5b5b]"
+                >
+                  길찾기
+                  <Image src="/illust/chevron-right.svg" alt="" width={16} height={16} />
+                </Link>
+              }
+            />
+          </div>
+
+          <div className="py-2.5">
+            <Field
               label="모임인원"
-              meta={goAnyway ? "모두 안 모여도 함께해요" : "다 모여야 함께해요"}
+              meta={goAnyway ? "모두 안 모여도 함께 해요." : "다 모여야 함께해요"}
               value={`${maxPeople}명`}
             />
           </div>
 
           {meetup?.message && (
             <div className="py-2.5">
-              <Field icon={SPEECH} label="한마디" value={meetup.message} />
+              <Field label="한마디" value={meetup.message} />
             </div>
           )}
         </div>
 
         <div className="mt-3 rounded-2xl bg-surface px-4 py-4">
-          <p className="text-[17px] font-bold text-black">
-            참여자 <span className="text-accent">{people.length}</span>
+          <p className="text-[18px] font-medium text-black">
+            참여자 <span className="font-bold text-brand">{people.length}</span>
           </p>
           <ul className="mt-3 flex flex-col gap-3">
             {people.length === 0 && (
               <li className="text-[15px] text-muted">아직 아무도 없어요. 첫 번째가 되어 주세요.</li>
             )}
-            {people.map((p) => (
-              <li key={p.userId} className="flex items-center gap-2.5">
-                <span className="w-7 h-7 rounded-full bg-accent-soft" aria-hidden="true" />
-                <span className="text-[16px] text-black">{p.user.nickname}</span>
+            {people.map((p, i) => (
+              <li key={p.userId} className="flex items-center gap-2">
+                <Image
+                  src={AVATARS[i % AVATARS.length]}
+                  alt=""
+                  width={24}
+                  height={24}
+                  className="shrink-0 rounded-full"
+                />
+                <span className="text-[16px] text-muted">{p.user.nickname}</span>
                 {meetup?.creatorId === p.userId && (
-                  <span className="px-2 py-0.5 rounded bg-accent-soft text-accent text-[12px] font-bold">
+                  <span className="px-1.5 py-1 rounded bg-accent-soft text-accent text-[12px] font-medium leading-none">
                     개설자
                   </span>
                 )}

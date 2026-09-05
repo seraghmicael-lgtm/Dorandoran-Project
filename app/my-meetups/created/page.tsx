@@ -4,6 +4,7 @@ import MeetupCard from "@/components/ds/MeetupCard";
 import MyMeetupTabs from "@/components/ds/MyMeetupTabs";
 import AdBanner from "@/components/ds/AdBanner";
 import PastCard from "@/components/ds/PastCard";
+import PushDemo from "@/components/ds/PushDemo";
 import { prisma } from "@/lib/prisma";
 import { UID_COOKIE } from "@/lib/session";
 
@@ -57,6 +58,8 @@ export default async function MyMeetupsCreatedPage() {
 
   return (
     <WireframeLayout justify="start" className="flex flex-col">
+      {/* 프로토타입 — 알림 팝업(PUSH-01~03) 트리거. Figma 목업의 배경 화면이 이 화면이다 */}
+      <PushDemo />
       <MyMeetupTabs active="created" />
 
       <div className="flex-1 px-5 pt-5 flex flex-col gap-6 pb-6">
