@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import PushNotification from "./PushNotification";
 
@@ -30,8 +31,14 @@ export default function PushDemo() {
 
   return (
     <>
-      {/* 화면 오른쪽 바깥의 프로토타입 조작판 — 실제 UI가 아니다 */}
-      <div className="fixed right-2 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-2">
+      {/* 화면 오른쪽 위 바깥의 프로토타입 조작판 — 실제 UI가 아니다 */}
+      <div className="fixed right-2 top-16 z-40 flex flex-col gap-2">
+        <Link
+          href="/home"
+          className="px-2.5 py-1.5 rounded-full bg-black/70 text-white text-[11px] font-bold whitespace-nowrap text-center"
+        >
+          홈으로
+        </Link>
         {(Object.keys(VARIANTS) as VariantKey[]).map((key) => (
           <button
             key={key}
