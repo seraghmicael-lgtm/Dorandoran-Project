@@ -534,7 +534,14 @@ try {
 
     // 상세보기 필드 갱신분(MY-01-01·MY-02-01·JN-02 1235:3022) — 아이콘 없이 라벨(소요시간) 표기,
     // 길찾기가 값과 같은 줄에 붙는다
-    ok(created.includes("모두 모임") && created.includes("일부 모임") && created.includes("취소"), "만든 동행: 알림 팝업 프로토타입 트리거 3개");
+    // 알림 팝업 프로토타입은 WireframeLayout 에 박아 모든 화면에서 뜬다(만든 동행만이 아니다)
+    for (const path of ["/home", "/my-meetups", "/my-meetups/created", "/create/activity"]) {
+      const h = await html(path);
+      ok(
+        ["홈으로", "모두 모임", "일부 모임", "취소"].every((s) => h.includes(s)),
+        `${path}: 알림 팝업 프로토타입 조작판 노출`,
+      );
+    }
     const detailHtml = await withUid(`/meetup/${made.id}`);
     ok(detailHtml.includes("걸리는 시간(소요시간)"), "상세: 라벨에 (소요시간) 표기");
     ok(!/<svg[^>]*viewBox="0 0 24 24"[^>]*>\s*<circle cx="12" cy="12" r="9"/.test(detailHtml), "상세: 시계 아이콘 제거");

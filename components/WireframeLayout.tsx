@@ -3,6 +3,7 @@
 import React from "react";
 import { usePathname } from "next/navigation";
 import BottomNavFive from "./BottomNavFive";
+import PushDemo from "./ds/PushDemo";
 
 interface WireframeLayoutProps {
   children: React.ReactNode;
@@ -48,6 +49,8 @@ export default function WireframeLayout({
           {children}
         </div>
         {effectiveNav === "five" && <BottomNavFive active={activeTabFiveFor(pathname)} />}
+        {/* 프로토타입 알림 팝업 조작판 — 모든 화면이 이 레이아웃을 거치므로 여기 한 곳에 둔다 */}
+        <PushDemo />
       </div>
     </div>
   );
