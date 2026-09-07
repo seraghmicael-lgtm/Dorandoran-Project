@@ -41,11 +41,21 @@ export default function WireframeLayout({
 
   return (
     <div className="min-h-screen bg-gray-100 text-black flex justify-center items-start">
-      {/* 기준 프레임 360×800. 높이는 800을 하한으로만 쓰고 실제 화면이 더 길면 따라간다 —
-          800px 로 못 박으면 긴 폰에서 아래가 비고 짧은 폰에서 잘린다.
+      {/* 기준 프레임 360×800. 하단 탭이 있는 화면은 프레임 자체를 화면 높이에 고정하고
+          안쪽 콘텐츠만 스크롤한다 — ds_navigation_bottom 이 항상 바닥에 붙어 있어야 해서다.
+          탭이 없는 화면은 기존처럼 프레임이 내용 길이를 따라 늘어난다(높이는 800을
+          하한으로만 쓴다 — 못 박으면 긴 폰에서 아래가 비고 짧은 폰에서 잘린다).
           100svh 는 주소창이 접혔다 펴질 때 프레임이 튀지 않게 한다. */}
-      <div className="w-full max-w-[360px] min-h-[max(800px,100svh)] bg-white border-x border-gray-200 flex flex-col relative shadow-none font-sans text-sm">
-        <div className={`flex-1 flex flex-col ${JUSTIFY[justify]} ${ITEMS[items]} ${className}`}>
+      <div
+        className={`w-full max-w-[360px] bg-white border-x border-gray-200 flex flex-col relative shadow-none font-sans text-sm ${
+          effectiveNav === "five" ? "h-[100svh]" : "min-h-[max(800px,100svh)]"
+        }`}
+      >
+        <div
+          className={`flex-1 flex flex-col ${JUSTIFY[justify]} ${ITEMS[items]} ${className} ${
+            effectiveNav === "five" ? "overflow-y-auto" : ""
+          }`}
+        >
           {children}
         </div>
         {effectiveNav === "five" && <BottomNavFive active={activeTabFiveFor(pathname)} />}

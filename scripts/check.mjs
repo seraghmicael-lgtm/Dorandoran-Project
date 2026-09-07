@@ -567,15 +567,27 @@ try {
       ok(r.ok && body.includes("<svg"), `일러스트 ${a}.svg 있음`);
       // 내보내기 회색 배경(#626262)이 남아 있으면 그림 뒤에 회색 사각형이 깔린다
       ok(!body.includes("#626262"), `일러스트 ${a}.svg 배경 아티팩트 없음`);
+      // 프레임 크기 그대로인 흰 배경 rect 가 clipPath 밖에 하나 더 있으면
+      // 흰 바탕이 아닌 화면(스플래시 등)에서 흰 사각형이 그대로 비친다
+      const frameRects = body.match(/<rect width="360" height="800"/g) ?? [];
+      ok(frameRects.length <= 1, `일러스트 ${a}.svg 흰 배경 rect 중복 없음`, String(frameRects.length));
     }
     const uses = [
-      ["/splash", "symbol"],
       ["/signup", "shield"],
       ["/notification-permission", "bell"],
       ["/welcome", "welcome"],
     ];
     for (const [path, asset] of uses) {
       ok((await html(path)).includes(`/illust/${asset}.svg`), `${path}: ${asset} 사용`);
+    }
+
+    // 새 스플래시(1235:8623) — 로고·문구가 배경 그림에 함께 그려진 통짜 이미지 한 장
+    {
+      const r = await fetch(`${BASE}/illust/splash-bg.png`);
+      ok(r.ok && (r.headers.get("content-type") ?? "").includes("image/png"), "스플래시 배경 이미지 있음");
+      const splashHtml = await html("/splash");
+      ok(splashHtml.includes("splash-bg.png"), "/splash: 배경 이미지 사용");
+      ok(!splashHtml.includes("오늘 같이할 사람 찾기"), "/splash: 옛 문구 제거");
     }
   }
 
