@@ -538,7 +538,7 @@ try {
     for (const path of ["/home", "/my-meetups", "/my-meetups/created", "/create/activity"]) {
       const h = await html(path);
       ok(
-        ["홈으로", "모두 모임", "일부 모임", "취소"].every((s) => h.includes(s)),
+        ["첫화면", "홈으로", "모두 모임", "일부 모임", "취소"].every((s) => h.includes(s)),
         `${path}: 알림 팝업 프로토타입 조작판 노출`,
       );
     }

@@ -1,11 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
-import PushNotification from "./PushNotification";
+import PushLockScreen from "./PushLockScreen";
 
 // 프로토타입 전용 — 실제 발송 로직 없이 UI디자인의 PUSH-01/02/03 을 그 자리에서 띄워 본다.
-// 화면 오른쪽 밖에 트리거 버튼 3개를 두고, 누르면 지금 화면 위로 알림이 드롭다운된다.
+// 화면 오른쪽 밖에 트리거 버튼 3개를 두고, 누르면 폰이 잠긴 대기 화면 전체가 뜬다
+// (지금 화면 위 드롭다운이 아니다 — 알림이 오는 순간을 통째로 재현한다).
 const VARIANTS = {
   all: {
     label: "모두 모임",
@@ -33,12 +33,23 @@ export default function PushDemo() {
     <>
       {/* 화면 오른쪽 위 바깥의 프로토타입 조작판 — 실제 UI가 아니다 */}
       <div className="fixed right-2 top-16 z-40 flex flex-col gap-2">
-        <Link
-          href="/home"
-          className="px-2.5 py-1.5 rounded-full bg-black/70 text-white text-[11px] font-bold whitespace-nowrap text-center"
+        <button
+          type="button"
+          // Link 의 클라이언트 전환이 씹히는 경우가 있어(재현 안 됨) — 아예 하드 이동으로 확실히 보낸다
+          // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+          onClick={() => (window.location.href = "/splash")}
+          className="px-2.5 py-1.5 rounded-full bg-black/70 text-white text-[11px] font-bold cursor-pointer whitespace-nowrap"
+        >
+          첫화면
+        </button>
+        <button
+          type="button"
+          // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+          onClick={() => (window.location.href = "/home")}
+          className="px-2.5 py-1.5 rounded-full bg-black/70 text-white text-[11px] font-bold cursor-pointer whitespace-nowrap"
         >
           홈으로
-        </Link>
+        </button>
         {(Object.keys(VARIANTS) as VariantKey[]).map((key) => (
           <button
             key={key}
@@ -52,12 +63,11 @@ export default function PushDemo() {
       </div>
 
       {open && (
-        <div
-          className="absolute inset-0 z-30 bg-[rgba(123,123,123,0.7)] backdrop-blur-[1.5px] cursor-pointer"
-          onClick={() => setOpen(null)}
-        >
-          <PushNotification headline={VARIANTS[open].headline} sub={VARIANTS[open].sub} />
-        </div>
+        <PushLockScreen
+          headline={VARIANTS[open].headline}
+          sub={VARIANTS[open].sub}
+          onClose={() => setOpen(null)}
+        />
       )}
     </>
   );

@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-// UI디자인 push(1237:5916) — 드롭다운 알림. 화면은 그대로 두고 위에서 살짝 겹쳐 보여준다.
+// UI디자인 push(1237:5916) — 알림 카드. 배치는 쓰는 쪽(대기 화면 등)이 정한다.
 export default function PushNotification({
   headline,
   sub,
@@ -10,7 +10,7 @@ export default function PushNotification({
 }) {
   return (
     <div
-      className="absolute left-[10.5px] top-5 w-[340px] rounded-[20px] bg-white/80 backdrop-blur-[2px] shadow-[0_1px_6px_rgba(0,0,0,0.28)] px-3.5 py-4 flex gap-3 items-start"
+      className="relative w-full rounded-[20px] bg-white/80 backdrop-blur-[2px] shadow-[0_1px_6px_rgba(0,0,0,0.28)] px-3.5 py-4 flex gap-3 items-start"
       role="status"
     >
       <Image src="/illust/symbol.svg" alt="" width={42} height={42} className="shrink-0" />
