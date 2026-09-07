@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { UID_COOKIE } from "@/lib/session";
 
 // 만든 동행 취소 — 작성자 본인만 가능. status를 cancelled로 바꾸고 시각을 기록한다.
 export async function POST(
@@ -9,7 +10,7 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const uid = (await cookies()).get("uid")?.value;
+    const uid = (await cookies()).get(UID_COOKIE)?.value;
     if (!uid) {
       return NextResponse.json({ error: "no session" }, { status: 401 });
     }

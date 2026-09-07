@@ -69,7 +69,9 @@ export default function CancelCreatedButton({
                 </button>
                 <button
                   type="button"
-                  onClick={() => router.refresh()}
+                  // 이 상세 화면은 취소된 모임 기준으로 안 바뀐다(상태 필터 없음) — refresh 로 남으면
+                  // 방금 취소한 걸 또 취소할 수 있는 것처럼 보인다. 목록으로 보낸다.
+                  onClick={() => router.push("/my-meetups/created")}
                   className="w-full h-12 rounded-xl border border-gray-200 bg-white text-[#5b5b5b] text-[16px] font-bold cursor-pointer"
                 >
                   확인

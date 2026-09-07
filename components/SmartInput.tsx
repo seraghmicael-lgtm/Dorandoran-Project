@@ -14,6 +14,7 @@ export default function SmartInput({
   suggestions = [],
   confirmLabel = "이걸로 할게요",
   divider = false,
+  pending = false,
   onConfirm,
   onVoice,
 }: {
@@ -25,6 +26,8 @@ export default function SmartInput({
   /** 확인 버튼 문구. 바로 다음으로 가는 화면이 아니면 바꿔 쓴다(예: "이 장소 찾기") */
   confirmLabel?: string;
   divider?: boolean;
+  /** 확인 처리 중 — 버튼을 눌러도 반응 없는 것처럼 보이지 않게 막아둔다 */
+  pending?: boolean;
   onConfirm: (value: string) => void;
   /** 주면 말하기를 이 화면에서 처리한다(드롭업). 없으면 말하기 화면으로 넘어간다. */
   onVoice?: () => void;
@@ -112,7 +115,8 @@ export default function SmartInput({
           <button
             type="button"
             onClick={() => onConfirm(value.trim())}
-            className="w-full h-[50px] rounded-lg bg-ink text-white text-[16px] font-bold cursor-pointer"
+            disabled={pending}
+            className="w-full h-[50px] rounded-lg bg-ink text-white text-[16px] font-bold cursor-pointer disabled:opacity-60 disabled:cursor-default"
           >
             {confirmLabel}
           </button>
