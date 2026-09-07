@@ -9,18 +9,18 @@ import PushLockScreen from "./PushLockScreen";
 const VARIANTS = {
   all: {
     label: "모두 모임",
-    headline: "3시 산책동행, 정원이 모두 모였어요!",
-    sub: "즐거운 시간 보내세요.",
+    headline: "오후 3시 산책, 네 명이 다 모였어요",
+    sub: "30분 전에 다시 알려드릴게요.",
   },
   some: {
     label: "일부 모임",
-    headline: "3시 산책동행에 도란도란님 외 3명이 참여했어요",
-    sub: "30분 전에 다시 알려드릴게요.",
+    headline: "오후 3시 산책, 한 시간 남았어요",
+    sub: "도란도란님 외 1명이 함께 가세요.\n도란공원 정문에서 만나요.",
   },
   cancelled: {
     label: "취소",
-    headline: "오후 3시 산책동행은 열리지 않았어요",
-    sub: "같은 내용으로 다시 열어보실래요?",
+    headline: "오후 3시 산책, 아쉽게도\n열리지 않았어요",
+    sub: "조용히 내렸어요. 기록도 안 남았고요.\n같은 내용으로 다시 열어보실래요?",
   },
 } as const;
 

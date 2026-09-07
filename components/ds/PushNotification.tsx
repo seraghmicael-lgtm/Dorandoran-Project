@@ -16,8 +16,8 @@ export default function PushNotification({
       <Image src="/illust/symbol.svg" alt="" width={42} height={42} className="shrink-0" />
       <div className="flex flex-col gap-0.5 w-[215px]">
         <p className="text-[10px] font-medium tracking-[-0.1px] text-black">오늘 마실</p>
-        <p className="text-[14px] font-bold text-black leading-[1.4]">{headline}</p>
-        <p className="text-[12px] text-black leading-[1.25]">{sub}</p>
+        <p className="text-[14px] font-bold text-black leading-[1.4] whitespace-pre-line">{headline}</p>
+        <p className="text-[12px] text-black leading-[1.25] whitespace-pre-line">{sub}</p>
       </div>
       <Image
         src="/illust/chevron-up.svg"
