@@ -27,11 +27,19 @@ export default function MeetupCard({
   // "도란공원 정문 · 걸어서 8분" — 도보 시간은 연초록 배지로 떼어낸다(새 디자인)
   const [place, walk] = (locationName ?? "").split(" · ");
 
+  // ds_count — 여유 있으면 초록, 한 자리만 남았으면(임박) 빨강, 다 찼으면 회색
+  const countTone =
+    joined >= maxPeople
+      ? "bg-gray-100 text-gray-500"
+      : joined === maxPeople - 1
+      ? "bg-red-50 text-red-500"
+      : "bg-accent-faint text-accent";
+
   const body = (
     <>
       <div className="flex items-center justify-between gap-3">
         <span className="text-[15px] font-bold text-black">{clock}</span>
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent-faint text-accent text-[13px] font-bold">
+        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[13px] font-bold ${countTone}`}>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <circle cx="12" cy="8" r="3.4" stroke="currentColor" strokeWidth="2.4" />
             <path d="M5 19c.8-3.5 3.5-5.4 7-5.4s6.2 1.9 7 5.4" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
