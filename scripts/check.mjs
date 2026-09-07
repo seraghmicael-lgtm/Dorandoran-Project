@@ -530,7 +530,11 @@ try {
     ok(created.includes("회귀검사 홈카드"), "만든 동행: 내가 올린 게 보인다");
     // 새 디자인은 목록 카드에서 취소를 뺐다 — 취소는 상세 화면에서만
     ok(!created.includes("만든 동행 취소하기"), "만든 동행: 카드에 취소 링크 없음");
-    ok((await withUid(`/meetup/${made.id}`)).includes("만든 동행 취소하기"), "상세: 개설자에게 취소 버튼");
+    const creatorDetail = await withUid(`/meetup/${made.id}`);
+    ok(creatorDetail.includes("만든 동행 취소하기"), "상세: 개설자에게 취소 버튼");
+    // MY-03(취소 확인)→MY-04(취소 완료)는 React state 로 열리는 다이얼로그라 SSR HTML엔
+    // 안 잡힌다 — 취소 완료 그림이 실제로 내려오는지만 여기서 확인하고, 문구는 브라우저로 확인한다
+    ok((await fetch(`${BASE}/illust/cancelled.png`)).ok, "MY-04 취소완료 그림 있음");
 
     // 상세보기 필드 갱신분(MY-01-01·MY-02-01·JN-02 1235:3022) — 아이콘 없이 라벨(소요시간) 표기,
     // 길찾기가 값과 같은 줄에 붙는다
@@ -588,6 +592,11 @@ try {
       const splashHtml = await html("/splash");
       ok(splashHtml.includes("splash-bg.png"), "/splash: 배경 이미지 사용");
       ok(!splashHtml.includes("오늘 같이할 사람 찾기"), "/splash: 옛 문구 제거");
+
+      // 스플래시 다음은 on-01(/onboarding) — 문구+시작 버튼이 그리로 옮겨왔다
+      const onboardingHtml = await html("/onboarding");
+      ok(onboardingHtml.includes("오늘 같이할 사람 찾기"), "/onboarding: on-01 문구");
+      ok(onboardingHtml.includes("동네 인증하고 시작하기"), "/onboarding: 시작 버튼");
     }
   }
 

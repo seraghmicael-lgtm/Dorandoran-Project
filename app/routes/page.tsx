@@ -3,7 +3,8 @@ import WireframeLayout from "@/components/WireframeLayout";
 
 export default function RouteIndexPage() {
   const routes = [
-    { href: "/splash", label: "/splash (01_스플래시 & 진입)" },
+    { href: "/splash", label: "/splash (진입 · 순수 스플래시)" },
+    { href: "/onboarding", label: "/onboarding (on-01_오늘 같이할 사람 찾기)" },
     { href: "/location-permission", label: "/location-permission (02_위치 권한)" },
     { href: "/home", label: "/home (03_홈)" },
     { href: "/signup", label: "/signup (04_회원가입)" },

@@ -172,7 +172,13 @@ export default async function MeetupDetailPage({
           // 개설자는 여기서 못 빠진다 — 동행 자체를 취소하는 것과 다르다
           meetup?.creatorId === uid ? (
             // 목록 카드에서 취소 링크가 빠졌으니(새 디자인) 개설자의 취소는 여기가 유일한 길이다
-            <CancelCreatedButton meetupId={id} />
+            <CancelCreatedButton
+              meetupId={id}
+              participants={people.map((p) => ({
+                nickname: p.user.nickname,
+                isCreator: meetup?.creatorId === p.userId,
+              }))}
+            />
           ) : (
             <LeaveMeetupButton meetupId={id} />
           )
