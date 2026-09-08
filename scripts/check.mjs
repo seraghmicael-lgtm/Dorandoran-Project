@@ -597,12 +597,10 @@ try {
       ok(r.ok && (r.headers.get("content-type") ?? "").includes("image/png"), "스플래시 배경 이미지 있음");
       const splashHtml = await html("/splash");
       ok(splashHtml.includes("splash-bg.png"), "/splash: 배경 이미지 사용");
-      ok(!splashHtml.includes("오늘 같이할 사람 찾기"), "/splash: 옛 문구 제거");
-
-      // 스플래시 다음은 on-01(/onboarding) — 문구+시작 버튼이 그리로 옮겨왔다
-      const onboardingHtml = await html("/onboarding");
-      ok(onboardingHtml.includes("오늘 같이할 사람 찾기"), "/onboarding: on-01 문구");
-      ok(onboardingHtml.includes("동네 인증하고 시작하기"), "/onboarding: 시작 버튼");
+      // on-01(시작 문구+버튼)은 이제 별도 경로가 아니라 같은 페이지의 타이머 레이어다 —
+      // 최초 SSR에는 순수 스플래시만 나오고, 문구는 클라이언트 타이머(1.5s) 이후에만 뜬다.
+      ok(!splashHtml.includes("오늘 같이할 사람 찾기"), "/splash: 최초 진입엔 시작 문구 없음(레이어 전)");
+      ok(!splashHtml.includes("동네 인증하고 시작하기"), "/splash: 최초 진입엔 시작 버튼 없음(레이어 전)");
     }
   }
 

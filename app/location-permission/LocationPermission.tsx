@@ -64,7 +64,7 @@ function LocationPermissionContent() {
           </button>
           <button
             type="button"
-            onClick={() => router.push("/onboarding")}
+            onClick={() => router.push("/splash")}
             disabled={loading}
             className="w-full h-[54px] rounded-lg bg-white text-black border border-gray-300 flex items-center justify-center text-[17px] font-bold disabled:opacity-60"
           >
