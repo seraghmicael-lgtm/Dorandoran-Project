@@ -31,6 +31,8 @@ export default function CreatePlacePage() {
   const [searching, setSearching] = useState(false);
   // 타이핑할 때 뜨는 후보 — 지금 계신 곳 둘레의 진짜 지명을 받아둔다
   const [nearby, setNearby] = useState<string[]>([]);
+  // "이 장소 찾기" 버튼을 검색칸 안이 아니라 화면 하단에 고정으로 띄우려고 입력값을 여기서도 들고 있는다
+  const [query, setQuery] = useState("");
   // 말하기는 이 화면 안에서 — 아래에서 올라오는 시트로 듣는다(cr-04)
   const [voiceOpen, setVoiceOpen] = useState(false);
 
@@ -107,13 +109,25 @@ export default function CreatePlacePage() {
         {/* 검색칸을 안내문 바로 밑에 둔다 — 이 화면의 첫 할 일이 "어디를 찾을지 말하기"다 */}
         <SmartInput
           placeholder="예) 도란공원"
-          // 위치를 모르면 검색이 아니라 적은 그대로 쓰는 것이므로 문구도 그렇게 말한다
-          confirmLabel={searching ? "찾고 있어요..." : origin === null ? "이걸로 할게요" : "이 장소 찾기"}
           pending={searching}
           suggestions={nearby}
+          showConfirmButton={false}
           onConfirm={search}
+          onChange={setQuery}
           onVoice={() => setVoiceOpen(true)}
         />
+
+        {/* 지도·검색결과가 길어져도 스크롤에 딸려 사라지지 않게 화면 하단에 고정 */}
+        {query.trim() && (
+          <button
+            type="button"
+            onClick={() => search(query)}
+            disabled={searching}
+            className="sticky bottom-4 z-10 mt-3 w-full h-[50px] rounded-lg bg-ink text-white text-[16px] font-bold cursor-pointer disabled:opacity-60 disabled:cursor-default"
+          >
+            {searching ? "찾고 있어요..." : origin === null ? "이걸로 할게요" : "이 장소 찾기"}
+          </button>
+        )}
 
         <div className="h-4" />
 
