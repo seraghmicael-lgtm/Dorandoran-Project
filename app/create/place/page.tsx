@@ -96,25 +96,22 @@ export default function CreatePlacePage() {
       backHref="/create/duration"
       footer={<PrevNext backHref="/create/duration" nextHref="/create/people" requires="location" />}
     >
-      <div className="mt-5 flex flex-col">
-        {/* 검색칸을 제목 바로 밑에 둔다 — 이 화면의 첫 할 일이 "어디를 찾을지 말하기"다 */}
+      {/* cr-04 — 안내문은 검색칸이 아니라 제목 바로 아래에 온다 */}
+      <p className="mt-2 text-[15px] text-muted leading-relaxed whitespace-pre-line">
+        {origin === null
+          ? "’도란공원 정문’처럼 만날 곳을 적어주세요"
+          : "’도란공원’처럼 쓰거나 말하면\n지도에서 찾아드릴게요"}
+      </p>
+
+      <div className="mt-4 flex flex-col">
+        {/* 검색칸을 안내문 바로 밑에 둔다 — 이 화면의 첫 할 일이 "어디를 찾을지 말하기"다 */}
         <SmartInput
           placeholder="예) 도란공원"
-          hint={
-            origin === null
-              ? "’도란공원 정문’처럼 만날 곳을 적어주세요"
-              : "’도란공원’처럼 쓰거나 말하면\n지도에서 찾아드릴게요"
-          }
           // 위치를 모르면 검색이 아니라 적은 그대로 쓰는 것이므로 문구도 그렇게 말한다
           confirmLabel={searching ? "찾고 있어요..." : origin === null ? "이걸로 할게요" : "이 장소 찾기"}
           pending={searching}
           suggestions={nearby}
-          showConfirmButton={origin === null}
           onConfirm={search}
-          onChange={(query) => {
-            // 위치가 있으면 자동으로 검색. 없으면 입력만 받는다.
-            if (origin !== null && query.trim()) search(query.trim());
-          }}
           onVoice={() => setVoiceOpen(true)}
         />
 

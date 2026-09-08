@@ -6,6 +6,7 @@ export default function OptionButton({
   sub,
   selected = false,
   full = false,
+  align = "center",
   onClick,
 }: {
   label: string;
@@ -14,6 +15,8 @@ export default function OptionButton({
   selected?: boolean;
   /** 한 줄을 다 쓰는 넓은 칸 */
   full?: boolean;
+  /** sub 없는 칸의 글씨 위치 — cr-03(세로 목록, sub 있는 형제와 줄맞춤)은 "start", cr-01(격자)은 기본값 "center" */
+  align?: "start" | "center";
   onClick: () => void;
 }) {
   const tone = selected
@@ -25,7 +28,7 @@ export default function OptionButton({
       onClick={onClick}
       aria-pressed={selected}
       className={`${full ? "w-full" : "flex-1"} min-h-[56px] px-4 rounded-xl border ${tone} flex items-center ${
-        sub ? "justify-between gap-3" : "justify-start gap-3"
+        sub ? "justify-between gap-3" : align === "start" ? "justify-start gap-3" : "justify-center gap-3"
       } text-[17px] font-bold cursor-pointer`}
     >
       <span>{label}</span>

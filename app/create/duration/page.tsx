@@ -66,6 +66,7 @@ export default function CreateDurationPage() {
           <OptionButton
             key={opt.label}
             full
+            align="start"
             label={opt.label}
             sub={
               opt.minutes == null
