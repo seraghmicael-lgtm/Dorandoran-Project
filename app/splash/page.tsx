@@ -1,31 +1,22 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import WireframeLayout from "@/components/WireframeLayout";
 import BrandMark, { BrandWordmark } from "@/components/ds/BrandMark";
 import StepFooter from "@/components/ds/StepFooter";
 
 // UI디자인 splash(1235:8623) + on-01 — 경로 이동 없이 한 페이지 안에서
-// 순수 브랜드 스플래시를 잠깐 보여준 뒤 같은 페이지 위에 시작 문구+버튼 레이어를 띄운다.
+// 순수 브랜드 스플래시를 보여주다 하단 버튼을 누르면 같은 페이지 위에서
+// 시작 문구+버튼 레이어로 전환한다(자동 전환 없음 — 눌러야 넘어간다).
 // 로고·문구가 배경 그림에 함께 그려져 있어 통짜 이미지 한 장으로 그대로 쓴다.
 export default function SplashPage() {
   const [revealed, setRevealed] = useState(false);
 
-  useEffect(() => {
-    const t = setTimeout(() => setRevealed(true), 1500);
-    return () => clearTimeout(t);
-  }, []);
-
   if (!revealed) {
     return (
       <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
-        <button
-          type="button"
-          onClick={() => setRevealed(true)}
-          aria-label="시작하기"
-          className="relative flex-1 w-full bg-[#ebf7f5] cursor-pointer"
-        >
+        <div className="relative flex-1 w-full bg-[#ebf7f5]">
           <Image
             src="/illust/splash-bg.png"
             alt="오늘마실"
@@ -34,7 +25,14 @@ export default function SplashPage() {
             className="object-cover object-bottom"
             priority
           />
-        </button>
+          <button
+            type="button"
+            onClick={() => setRevealed(true)}
+            className="absolute inset-x-5 bottom-8 h-[54px] rounded-lg bg-ink text-white flex items-center justify-center text-[17px] font-bold cursor-pointer"
+          >
+            시작하기
+          </button>
+        </div>
       </WireframeLayout>
     );
   }
