@@ -170,6 +170,19 @@ export default async function MeetupDetailPage({
                 )}
               </li>
             ))}
+            {/* UI디자인 Frame 179(1331:3431) — 아직 안 찬 자리는 빈 아바타 + "–" 로 표시 */}
+            {Array.from({ length: Math.max(0, maxPeople - people.length) }).map((_, i) => (
+              <li key={`empty-${i}`} className="flex items-center gap-2">
+                <Image
+                  src="/illust/avatar-empty.svg"
+                  alt=""
+                  width={24}
+                  height={24}
+                  className="shrink-0 rounded-full"
+                />
+                <span className="text-[16px] text-[#d1d1d1]">–</span>
+              </li>
+            ))}
           </ul>
         </div>
       </div>
