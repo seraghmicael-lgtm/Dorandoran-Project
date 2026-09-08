@@ -597,12 +597,10 @@ try {
       ok(r.ok && (r.headers.get("content-type") ?? "").includes("image/png"), "스플래시 배경 이미지 있음");
       const splashHtml = await html("/splash");
       ok(splashHtml.includes("splash-bg.png"), "/splash: 배경 이미지 사용");
-      // on-01(시작 문구+버튼)은 이제 별도 경로가 아니라 같은 페이지의 타이머 레이어다 —
-      // 최초 SSR에는 순수 스플래시만 나오고, 문구는 클라이언트 타이머(1.5s) 이후에만 뜬다.
-      // on-01(시작 문구+버튼) 레이어는 삭제됨 — 순수 스플래시 한 장 + "시작하기" 버튼뿐
-      ok(!splashHtml.includes("오늘 같이할 사람 찾기"), "/splash: on-01 문구 없음(삭제됨)");
-      ok(!splashHtml.includes("동네 인증하고 시작하기"), "/splash: on-01 버튼 없음(삭제됨)");
-      ok(splashHtml.includes("시작하기"), "/splash: 시작 버튼 있음");
+      // on-01(로고·문구·ds_button)은 별도 화면이 아니라 이 배경 사진 위에 얹힌
+      // 하나의 레이어다 — 진입 즉시(타이머 없이) 다 보인다.
+      ok(splashHtml.includes("장 보러, 산책하러, 커피 한 잔"), "/splash: on-01 문구가 같은 레이어에 있음");
+      ok(splashHtml.includes("동네 인증하고 시작하기"), "/splash: ds_button 있음");
     }
   }
 

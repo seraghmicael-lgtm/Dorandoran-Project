@@ -1,27 +1,25 @@
 import Image from "next/image";
 
 // UI디자인의 로고 심볼(1083:3926) — Figma 에서 내보낸 SVG 를 그대로 쓴다.
+// ⚠️ next/image 를 쓰면(둘 다 <Image>) 이 심볼과 아래 워드마크를 나란히 놓았을 때
+// 브라우저에 아이콘이 겹쳐 찍히는 렌더링 버그가 있다(정적 <img> 로는 재현 안 됨,
+// Next 15.5.4/Turbopack 확인) — 그래서 이 둘만 next/image 대신 순수 <img> 를 쓴다.
 export default function BrandMark({ size = 100 }: { size?: number }) {
   return (
-    <Image
-      src="/illust/symbol.svg"
-      alt="오늘마실"
-      width={size}
-      height={size}
-      priority={size >= 100}
-    />
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src="/illust/symbol.svg" alt="오늘마실" width={size} height={size} />
   );
 }
 
 /** 워드마크(1100:8556). 심볼과 나란히 쓰거나 단독으로 */
 export function BrandWordmark({ width = 124 }: { width?: number }) {
   return (
-    <Image
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
       src="/illust/logo.svg"
       alt="오늘마실"
       width={width}
       height={Math.round((width * 43) / 124)}
-      priority
     />
   );
 }
