@@ -27,7 +27,7 @@ export default function CreateMessagePage() {
       step={6}
       title={"추가로 남길\n얘기가 있나요?"}
       backHref="/create/people"
-      footer={<PrevNext backHref="/create/people" onNext={goNext} stack />}
+      footer={<PrevNext backHref="/create/people" onNext={goNext} />}
     >
       <div className="mt-5 flex flex-col gap-3">
         <textarea

@@ -9,8 +9,8 @@ import {
   subscribeDraft,
 } from "@/lib/draft";
 
-// UI디자인 CR 그룹 하단 — [이전] 흰 바탕 / [다음] 검정, 좌우 반반.
-// cr-06(하실 말씀)만 세로로 쌓여 있어 stack 으로 바꾼다.
+// UI디자인 CR 그룹 하단 — [이전] 흰 바탕 / [다음] 검정, 좌우 반반(ds_step_footer).
+// stack 은 세로로 쌓아야 하는 예외 화면을 위한 옵션 — 지금은 쓰는 화면 없음.
 export default function PrevNext({
   backHref,
   nextHref,

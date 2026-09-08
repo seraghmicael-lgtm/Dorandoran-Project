@@ -637,11 +637,11 @@ try {
       ok(act.includes("grid grid-cols-2"), "활동: 선택칸은 두 칸 격자(혼자 남는 병원도 같은 너비)");
       ok(!act.includes('<span class="flex-1"></span>'), "활동: 빈 자리채움 없음");
 
-      const stacked = [...msgHtml.matchAll(/class="([^"]*h-\[54px\][^"]*)"/g)].map((m) => m[1]);
-      ok(stacked.length === 2, "하실 말씀: 이전·다음 두 개");
+      const footerBtns = [...msgHtml.matchAll(/class="([^"]*h-\[54px\][^"]*)"/g)].map((m) => m[1]);
+      ok(footerBtns.length === 2, "하실 말씀: 이전·다음 두 개");
       ok(
-        stacked.every((c) => c.includes("w-full") && !c.includes("flex-1")),
-        "하실 말씀: 세로로 쌓아도 납작해지지 않는다",
+        footerBtns.every((c) => c.includes("flex-1") && !c.includes("w-full")),
+        "하실 말씀: 가로형(ds_step_footer) 반반 배치",
       );
     }
 
