@@ -2,20 +2,25 @@
 // 상세보기·검토 화면이 같이 쓴다. 최신 디자인엔 라벨 앞 아이콘이 없다.
 export default function Field({
   label,
+  labelColor,
   meta,
   value,
   /** 값과 같은 줄, 오른쪽 끝에 붙는 것("길찾기" 버튼 등) */
   trailing,
 }: {
   label: string;
+  /** 라벨 색상 — 기본값 "text-muted" (회색) */
+  labelColor?: string;
   /** 라벨 뒤 세로선으로 이어지는 보조 정보 — 시간 범위, 도보 시간, 안내문 등 */
   meta?: string;
   value: string;
   trailing?: React.ReactNode;
 }) {
+  const labelClass = labelColor ?? "text-muted";
+
   return (
     <div className="flex flex-col gap-1">
-      <div className="flex items-center gap-2 text-[14px] text-muted">
+      <div className={`flex items-center gap-2 text-[14px] ${labelClass}`}>
         <span>{label}</span>
         {meta && (
           <>

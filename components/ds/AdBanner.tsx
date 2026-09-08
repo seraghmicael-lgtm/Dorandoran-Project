@@ -11,12 +11,12 @@ export default function AdBanner() {
         <span className="text-[13px] text-muted">우리동네병원 정형외과</span>
       </div>
       <Image
-        src="/illust/ad-hospital.png"
+        src="/illust/ad-banner.png"
         alt=""
         aria-hidden="true"
-        width={72}
-        height={65}
-        className="shrink-0"
+        width={84}
+        height={76}
+        className="shrink-0 rounded-lg object-cover"
       />
     </div>
   );

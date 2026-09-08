@@ -440,7 +440,7 @@ try {
     !["송정마을 어귀", "도토리마을 공원", "한마음 경로당"].some((n) => placeHtml.includes(n)),
     "장소 화면: 고정 카드 3개 제거됨"
   );
-  // 새 UI디자인에는 "목록에 없으면" 머리말이 없다 — 어느 화면에도 남아 있으면 안 된다
+  // 활동 화면(cr-01)은 다시 "목록에 없으면" 머리말이 생겼다 — 검색칸이 옵션 아래로 내려간 것도 같이 확인
   const stepPages = [
     ["/create/activity", 1, "어떤 활동을"],
     ["/create/time", 2, "동행과 몇 시에"],
@@ -451,7 +451,13 @@ try {
   ];
   for (const [path, step, heading] of stepPages) {
     const h = await html(path);
-    ok(!h.includes("목록에 없으면"), `${path}: 옛 머리말 없음`);
+    if (path === "/create/activity") {
+      ok(h.includes("목록에 없으면"), `${path}: 머리말 있음`);
+      ok(h.indexOf("병원") < h.indexOf("목록에 없으면"), `${path}: 검색칸이 옵션 아래`);
+      ok(!/이전<\/button>/.test(h), `${path}: 하단 "이전" 버튼 없음(다음만)`);
+    } else {
+      ok(!h.includes("목록에 없으면"), `${path}: 옛 머리말 없음`);
+    }
     ok(h.includes(heading), `${path}: 새 제목`, heading);
     // 진행 표시는 초록 알약("N/6")이 아니라 6칸 세그먼트 막대 — 지나온 칸까지 채워진다
     const segs = [...h.matchAll(/rounded-full (bg-accent|bg-gray-100)"/g)].map((m) => m[1]).slice(0, 6);
@@ -600,21 +606,15 @@ try {
     }
   }
 
-  // 위치 권한 화면의 지도 — 진짜 구글 지도(Static Maps)를 디자인 톤으로 깎아 쓴다
+  // 위치 권한 화면 — on-02 갱신분: 실제 지도 대신 위치 일러스트 한 장
   {
     const h = await html("/location-permission");
-    const m = h.match(/https:\/\/maps\.googleapis\.com\/maps\/api\/staticmap[^"]*/);
-    ok(!!m, "위치 화면: Static Maps 이미지");
-    if (m) {
-      const url = m[0].replace(/&amp;/g, "&");
-      ok(url.includes("size=320x170") && url.includes("scale=2"), "지도: 디자인 크기(320x170@2x)");
-      ok((url.match(/&style=/g) ?? []).length >= 8, "지도: 디자인 스타일 적용");
-      ok(url.includes("key="), "지도: 키 포함");
-      // 실제로 이미지가 내려오는지 — 키·API 가 막히면 여기서 걸린다
-      const img = await fetch(url);
-      ok(img.ok && (img.headers.get("content-type") ?? "").startsWith("image/"), "지도: 이미지가 실제로 내려온다", String(img.status));
-    }
-    ok(h.includes("#4A90E2"), "지도: 위치 점 오버레이");
+    ok(h.includes("/illust/map.svg"), "위치 화면: 위치 일러스트 사용");
+    ok(
+      !h.includes("maps.googleapis.com/maps/api/staticmap"),
+      "위치 화면: 실제 지도 안 씀(일러스트로 대체됨)"
+    );
+    ok(h.includes("위치는 오늘마실에 저장되지 않아요"), "위치 화면: 저장 안내 문구");
   }
 
   // 말하기 화면 — cr-01 껍데기에 마이크 하나. 옛 음성 화면의 잡다한 조작은 없어야 한다

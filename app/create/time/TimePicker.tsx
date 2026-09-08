@@ -97,8 +97,8 @@ function Wheel({
             onClick={() => {
               ref.current?.scrollTo({ top: values.indexOf(v) * ITEM_H, behavior: "smooth" });
             }}
-            className={`relative w-full snap-center flex items-center justify-center text-[20px] tabular-nums cursor-pointer ${
-              v === value ? "font-bold text-accent" : "text-gray-400"
+            className={`relative w-full snap-center flex items-center justify-center text-[42px] tracking-[-0.42px] tabular-nums cursor-pointer ${
+              v === value ? "font-bold text-accent" : "font-medium text-[#d1d1d1]"
             }`}
             style={{ height: ITEM_H }}
           >
@@ -137,10 +137,8 @@ export default function TimePicker({
 
   return (
     <>
-      {/* 고른 시각 — 굴릴 때마다 여기 글씨가 같이 바뀐다 */}
-      <p className="mt-8 text-[26px] font-bold text-black text-center">{label}</p>
-
-      <div className="mt-5 flex items-stretch gap-1 rounded-2xl border border-gray-200 px-3 py-2">
+      {/* 고른 시각은 휠 안에 그대로 보이니 따로 요약 글씨를 안 둔다 */}
+      <div className="mt-8 flex items-stretch gap-1 rounded-xl border border-gray-200 px-3 py-2">
         {/* 오전/오후는 두 개뿐이라 굴리지 않고 눌러서 고른다. 이미 지난 쪽은 아예 안 나온다 */}
         <div className="flex-1 flex flex-col justify-center gap-1 py-1">
           {meridiems.map((m) => (
@@ -149,10 +147,10 @@ export default function TimePicker({
               type="button"
               aria-pressed={clock.meridiem === m}
               onClick={() => set({ meridiem: m })}
-              className={`h-[48px] rounded-lg flex items-center justify-center text-[20px] cursor-pointer ${
+              className={`h-[48px] rounded-lg flex items-center justify-center text-[28px] tracking-[-0.28px] cursor-pointer ${
                 clock.meridiem === m
-                  ? "bg-accent-soft text-accent font-bold"
-                  : "text-gray-400"
+                  ? "text-accent font-bold"
+                  : "font-medium text-[#d1d1d1]"
               }`}
             >
               {m}
@@ -166,6 +164,10 @@ export default function TimePicker({
           onChange={(hour12) => set({ hour12 })}
           ariaLabel="시"
         />
+        {/* 시:분 사이 구분선 — 어느 쪽이 골라졌든 늘 옅은 회색이다 */}
+        <span className="self-center text-[20px] text-[#d1d1d1]" aria-hidden="true">
+          :
+        </span>
         <Wheel
           values={minutes}
           value={clock.minute}

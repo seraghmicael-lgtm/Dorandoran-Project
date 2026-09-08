@@ -15,8 +15,10 @@ export default function SmartInput({
   confirmLabel = "이걸로 할게요",
   divider = false,
   pending = false,
+  showConfirmButton = true,
   onConfirm,
   onVoice,
+  onChange,
 }: {
   /** 빈 문자열이면 머리말을 아예 안 보여준다(디자인 기본) */
   label?: string;
@@ -28,13 +30,22 @@ export default function SmartInput({
   divider?: boolean;
   /** 확인 처리 중 — 버튼을 눌러도 반응 없는 것처럼 보이지 않게 막아둔다 */
   pending?: boolean;
+  /** 확인 버튼을 보여줄지 여부. false면 typing 상태에서도 버튼을 안 보여준다 */
+  showConfirmButton?: boolean;
   onConfirm: (value: string) => void;
   /** 주면 말하기를 이 화면에서 처리한다(드롭업). 없으면 말하기 화면으로 넘어간다. */
   onVoice?: () => void;
+  /** 입력 값이 변경되었을 때 호출 */
+  onChange?: (value: string) => void;
 }) {
   const router = useRouter();
   const [value, setValue] = useState("");
   const typing = value.trim().length > 0;
+
+  const handleSetValue = (newValue: string) => {
+    setValue(newValue);
+    onChange?.(newValue);
+  };
 
   // 후보가 수십~수백 개라 그냥 자르면 엉뚱한 게 먼저 나온다.
   // 앞글자부터 맞는 것 → 그 다음 어디든 들어간 것, 같은 조건이면 짧은 것 순.
@@ -70,19 +81,19 @@ export default function SmartInput({
     >
       {label && <p className="text-[15px] text-muted">{label}</p>}
 
-      <div className="flex items-stretch gap-2">
+      <div className="flex items-stretch rounded-xl border border-gray-200">
         <input
           type="text"
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={(e) => handleSetValue(e.target.value)}
           placeholder={placeholder}
-          className="flex-1 min-w-0 h-[56px] px-4 rounded-xl border border-gray-200 bg-white text-[16px] text-black placeholder:text-muted focus:outline-none focus:border-accent"
+          className="flex-1 min-w-0 h-[56px] px-4 bg-white text-[16px] text-black placeholder:text-muted focus:outline-none"
         />
         <button
           type="button"
           onClick={handleVoice}
           aria-label="말하기"
-          className="w-[56px] h-[56px] shrink-0 rounded-xl bg-surface flex items-center justify-center cursor-pointer"
+          className="w-[56px] h-[56px] shrink-0 bg-surface flex items-center justify-center cursor-pointer border-l border-gray-200"
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <rect x="9" y="2" width="6" height="12" rx="3" fill="#555" />
@@ -104,7 +115,7 @@ export default function SmartInput({
                 <button
                   key={s}
                   type="button"
-                  onClick={() => setValue(s)}
+                  onClick={() => handleSetValue(s)}
                   className="px-3 h-[36px] rounded-full bg-surface text-[15px] text-black cursor-pointer"
                 >
                   {s}
@@ -112,14 +123,16 @@ export default function SmartInput({
               ))}
             </div>
           )}
-          <button
-            type="button"
-            onClick={() => onConfirm(value.trim())}
-            disabled={pending}
-            className="w-full h-[50px] rounded-lg bg-ink text-white text-[16px] font-bold cursor-pointer disabled:opacity-60 disabled:cursor-default"
-          >
-            {confirmLabel}
-          </button>
+          {showConfirmButton && (
+            <button
+              type="button"
+              onClick={() => onConfirm(value.trim())}
+              disabled={pending}
+              className="w-full h-[50px] rounded-lg bg-ink text-white text-[16px] font-bold cursor-pointer disabled:opacity-60 disabled:cursor-default"
+            >
+              {confirmLabel}
+            </button>
+          )}
         </>
       )}
 

@@ -14,10 +14,20 @@ import {
 
 // UI디자인 CR-07 갱신분(1219:3583) — 이렇게 올릴까요?
 // 필드마다 연회색 둥근 박스 하나 — 상세보기(JN-02)와 같은 값 표시 방식.
-function FieldBox({ label, value }: { label: string; value: string }) {
+function FieldBox({
+  label,
+  labelColor,
+  meta,
+  value,
+}: {
+  label: string;
+  labelColor?: string;
+  meta?: string;
+  value: string;
+}) {
   return (
     <div className="rounded-xl bg-surface px-4 py-3">
-      <Field label={label} value={value} />
+      <Field label={label} labelColor={labelColor} meta={meta} value={value} />
     </div>
   );
 }
@@ -40,6 +50,9 @@ export default function CreateReviewPage() {
     : "동행";
   const startClock = (draft.startTime ?? draft.time ?? "").replace(/^오늘\s*/, "").split(" ~ ")[0];
 
+  // 만나는 곳 장소명과 도보시간 분리 (상세보기 화면과 동일한 패턴)
+  const [placeName, walkTime] = (draft.location ?? "").split(" · ") as [string, string | undefined];
+
   return (
     <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
       <header className="h-[60px] px-5 flex items-center border-b border-gray-100 bg-white relative">
@@ -58,10 +71,36 @@ export default function CreateReviewPage() {
         </div>
 
         <div className="mt-6 flex flex-col gap-3">
-          {draft.startTime && <FieldBox label="걸리는 시간" value={draft.duration ?? draft.startTime} />}
-          {draft.location && <FieldBox label="만나는 곳" value={draft.location} />}
-          {draft.maxPeople != null && <FieldBox label="모임인원" value={`${draft.maxPeople}명`} />}
-          {draft.message && <FieldBox label="한마디" value={draft.message} />}
+          {draft.startTime && (
+            <FieldBox
+              label="걸리는 시간"
+              labelColor="text-brand"
+              value={draft.duration ?? draft.startTime}
+            />
+          )}
+          {draft.location && (
+            <FieldBox
+              label="만나는 곳"
+              labelColor="text-brand"
+              meta={walkTime}
+              value={placeName}
+            />
+          )}
+          {draft.maxPeople != null && (
+            <FieldBox
+              label="모임인원"
+              labelColor="text-brand"
+              meta={draft.goAnyway ? "모두 안 모여도 갈게요" : "다 모여야 갈게요"}
+              value={`${draft.maxPeople}명`}
+            />
+          )}
+          {draft.message && (
+            <FieldBox
+              label="한마디"
+              labelColor="text-brand"
+              value={draft.message}
+            />
+          )}
         </div>
       </div>
 

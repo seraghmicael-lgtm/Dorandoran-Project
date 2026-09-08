@@ -102,14 +102,19 @@ export default function CreatePlacePage() {
           placeholder="예) 도란공원"
           hint={
             origin === null
-              ? "‘도란공원 정문’처럼 만날 곳을 적어주세요"
-              : "‘도란공원’처럼 쓰거나 말하면\n지도에서 찾아드릴게요"
+              ? "’도란공원 정문’처럼 만날 곳을 적어주세요"
+              : "’도란공원’처럼 쓰거나 말하면\n지도에서 찾아드릴게요"
           }
           // 위치를 모르면 검색이 아니라 적은 그대로 쓰는 것이므로 문구도 그렇게 말한다
           confirmLabel={searching ? "찾고 있어요..." : origin === null ? "이걸로 할게요" : "이 장소 찾기"}
           pending={searching}
           suggestions={nearby}
+          showConfirmButton={origin === null}
           onConfirm={search}
+          onChange={(query) => {
+            // 위치가 있으면 자동으로 검색. 없으면 입력만 받는다.
+            if (origin !== null && query.trim()) search(query.trim());
+          }}
           onVoice={() => setVoiceOpen(true)}
         />
 

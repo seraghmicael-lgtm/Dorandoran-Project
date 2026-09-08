@@ -38,9 +38,9 @@ export default function CreatePeoplePage() {
       backHref="/create/place"
       footer={<PrevNext backHref="/create/place" nextHref="/create/message" requires="maxPeople" />}
     >
-      <p className="mt-8 text-[15px] text-muted text-center">나를 포함한 숫자예요</p>
+      <p className="mt-5 text-[15px] text-muted text-center">나를 포함한 숫자예요</p>
 
-      <div className="mt-4 flex flex-col gap-3">
+      <div className="mt-5 flex flex-col gap-3">
         {[0, 2, 4].map((i) => (
           <div key={i} className="flex gap-3">
             {[OPTIONS[i], OPTIONS[i + 1]].map((n) => (

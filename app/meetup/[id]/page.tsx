@@ -6,6 +6,7 @@ import Field from "@/components/ds/Field";
 import { prisma } from "@/lib/prisma";
 import { directionsUrl } from "@/lib/places";
 import { UID_COOKIE } from "@/lib/session";
+import { formatClockWithColons } from "@/lib/koreanTime";
 import LeaveMeetupButton from "@/components/LeaveMeetupButton";
 import CancelCreatedButton from "@/components/CancelCreatedButton";
 
@@ -79,10 +80,16 @@ export default async function MeetupDetailPage({
   const status = statusOf(people.length, maxPeople, joined);
   const startClock = startTime.replace(/^오늘\s*/, "").split(" ~ ")[0];
 
+  const backLink = joined
+    ? meetup?.creatorId === uid
+      ? "/my-meetups/created"
+      : "/my-meetups"
+    : "/home";
+
   return (
     <WireframeLayout justify="start" className="flex flex-col">
       <header className="h-[60px] px-5 flex items-center border-b border-gray-100 bg-white relative">
-        <Link href="/home" aria-label="뒤로" className="text-2xl text-black leading-none">
+        <Link href={backLink} aria-label="뒤로" className="text-2xl text-black leading-none">
           ‹
         </Link>
         <span className="absolute inset-x-0 text-center text-[17px] font-bold text-black pointer-events-none">
@@ -101,7 +108,7 @@ export default async function MeetupDetailPage({
 
         <div className="mt-6 rounded-2xl bg-surface px-4 py-3 flex flex-col divide-y divide-gray-200">
           <div className="py-2.5">
-            <Field label="걸리는 시간(소요시간)" meta={startTime} value={meetup?.duration ?? "미정"} />
+            <Field label="걸리는 시간(소요시간)" meta={formatClockWithColons(startTime)} value={meetup?.duration ?? "미정"} />
           </div>
 
           <div className="py-2.5">
@@ -195,7 +202,7 @@ export default async function MeetupDetailPage({
               참여하기
             </Link>
             <Link
-              href="/home"
+              href={backLink}
               className="w-full h-[54px] rounded-lg border border-gray-300 bg-white text-black flex items-center justify-center text-[17px] font-medium"
             >
               이전

@@ -17,6 +17,7 @@ export default function PrevNext({
   requires,
   onNext,
   stack = false,
+  showPrev = true,
 }: {
   backHref: string;
   nextHref?: string | ((draft: MeetupDraft) => string);
@@ -25,6 +26,8 @@ export default function PrevNext({
   /** 화면에 아직 저장 안 된 선택이 떠 있는 경우(시각 고르기) — 다음이 그걸 확정하고 넘어간다 */
   onNext?: () => void;
   stack?: boolean;
+  /** cr-01(활동)처럼 "이전" 없이 [다음]만 보여줄 때 false — 상단 ‹ 는 그대로 backHref 로 간다 */
+  showPrev?: boolean;
 }) {
   const router = useRouter();
   const raw = useSyncExternalStore(subscribeDraft, draftSnapshot, noDraftOnServer);
@@ -45,7 +48,8 @@ export default function PrevNext({
       : typeof value === "string" && value.trim().length > 0;
 
   // 세로로 쌓을 땐 flex-1 이 세로 축에 걸려 버튼이 납작해진다 — 그때는 가로만 채운다
-  const shape = stack ? "w-full" : "flex-1";
+  // 이전이 없으면 다음이 폭 전체를 채운다
+  const shape = stack || !showPrev ? "w-full" : "flex-1";
 
   const prev = (
     <button
@@ -74,7 +78,7 @@ export default function PrevNext({
 
   return (
     <div className={`px-5 pt-4 pb-6 flex gap-2.5 ${stack ? "flex-col-reverse" : ""}`}>
-      {prev}
+      {showPrev && prev}
       {next}
     </div>
   );

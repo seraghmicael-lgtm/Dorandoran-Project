@@ -4,11 +4,11 @@ import { Suspense, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import StepScreen from "@/components/ds/StepScreen";
 import StepFooter from "@/components/ds/StepFooter";
-import StaticMap from "@/components/ds/StaticMap";
+import { Illust } from "@/components/ds/BrandMark";
 import { safeInternalPath } from "@/lib/safePath";
 
 // UI디자인 on-02 (1083:4055) — 위치 권한
-function LocationPermissionContent({ center }: { center: { lat: number; lng: number } }) {
+function LocationPermissionContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -74,19 +74,17 @@ function LocationPermissionContent({ center }: { center: { lat: number; lng: num
       }
     >
       <div className="mt-9 flex flex-col items-center gap-7">
-        {/* ds_map — 실제 구글 지도(Static Maps). 아직 허용 전이라 지금 계신 곳을
-            모르면 저장해둔 위치나 기본 좌표를 중심으로 보여주는 안내용 그림이다. */}
-        <StaticMap lat={center.lat} lng={center.lng} className="w-full h-[170px] rounded-xl" />
-        <p className="text-[14px] text-[#999999]">위치는 오늘마실에 저장되지 않아요</p>
+        <Illust name="map" size={160} />
+        <p className="text-[14px] text-muted">위치는 오늘마실에 저장되지 않아요</p>
       </div>
     </StepScreen>
   );
 }
 
-export default function LocationPermission({ center }: { center: { lat: number; lng: number } }) {
+export default function LocationPermission() {
   return (
     <Suspense fallback={null}>
-      <LocationPermissionContent center={center} />
+      <LocationPermissionContent />
     </Suspense>
   );
 }

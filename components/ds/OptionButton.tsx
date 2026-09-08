@@ -25,7 +25,7 @@ export default function OptionButton({
       onClick={onClick}
       aria-pressed={selected}
       className={`${full ? "w-full" : "flex-1"} min-h-[56px] px-4 rounded-xl border ${tone} flex items-center ${
-        sub ? "justify-between gap-3" : "justify-center"
+        sub ? "justify-between gap-3" : "justify-start gap-3"
       } text-[17px] font-bold cursor-pointer`}
     >
       <span>{label}</span>

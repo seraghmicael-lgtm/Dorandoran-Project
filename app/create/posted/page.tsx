@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
 import { MeetupDraft, loadDraft, clearDraft } from "@/lib/draft";
@@ -154,20 +155,22 @@ export default function CreatePostedPage() {
       </header>
 
       <div className="flex-1 px-[18px] py-[22px] flex flex-col items-center gap-5 text-center">
-        {/* ✓ 원형 배지 + 올렸어요 */}
-        <div className="flex flex-col items-center gap-3 pt-4">
-          <div className="w-[74px] h-[74px] rounded-full border-2 border-black bg-white flex items-center justify-center">
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M5 12.5l4.5 4.5L19 7.5" stroke="#171717" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
-          <h1 className="text-xl font-bold text-black">올렸어요</h1>
+        {/* UI디자인 1123:2059 — 발자국+체크 일러스트 */}
+        <div className="pt-4">
+          <Image
+            src="/illust/posted-illust.png"
+            alt=""
+            aria-hidden="true"
+            width={150}
+            height={150}
+          />
         </div>
+        <h1 className="text-[28px] font-bold text-black tracking-[-0.28px]">올렸어요</h1>
 
         {/* 회색 안내문 */}
         {/* 두 문장을 한 줄에 붙이면 길어서 눈이 미끄러진다 — 문장마다 줄을 바꾼다 */}
-        <p className="text-[15px] text-muted whitespace-pre-line leading-relaxed">
-          {"사람이 모이면 알려드릴게요.\n안 모이면 조용히 사라져요."}
+        <p className="text-[18px] text-muted whitespace-pre-line leading-relaxed">
+          {"사람이 모이면 알려드릴게요\n안 모이면 조용히 사라져요"}
         </p>
 
         {/* 좌측 정렬 섹션 제목 */}

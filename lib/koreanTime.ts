@@ -170,3 +170,11 @@ export function computeEndTime(time: string, addMinutes: number): string | null 
   const endMin = total % 60;
   return endMin === 0 ? `${endH}시` : `${endH}시 ${endMin}분`;
 }
+
+/** "오늘 오후 10시 10분 ~ 10시 40분" → "오후 10:10 ~ 10:40" (콜론 시각 표기) */
+export function formatClockWithColons(timeStr: string): string {
+  let result = timeStr;
+  result = result.replace(/^오늘\s*/, "");
+  result = result.replace(/(\d{1,2})시\s*(\d{1,2})분/g, "$1:$2");
+  return result;
+}

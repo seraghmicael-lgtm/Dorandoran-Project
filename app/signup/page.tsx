@@ -43,7 +43,7 @@ export default function SignupPage() {
             disabled={loading}
             className="w-full h-[54px] rounded-lg bg-white text-black border border-gray-300 flex items-center justify-center text-[17px] font-bold disabled:opacity-60"
           >
-            이전
+            로그인 없이 시작하기
           </button>
         </StepFooter>
       }

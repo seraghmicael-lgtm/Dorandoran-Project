@@ -47,19 +47,12 @@ export default function CreateActivityPage() {
       step={1}
       title={"어떤 활동을\n하고 싶으세요?"}
       backHref="/home"
-      footer={<PrevNext backHref="/home" nextHref="/create/time" requires="activity" />}
+      // cr-01 은 이 흐름의 첫 단계라 "이전"이 없다 — 위 ‹ 를 누르면 backHref(/home)로 간다
+      footer={<PrevNext backHref="/home" nextHref="/create/time" requires="activity" showPrev={false} />}
     >
-      <div className="mt-5">
-        <SmartInput
-          placeholder="예) 장보러 가실 분 있나요"
-          suggestions={ACTIVITY_SUGGESTIONS}
-          onConfirm={choose}
-        />
-      </div>
-
       {/* 두 칸 격자 — 홀수라 혼자 남는 마지막 칸(병원)도 나머지와 같은 너비다.
           줄마다 flex 로 나누면 짝이 없는 칸이 padding 만큼 넓어진다. */}
-      <div className="mt-4 grid grid-cols-2 gap-3">
+      <div className="mt-5 grid grid-cols-2 gap-3">
         {OPTIONS.map((option) => (
           <OptionButton
             key={option}
@@ -69,6 +62,15 @@ export default function CreateActivityPage() {
             onClick={() => choose(option)}
           />
         ))}
+      </div>
+
+      <div className="mt-4">
+        <SmartInput
+          label="목록에 없으면"
+          placeholder="예) 장보러 가실 분 있나요"
+          suggestions={ACTIVITY_SUGGESTIONS}
+          onConfirm={choose}
+        />
       </div>
     </CreateStep>
   );

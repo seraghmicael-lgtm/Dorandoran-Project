@@ -32,12 +32,13 @@ export function Illust({
   size = 160,
   className,
 }: {
-  name: "welcome" | "shield" | "bell" | "joined" | "empty";
+  name: "welcome" | "shield" | "bell" | "joined" | "empty" | "map";
   size?: number;
   className?: string;
 }) {
-  // 방패·종만 정사각형이 아니라 원본 비율을 지킨다
-  const ratio = name === "shield" ? 159 / 137 : name === "bell" ? 159 / 188 : 1;
+  // 원본 SVG 가 preserveAspectRatio="none" 로 내보내져 있어 비율을 안 맞추면 눌려 보인다
+  const ratio =
+    name === "shield" ? 159 / 137 : name === "bell" ? 159 / 188 : name === "map" ? 139.84 / 116.533 : 1;
   return (
     <Image
       src={`/illust/${name}.svg`}
