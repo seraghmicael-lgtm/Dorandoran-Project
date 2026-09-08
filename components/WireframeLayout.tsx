@@ -52,7 +52,7 @@ export default function WireframeLayout({
         }`}
       >
         <div
-          className={`flex-1 flex flex-col ${JUSTIFY[justify]} ${ITEMS[items]} ${className} ${
+          className={`flex-1 flex flex-col pt-10 ${JUSTIFY[justify]} ${ITEMS[items]} ${className} ${
             effectiveNav === "five" ? "overflow-y-auto" : ""
           }`}
         >

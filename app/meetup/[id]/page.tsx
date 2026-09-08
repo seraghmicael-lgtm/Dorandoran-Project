@@ -87,7 +87,7 @@ export default async function MeetupDetailPage({
     : "/home";
 
   return (
-    <WireframeLayout justify="start" className="flex flex-col">
+    <WireframeLayout justify="start" className="flex flex-col bg-[#f3fbf2]">
       <header className="h-[60px] px-5 flex items-center border-b border-gray-100 bg-white relative">
         <Link href={backLink} aria-label="뒤로" className="text-2xl text-black leading-none">
           ‹
@@ -106,7 +106,7 @@ export default async function MeetupDetailPage({
         </div>
         <h1 className="mt-1 text-[24px] font-bold text-black">{activity}</h1>
 
-        <div className="mt-6 rounded-2xl bg-surface px-4 py-3 flex flex-col divide-y divide-gray-200">
+        <div className="mt-6 rounded-2xl bg-white shadow-[0_2px_6px_rgba(0,0,0,0.08)] px-4 py-3 flex flex-col divide-y divide-gray-200">
           <div className="py-2.5">
             <Field label="걸리는 시간(소요시간)" meta={formatClockWithColons(startTime)} value={meetup?.duration ?? "미정"} />
           </div>
@@ -145,7 +145,7 @@ export default async function MeetupDetailPage({
           )}
         </div>
 
-        <div className="mt-3 rounded-2xl bg-surface px-4 py-4">
+        <div className="mt-3 rounded-2xl bg-white shadow-[0_2px_6px_rgba(0,0,0,0.08)] px-4 py-4">
           <p className="text-[18px] font-medium text-black">
             참여자 <span className="font-bold text-brand">{people.length}</span>
           </p>
