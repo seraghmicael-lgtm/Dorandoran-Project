@@ -599,8 +599,10 @@ try {
       ok(splashHtml.includes("splash-bg.png"), "/splash: 배경 이미지 사용");
       // on-01(시작 문구+버튼)은 이제 별도 경로가 아니라 같은 페이지의 타이머 레이어다 —
       // 최초 SSR에는 순수 스플래시만 나오고, 문구는 클라이언트 타이머(1.5s) 이후에만 뜬다.
-      ok(!splashHtml.includes("오늘 같이할 사람 찾기"), "/splash: 최초 진입엔 시작 문구 없음(레이어 전)");
-      ok(!splashHtml.includes("동네 인증하고 시작하기"), "/splash: 최초 진입엔 시작 버튼 없음(레이어 전)");
+      // on-01(시작 문구+버튼) 레이어는 삭제됨 — 순수 스플래시 한 장 + "시작하기" 버튼뿐
+      ok(!splashHtml.includes("오늘 같이할 사람 찾기"), "/splash: on-01 문구 없음(삭제됨)");
+      ok(!splashHtml.includes("동네 인증하고 시작하기"), "/splash: on-01 버튼 없음(삭제됨)");
+      ok(splashHtml.includes("시작하기"), "/splash: 시작 버튼 있음");
     }
   }
 
