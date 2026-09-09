@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import PushLockScreen from "./PushLockScreen";
+import { SCREEN_FLOW } from "@/lib/screenFlow";
 
 // 프로토타입 전용 — 실제 발송 로직 없이 UI디자인의 PUSH-01/02/03 을 그 자리에서 띄워 본다.
 // 화면 오른쪽 밖에 트리거 버튼 3개를 두고, 누르면 폰이 잠긴 대기 화면 전체가 뜬다
@@ -28,11 +30,38 @@ type VariantKey = keyof typeof VARIANTS;
 
 export default function PushDemo() {
   const [open, setOpen] = useState<VariantKey | null>(null);
+  const pathname = usePathname();
+
+  // 현재 화면이 순환 목록 어디쯤인지 — 동적 id 화면(/meetup/1 등)처럼 목록에 없으면 -1
+  const currentIndex = SCREEN_FLOW.findIndex((r) => r.href === pathname);
+  const prevHref = currentIndex > 0 ? SCREEN_FLOW[currentIndex - 1].href : null;
+  const nextHref =
+    currentIndex >= 0 && currentIndex < SCREEN_FLOW.length - 1
+      ? SCREEN_FLOW[currentIndex + 1].href
+      : null;
 
   return (
     <>
       {/* 화면 오른쪽 위 바깥의 프로토타입 조작판 — 실제 UI가 아니다 */}
       <div className="fixed right-2 top-16 z-40 flex flex-col gap-2">
+        <div className="flex gap-1">
+          <button
+            type="button"
+            disabled={!prevHref}
+            onClick={() => prevHref && (window.location.href = prevHref)}
+            className="flex-1 px-2 py-1.5 rounded-full bg-black/70 text-white text-[11px] font-bold cursor-pointer whitespace-nowrap disabled:opacity-30 disabled:cursor-default"
+          >
+            ‹ 이전
+          </button>
+          <button
+            type="button"
+            disabled={!nextHref}
+            onClick={() => nextHref && (window.location.href = nextHref)}
+            className="flex-1 px-2 py-1.5 rounded-full bg-black/70 text-white text-[11px] font-bold cursor-pointer whitespace-nowrap disabled:opacity-30 disabled:cursor-default"
+          >
+            다음 ›
+          </button>
+        </div>
         <button
           type="button"
           // Link 의 클라이언트 전환이 씹히는 경우가 있어(재현 안 됨) — 아예 하드 이동으로 확실히 보낸다

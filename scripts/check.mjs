@@ -454,7 +454,8 @@ try {
     if (path === "/create/activity") {
       ok(h.includes("목록에 없으면"), `${path}: 머리말 있음`);
       ok(h.indexOf("병원") < h.indexOf("목록에 없으면"), `${path}: 검색칸이 옵션 아래`);
-      ok(!/이전<\/button>/.test(h), `${path}: 하단 "이전" 버튼 없음(다음만)`);
+      // PushDemo 조작판의 "‹ 이전"(페이지 넘기기)과 헷갈리지 않게 ">이전</button>"만 정확히 본다
+      ok(!/>이전<\/button>/.test(h), `${path}: 하단 "이전" 버튼 없음(다음만)`);
     } else {
       ok(!h.includes("목록에 없으면"), `${path}: 옛 머리말 없음`);
     }
