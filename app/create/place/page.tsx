@@ -117,16 +117,22 @@ export default function CreatePlacePage() {
           onVoice={() => setVoiceOpen(true)}
         />
 
-        {/* 지도·검색결과가 길어져도 스크롤에 딸려 사라지지 않게 화면 하단에 고정 */}
+        {/* 지도·검색결과가 아무리 길어져도 스크롤과 무관하게 화면 하단(다음 버튼 바로 위)에 고정 */}
         {query.trim() && (
-          <button
-            type="button"
-            onClick={() => search(query)}
-            disabled={searching}
-            className="sticky bottom-4 z-10 mt-3 w-full h-[50px] rounded-lg bg-ink text-white text-[16px] font-bold cursor-pointer disabled:opacity-60 disabled:cursor-default"
-          >
-            {searching ? "찾고 있어요..." : origin === null ? "이걸로 할게요" : "이 장소 찾기"}
-          </button>
+          <>
+            {/* 버튼이 화면에 고정되면 흐름에서 빠지므로, 밑 내용이 버튼에 가리지 않게 자리를 비워둔다 */}
+            <div className="mt-3 h-[50px]" />
+            <div className="fixed inset-x-0 bottom-[94px] z-20 flex justify-center px-5">
+              <button
+                type="button"
+                onClick={() => search(query)}
+                disabled={searching}
+                className="w-full max-w-[320px] h-[50px] rounded-lg bg-ink text-white text-[16px] font-bold cursor-pointer shadow-lg disabled:opacity-60 disabled:cursor-default"
+              >
+                {searching ? "찾고 있어요..." : origin === null ? "이걸로 할게요" : "이 장소 찾기"}
+              </button>
+            </div>
+          </>
         )}
 
         <div className="h-4" />
