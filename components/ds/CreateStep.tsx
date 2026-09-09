@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import WireframeLayout from "@/components/WireframeLayout";
 import MemoryChips from "@/components/ds/MemoryChips";
@@ -34,9 +35,9 @@ export default function CreateStep({
           type="button"
           onClick={() => router.push(backHref)}
           aria-label="이전 화면으로"
-          className="text-2xl text-black cursor-pointer leading-none"
+          className="cursor-pointer"
         >
-          ‹
+          <Image src="/illust/arrow-back-ios-new.svg" alt="" width={24} height={24} />
         </button>
         <span className="absolute inset-x-0 text-center text-[17px] font-bold text-black pointer-events-none">
           동행 만들기

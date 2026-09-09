@@ -89,8 +89,8 @@ export default async function MeetupDetailPage({
   return (
     <WireframeLayout justify="start" className="flex flex-col bg-[#f3fbf2]">
       <header className="h-[60px] px-5 flex items-center border-b border-gray-100 bg-white relative">
-        <Link href={backLink} aria-label="뒤로" className="text-2xl text-black leading-none">
-          ‹
+        <Link href={backLink} aria-label="뒤로">
+          <Image src="/illust/arrow-back-ios-new.svg" alt="" width={24} height={24} />
         </Link>
         <span className="absolute inset-x-0 text-center text-[17px] font-bold text-black pointer-events-none">
           자세히 보기

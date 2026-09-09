@@ -4,6 +4,7 @@ import { useState } from "react";
 import CreateStep from "@/components/ds/CreateStep";
 import PrevNext from "@/components/ds/PrevNext";
 import VoiceSheet from "@/components/ds/VoiceSheet";
+import MicIcon from "@/components/ds/MicIcon";
 import { loadDraft, updateDraft } from "@/lib/draft";
 
 // UI디자인 cr-01 의 말하기 갈래 — 화면에서 움직이는 것은 마이크 하나뿐이다.
@@ -62,10 +63,7 @@ export default function CreateListeningPage() {
           aria-label="누르고 말하기"
           className="w-[132px] h-[132px] rounded-full bg-accent-soft flex flex-col items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
         >
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <rect x="9" y="2" width="6" height="12" rx="3" fill="#45B83C" />
-            <path d="M5 11a7 7 0 0 0 14 0M12 18v4" stroke="#45B83C" strokeWidth="2" strokeLinecap="round" />
-          </svg>
+          <MicIcon size={40} color="#45B83C" />
           <span className="text-[15px] font-bold text-accent">누르고 말하기</span>
         </button>
 

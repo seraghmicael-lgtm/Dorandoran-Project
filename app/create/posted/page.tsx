@@ -146,8 +146,8 @@ export default function CreatePostedPage() {
   return (
     <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
       <header className="h-[60px] px-5 flex items-center border-b border-gray-100 bg-white relative">
-        <Link href="/create/review" aria-label="뒤로" className="text-2xl text-black leading-none">
-          ‹
+        <Link href="/create/review" aria-label="뒤로">
+          <Image src="/illust/arrow-back-ios-new.svg" alt="" width={24} height={24} />
         </Link>
         <span className="absolute inset-x-0 text-center text-[17px] font-bold text-black pointer-events-none">
           올렸어요

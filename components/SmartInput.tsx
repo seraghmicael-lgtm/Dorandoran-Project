@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { unlockAudio } from "@/lib/voice";
 import { unlockAgentAudio } from "@/lib/realtimeMeetup";
+import MicIcon from "@/components/ds/MicIcon";
 
 // UI디자인 CR 그룹의 입력 줄 — 둥근 입력칸 + 오른쪽에 떨어진 마이크 버튼.
 // placeholder 는 화면마다 그 칸에 맞는 예시를 넣는다("예) 장보러 가실 분 있나요").
@@ -95,15 +96,7 @@ export default function SmartInput({
           aria-label="말하기"
           className="w-[56px] h-[56px] shrink-0 bg-surface flex items-center justify-center cursor-pointer border-l border-gray-200"
         >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <rect x="9" y="2" width="6" height="12" rx="3" fill="#555" />
-            <path
-              d="M5 11a7 7 0 0 0 14 0M12 18v4"
-              stroke="#555"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
+          <MicIcon size={22} color="#555" />
         </button>
       </div>
 

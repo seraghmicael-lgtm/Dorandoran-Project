@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import Image from "next/image";
 import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
 import MeetupCard from "@/components/ds/MeetupCard";
@@ -49,20 +50,12 @@ export default async function HomePage() {
   return (
     <WireframeLayout justify="start" className="flex flex-col">
       <header className="h-[60px] px-5 flex items-center justify-between border-b border-gray-100 bg-white">
-        <span className="flex items-center gap-1.5">
+        <span className="flex items-center gap-4">
           <BrandMark size={26} />
           <BrandWordmark width={86} />
         </span>
         <span aria-hidden="true">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M18 16V11a6 6 0 1 0-12 0v5l-1.5 2.5h15L18 16Z"
-              stroke="#171717"
-              strokeWidth="1.8"
-              strokeLinejoin="round"
-            />
-            <path d="M10 19.5a2 2 0 0 0 4 0" stroke="#171717" strokeWidth="1.8" strokeLinecap="round" />
-          </svg>
+          <Image src="/illust/notice.svg" alt="" width={24} height={24} />
         </span>
       </header>
 

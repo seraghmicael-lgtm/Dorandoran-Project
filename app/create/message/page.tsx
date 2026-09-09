@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import CreateStep from "@/components/ds/CreateStep";
 import PrevNext from "@/components/ds/PrevNext";
 import VoiceSheet from "@/components/ds/VoiceSheet";
+import MicIcon from "@/components/ds/MicIcon";
 import { updateDraft } from "@/lib/draft";
 
 // UI디자인 cr-06 (1089:7757) — 추가로 남길 얘기가 있나요?
@@ -42,10 +43,7 @@ export default function CreateMessagePage() {
           onClick={() => setSheetOpen(true)}
           className="w-full h-12 rounded-xl bg-brand flex items-center justify-center gap-2 cursor-pointer"
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <rect x="9" y="2" width="6" height="12" rx="3" fill="#fff" />
-            <path d="M5 11a7 7 0 0 0 14 0M12 18v4" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
-          </svg>
+          <MicIcon size={18} color="#fff" />
           <span className="text-[16px] font-bold text-white">말하기</span>
         </button>
       </div>
