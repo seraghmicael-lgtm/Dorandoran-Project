@@ -49,7 +49,7 @@ export default async function HomePage() {
 
   return (
     <WireframeLayout justify="start" className="flex flex-col">
-      <header className="h-[60px] px-7 flex items-center justify-between border-b border-gray-100 bg-white">
+      <header className="h-[60px] mt-4 px-7 flex items-center justify-between border-b border-gray-100 bg-white">
         <span className="flex items-center gap-4">
           <BrandMark size={26} />
           <BrandWordmark width={86} />
