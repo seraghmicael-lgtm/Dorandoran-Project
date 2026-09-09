@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import WireframeLayout from "@/components/WireframeLayout";
 
@@ -11,34 +10,27 @@ export default function SplashPage() {
 
   return (
     <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
-      <div className="relative flex-1 w-full bg-[#edfafb]">
-        <Image
+      <div className="relative flex-1 w-full bg-[#edfafb] flex flex-col items-center overflow-hidden">
+        {/* ⚠️ 실측 확인된 렌더링 버그: 사진처럼 디테일 많은 배경 이미지가 아이콘·워드마크와
+            같은 화면 영역에서 겹치면(둘 다 같은 세로 구간을 차지하면) 아이콘·워드마크가
+            두 겹으로 번져 보인다(실기기·프로덕션 빌드·헤드리스 전부 재현, next/image·plain img
+            무관). 사진을 아이콘 블록과 겹치지 않는 하단 고정 높이로 떼어놓으니 완전히 사라졌다 —
+            그래서 배경을 전체가 아니라 하단 300px만 차지하게 잘랐다. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src="/illust/splash-bg.png"
           alt=""
           aria-hidden="true"
-          fill
-          sizes="360px"
-          className="object-cover object-bottom"
-          priority
+          className="absolute left-0 right-0 bottom-0 w-full h-[300px] object-cover object-bottom"
         />
 
-        {/* UI디자인 Frame 254(1331:3400) — 구조 그대로: 워드마크·아이콘이 같은 그리드 칸에서
-            마진으로 겹쳐 쌓인다(Figma 원본 기법). 심볼은 이미 100x100 원 이미지라 별도 축소 없이 그대로 쓴다. */}
-        <div className="absolute inset-x-5 top-1/2 -translate-y-[60px] flex flex-col items-center gap-6">
-          <div className="grid grid-cols-[max-content] grid-rows-[max-content] place-items-start">
+        {/* UI디자인 Frame 254(1331:3400) — 아이콘 바로 아래 워드마크. */}
+        <div className="relative mt-[190px] flex flex-col items-center gap-6">
+          <div className="flex flex-col items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/illust/logo.svg"
-              alt="오늘마실"
-              className="col-start-1 row-start-1 block mt-[99.5px] w-[124px] h-[43px]"
-            />
+            <img src="/illust/symbol.svg" alt="" aria-hidden="true" className="block w-[100px] h-[100px]" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/illust/symbol.svg"
-              alt=""
-              aria-hidden="true"
-              className="col-start-1 row-start-1 block ml-[12px] w-[100px] h-[100px]"
-            />
+            <img src="/illust/logo.svg" alt="오늘마실" className="block w-[124px] h-[43px]" />
           </div>
           <p className="text-[18px] font-medium text-[#777] text-center leading-[1.5] whitespace-pre-line">
             {"장 보러, 산책하러, 커피 한 잔\n우리 동네에서 한두 시간"}
