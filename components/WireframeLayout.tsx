@@ -40,14 +40,15 @@ export default function WireframeLayout({
     (pathname === "/home" || pathname.startsWith("/my-meetups") ? "five" : "none");
 
   return (
-    <div className="min-h-screen bg-gray-100 text-black flex justify-center items-start">
-      {/* 기준 프레임 360×800 고정 — 폰 화면 크기와 무관하게 항상 같은 캔버스를 쓴다.
-          프레임 높이가 못 박혀 있으므로 넘치는 내용은 안쪽에서만 스크롤한다
+    <div className="h-dvh bg-gray-100 text-black flex justify-center items-start">
+      {/* 기준 프레임 폭 360 고정 — 높이는 브라우저 창(dvh)에 맞춰 늘어난다.
+          주소창이 접혔다 펴지는 모바일에서도 잘리지 않도록 vh 가 아니라 dvh 를 쓴다.
+          프레임 높이가 정해져 있으므로 넘치는 내용은 안쪽에서만 스크롤한다
           (ds_navigation_bottom 은 프레임 바닥에 붙은 채로 남는다).
           가장자리 선은 border 가 아니라 ring 으로 긋는다 — border 는 폭을 1px 씩
           갉아먹어서 화면 안의 여백이 Figma 좌표와 어긋난다. */}
       <div
-        className="w-[360px] h-[800px] shrink-0 bg-white ring-1 ring-gray-200 flex flex-col relative shadow-none font-sans text-sm"
+        className="w-[360px] h-full shrink-0 bg-white ring-1 ring-gray-200 flex flex-col relative shadow-none font-sans text-sm"
       >
         <div
           className={`flex-1 flex flex-col overflow-y-auto ${JUSTIFY[justify]} ${ITEMS[items]} ${className}`}
