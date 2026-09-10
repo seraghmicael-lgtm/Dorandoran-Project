@@ -80,53 +80,67 @@ export default function CancelCreatedButton({
               </div>
             </>
           ) : (
-            // Figma MY-03 — 취소 확인
-            <div className="flex-1 flex flex-col justify-center px-4 gap-5">
-              <h2 id="cancel-created-title" className="text-[24px] font-bold text-black text-center leading-[1.3] tracking-[-0.28px]">
-                만든 동행을 취소할까요?
-              </h2>
+            // Figma MY-03(1248:2886) — 취소 확인.
+            // container 위 28 · content 는 남는 높이 안에서 가운데 · footer 는 바닥에 붙는다.
+            <>
+              <div className="flex-1 min-h-0 px-4 pt-7 flex flex-col items-center justify-center">
+                {/* 1248:2926 — 제목 · 참여자 카드 · 안내문을 16 간격으로 */}
+                <div className="w-full flex flex-col gap-4">
+                  <h2
+                    id="cancel-created-title"
+                    className="text-[28px] font-bold leading-[1.3] tracking-[-0.28px] text-ink text-center"
+                  >
+                    만든 동행을 취소할까요?
+                  </h2>
 
-              <div className="rounded-xl bg-surface px-4 py-4 flex flex-col gap-4 shadow-[0_2px_6px_rgba(0,0,0,0.08)]">
-                <p className="text-[18px] text-black">
-                  참여자 <span className="font-bold text-brand">{participants.length}</span>
-                </p>
-                <ul className="flex flex-col gap-3">
-                  {participants.map((p, i) => (
-                    <li key={i} className="flex items-center gap-2">
-                      <Image
-                        src={AVATARS[i % AVATARS.length]}
-                        alt=""
-                        width={24}
-                        height={24}
-                        className="shrink-0 rounded-full"
-                      />
-                      <span className="text-[16px] text-muted">{p.nickname}</span>
-                      {p.isCreator && (
-                        <span className="px-1.5 py-1 rounded bg-accent-soft text-accent text-[12px] font-medium leading-none">
-                          개설자
-                        </span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
+                  {/* 1248:2954 — ds_card 지만 바탕은 surface/body-neutral */}
+                  <div className="rounded-xl bg-surface p-4 shadow-[0_2px_6px_rgba(0,0,0,0.08)] flex flex-col gap-4">
+                    <p className="flex items-baseline gap-1 text-[18px] leading-[1.5]">
+                      <span className="font-medium text-ink">참여자</span>
+                      <span className="font-bold text-brand">{participants.length}</span>
+                    </p>
+                    <ul className="flex flex-col gap-3">
+                      {participants.map((p, i) => (
+                        <li key={i} className="flex items-center gap-2">
+                          <Image
+                            src={AVATARS[i % AVATARS.length]}
+                            alt=""
+                            width={24}
+                            height={24}
+                            className="shrink-0 rounded-full"
+                          />
+                          <span className="text-[16px] font-medium leading-[1.5] text-sub">
+                            {p.nickname}
+                          </span>
+                          {p.isCreator && (
+                            <span className="px-1.5 py-1 rounded bg-brand-alpha-15 text-brand text-[12px] font-medium leading-none">
+                              개설자
+                            </span>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <p className="text-[18px] font-medium leading-[1.5] text-sub text-center whitespace-pre-line">
+                    {"참여 신청한 분께도 알려드릴게요.\n정말로 만든 동행을 취소하시겠어요?"}
+                  </p>
+
+                  {stage === "error" && (
+                    <p className="text-[16px] leading-[1.5] text-count-soon-ink text-center">
+                      취소하지 못했어요. 잠시 뒤에 다시 눌러주세요.
+                    </p>
+                  )}
+                </div>
               </div>
 
-              <p className="text-[18px] text-muted text-center leading-[1.5]">
-                {"참여 신청한 분께도 알려드릴게요.\n정말로 만든 동행을 취소하시겠어요?"}
-              </p>
-
-              {stage === "error" && (
-                <p className="text-[15px] text-black text-center">
-                  취소하지 못했어요. 잠시 뒤에 다시 눌러주세요.
-                </p>
-              )}
-
-              <div className="pb-10 flex flex-col gap-3">
+              {/* ds_step_footer(1248:2891) — 좌우 16 · 아래 40 · 버튼 48, 사이 12 */}
+              <div className="shrink-0 px-4 pb-10 flex flex-col gap-3">
                 <button
                   type="button"
                   onClick={cancel}
                   disabled={stage === "working"}
-                  className="w-full h-12 rounded-xl bg-brand text-white text-[16px] font-medium cursor-pointer disabled:opacity-60"
+                  className={`${footerButtonClass("brand")} cursor-pointer disabled:opacity-60`}
                 >
                   {stage === "working" ? "취소하는 중이에요..." : "취소할게요"}
                 </button>
@@ -134,12 +148,12 @@ export default function CancelCreatedButton({
                   type="button"
                   onClick={() => setStage("closed")}
                   disabled={stage === "working"}
-                  className="w-full h-12 rounded-xl border border-gray-200 bg-white text-[#5b5b5b] text-[16px] font-bold cursor-pointer disabled:opacity-60"
+                  className={`${footerButtonClass("ghost")} cursor-pointer disabled:opacity-60`}
                 >
                   이전
                 </button>
               </div>
-            </div>
+            </>
           )}
         </div>
       )}
