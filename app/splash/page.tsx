@@ -11,11 +11,12 @@ export default function SplashPage() {
   return (
     <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
       <div className="relative flex-1 w-full bg-[#edfafb] flex flex-col items-center overflow-hidden">
-        {/* ⚠️ 실측 확인된 렌더링 버그: 사진처럼 디테일 많은 배경 이미지가 아이콘·워드마크와
-            같은 화면 영역에서 겹치면(둘 다 같은 세로 구간을 차지하면) 아이콘·워드마크가
-            두 겹으로 번져 보인다(실기기·프로덕션 빌드·헤드리스 전부 재현, next/image·plain img
-            무관). 사진을 아이콘 블록과 겹치지 않는 하단 고정 높이로 떼어놓으니 완전히 사라졌다 —
-            그래서 배경을 전체가 아니라 하단 300px만 차지하게 잘랐다. */}
+        {/* ⚠️ 실측 확인된 렌더링 버그: 디테일 많은 배경 사진이 해상도 1080x2400일 때
+            아이콘·워드마크와 같은 화면 영역을 차지하면 그 둘이 두 겹으로 번져 보였다
+            (실기기·프로덕션 빌드·헤드리스 전부 재현, next/image·plain img 무관, 겹침 자체는
+            지금도 여전함 — 아이콘이 사진 위에 그대로 얹힌다). 배경 사진을 720x1600(가로세로
+            비율은 그대로, 화소 수만 절반)으로 줄이자 완전히 사라졌다 — 디테일량/디코드 비용이
+            어떤 임계값을 넘던 것으로 보인다. 사진을 다시 고해상도로 바꾸면 재발할 수 있다. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/illust/splash-bg.png"

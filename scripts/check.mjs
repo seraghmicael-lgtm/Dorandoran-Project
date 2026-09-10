@@ -222,15 +222,16 @@ ok(formatKoreanClock(13, 30) === "오후 1시 30분", "13:30 → 오후 1시 30�
     memoryChips({ activity: "산책" }).join("|") === "산책",
     "메모리풍선: 활동만 정했을 때"
   );
+  // cr-04·cr-05 실측대로 소요시간은 고른 라벨 그대로 건다("동안"으로 바꿔 붙이지 않는다)
   const full = memoryChips({
     activity: "산책",
     time: "오후 3시",
-    duration: "1시간",
+    duration: "1시간 소요",
     location: "도토리마을 공원 입구",
     maxPeople: 4,
   });
   ok(
-    full.join("|") === "산책|오후 3시|1시간 동안|도토리마을 공원 입구|4명",
+    full.join("|") === "산책|오후 3시|1시간 소요|도토리마을 공원 입구|4명",
     "메모리풍선: Figma 순서·문구 그대로",
     full.join(" / ")
   );
@@ -243,7 +244,7 @@ ok(formatKoreanClock(13, 30) === "오후 1시 30분", "13:30 → 오후 1시 30�
   ok(memoryChips({ activity: "   " }).length === 0, "메모리풍선: 공백만 있으면 안 건다");
 
   // 지금 화면에서 고르는 중인 값은 안 건다 — 고른 것은 [다음]으로 넘어간 화면에서 처음 보인다
-  const picked = { activity: "산책", time: "오후 3시", duration: "1시간", maxPeople: 4 };
+  const picked = { activity: "산책", time: "오후 3시", duration: "1시간 소요", maxPeople: 4 };
   ok(memoryChips(picked, 1).length === 0, "메모리풍선: 1단계에선 방금 고른 활동을 안 건다");
   ok(memoryChips(picked, 2).join("|") === "산책", "메모리풍선: 2단계에서 앞 단계 활동만 건다");
   ok(
@@ -251,7 +252,7 @@ ok(formatKoreanClock(13, 30) === "오후 1시 30분", "13:30 → 오후 1시 30�
     "메모리풍선: 3단계에선 이번 화면의 소요시간을 뺀다"
   );
   ok(
-    memoryChips(picked, 6).join("|") === "산책|오후 3시|1시간 동안|4명",
+    memoryChips(picked, 6).join("|") === "산책|오후 3시|1시간 소요|4명",
     "메모리풍선: 마지막 단계에선 앞에서 정한 것이 다 걸린다"
   );
 }
@@ -458,8 +459,8 @@ try {
     ["/create/activity", 1, "어떤 활동을"],
     ["/create/time", 2, "동행과 몇 시에"],
     ["/create/duration", 3, "얼마나 걸릴까요"],
-    ["/create/place", 4, "어디서 만날까요"],
-    ["/create/people", 5, "몇 명이 함께할까요"],
+    ["/create/place", 4, "어디서"],
+    ["/create/people", 5, "몇 명이"],
     ["/create/message", 6, "추가로 남길"],
   ];
   for (const [path, step, heading] of stepPages) {
@@ -547,7 +548,8 @@ try {
     ok(home.includes("오늘마실"), "홈: 로고");
     ok(home.includes("마실 어떠세요"), "홈: 인사말");
     ok(home.includes("회귀검사 홈카드"), "홈: 올린 동행이 목록에 뜬다");
-    ok(home.includes("1<!-- -->/<!-- -->5"), "홈: 자리 수 표시(1/5)");
+    // 숫자·슬래시가 각각 독립된 <span>이라(글자 크기가 달라) 사이에 태그가 낀다
+    ok(/>1<\/span>[^<]*<span[^>]*>\/<\/span>[^<]*<span[^>]*>5</.test(home), "홈: 자리 수 표시(1/5)");
 
     const created = await withUid("/my-meetups/created");
     ok(created.includes("회귀검사 홈카드"), "만든 동행: 내가 올린 게 보인다");
