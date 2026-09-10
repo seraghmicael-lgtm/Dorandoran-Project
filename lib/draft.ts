@@ -71,19 +71,32 @@ export function draftSnapshot(): string | null {
   }
 }
 
+/** 칩 하나하나가 어느 단계에서 정해지는지 — memoryChips 의 값 순서와 짝이다 */
+const CHIP_STEPS = [1, 2, 3, 4, 5] as const;
+
 /**
  * 메모리풍선에 걸 칩 목록 (Figma 941:980 순서: 할일 → 시간 → 모임시간 → 장소 → 인원).
  * 소요시간 칩은 "1시간 동안" (UI디자인 cr-04). 선택지 라벨의 "소요"는 떼고 붙인다.
  * 아직 안 정한 항목은 빼고, 하나도 없으면 빈 배열 — 화면은 아무것도 안 그린다.
+ *
+ * beforeStep 을 주면 그 단계 "앞"에서 정한 것만 건다. 지금 화면에서 고르는 중인 값은
+ * 빼야 한다 — 산책을 누르자마자 그 화면에 산책 칩이 뜨면 "이미 지나온 것"이라는 칩의
+ * 뜻이 깨진다. 고른 것은 [다음]을 눌러 넘어간 화면에서 칩으로 처음 보인다.
  */
-export function memoryChips(d: MeetupDraft | null | undefined): string[] {
-  return [
+export function memoryChips(
+  d: MeetupDraft | null | undefined,
+  beforeStep?: number,
+): string[] {
+  const values = [
     d?.activity,
     d?.time,
     d?.duration ? `${d.duration.replace(" 소요", "")} 동안` : null,
     d?.location,
     typeof d?.maxPeople === "number" ? `${d.maxPeople}명` : null,
-  ].filter((v): v is string => typeof v === "string" && v.trim().length > 0);
+  ];
+  return values
+    .filter((_, i) => beforeStep === undefined || CHIP_STEPS[i] < beforeStep)
+    .filter((v): v is string => typeof v === "string" && v.trim().length > 0);
 }
 
 /** draft 변화를 구독한다(useSyncExternalStore 용) */

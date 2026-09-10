@@ -241,6 +241,19 @@ ok(formatKoreanClock(13, 30) === "오후 1시 30분", "13:30 → 오후 1시 30�
   );
   ok(memoryChips({ maxPeople: 0 }).join("|") === "0명", "메모리풍선: 0명도 표시(0을 빈 값으로 안 본다)");
   ok(memoryChips({ activity: "   " }).length === 0, "메모리풍선: 공백만 있으면 안 건다");
+
+  // 지금 화면에서 고르는 중인 값은 안 건다 — 고른 것은 [다음]으로 넘어간 화면에서 처음 보인다
+  const picked = { activity: "산책", time: "오후 3시", duration: "1시간", maxPeople: 4 };
+  ok(memoryChips(picked, 1).length === 0, "메모리풍선: 1단계에선 방금 고른 활동을 안 건다");
+  ok(memoryChips(picked, 2).join("|") === "산책", "메모리풍선: 2단계에서 앞 단계 활동만 건다");
+  ok(
+    memoryChips(picked, 3).join("|") === "산책|오후 3시",
+    "메모리풍선: 3단계에선 이번 화면의 소요시간을 뺀다"
+  );
+  ok(
+    memoryChips(picked, 6).join("|") === "산책|오후 3시|1시간 동안|4명",
+    "메모리풍선: 마지막 단계에선 앞에서 정한 것이 다 걸린다"
+  );
 }
 
 // ---------- 유닛: meetupDialog ----------
@@ -460,11 +473,13 @@ try {
       ok(!h.includes("목록에 없으면"), `${path}: 옛 머리말 없음`);
     }
     ok(h.includes(heading), `${path}: 새 제목`, heading);
-    // 진행 표시는 초록 알약("N/6")이 아니라 6칸 세그먼트 막대 — 지나온 칸까지 채워진다
-    const segs = [...h.matchAll(/rounded-full (bg-accent|bg-gray-100)"/g)].map((m) => m[1]).slice(0, 6);
+    // 진행 표시는 초록 알약("N/6")이 아니라 6칸 세그먼트 막대 — 지나온 칸까지 채워진다.
+    // 빈 칸 색은 Stepper 가 쓰는 값을 그대로 본다(초록만 아니면 빈 칸) — 색 코드가 바뀌어도 안 깨진다.
+    const segs = [...h.matchAll(/h-\[6px\] rounded-full ([^"]+)"/g)]
+      .map((m) => (m[1].includes("bg-accent") ? "채움" : "빈칸"))
+      .slice(0, 6);
     ok(
-      segs.length === 6 &&
-        segs.every((c, i) => c === (i < step ? "bg-accent" : "bg-gray-100")),
+      segs.length === 6 && segs.every((c, i) => c === (i < step ? "채움" : "빈칸")),
       `${path}: 진행 막대 ${step}/6 칸 채워짐`,
       JSON.stringify(segs)
     );
@@ -633,11 +648,23 @@ try {
     // 버튼 크기 — 줄마다 flex 로 나누면 짝 없는 칸·세로로 쌓은 칸이 혼자 다른 크기가 된다
     {
       const act = await html("/create/activity");
-      ok(act.includes("grid grid-cols-2"), "활동: 선택칸은 두 칸 격자(혼자 남는 병원도 같은 너비)");
+      // Figma 실측대로 154px 고정폭을 흘려 담는다 — 혼자 남는 "병원"도 폭이 같아야 한다
+      const optWidths = [...act.matchAll(/aria-pressed="[^"]*"[^>]*style="width:(\d+)px"/g)].map(
+        (m) => Number(m[1])
+      );
+      ok(
+        optWidths.length === 7 && optWidths.every((w) => w === optWidths[0]),
+        "활동: 선택칸 너비가 전부 같다(혼자 남는 병원도 같은 너비)",
+        JSON.stringify(optWidths)
+      );
       ok(!act.includes('<span class="flex-1"></span>'), "활동: 빈 자리채움 없음");
 
-      const footerBtns = [...msgHtml.matchAll(/class="([^"]*h-\[54px\][^"]*)"/g)].map((m) => m[1]);
-      ok(footerBtns.length === 2, "하실 말씀: 이전·다음 두 개");
+      // 본문의 "말하기"도 h-12 rounded-xl 이라 테두리가 있는 하단 두 개만 본다
+      // ([이전]은 회색 테두리, [다음]은 폭을 맞추려고 투명 테두리를 둔다)
+      const footerBtns = [
+        ...msgHtml.matchAll(/class="([^"]*\bh-12\b[^"]*rounded-xl border[^"]*)"/g),
+      ].map((m) => m[1]);
+      ok(footerBtns.length === 2, "하실 말씀: 이전·다음 두 개", String(footerBtns.length));
       ok(
         footerBtns.every((c) => c.includes("flex-1") && !c.includes("w-full")),
         "하실 말씀: 가로형(ds_step_footer) 반반 배치",
