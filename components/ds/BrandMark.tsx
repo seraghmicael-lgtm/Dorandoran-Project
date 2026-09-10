@@ -24,6 +24,19 @@ export function BrandWordmark({ width = 124 }: { width?: number }) {
   );
 }
 
+/** 상단 바 로고(심볼+워드마크 한 벌). Figma 내보내기 그대로 95x24 */
+export function BrandHeaderLogo({ width = 95 }: { width?: number }) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/illust/header-logo.svg"
+      alt="오늘마실"
+      width={width}
+      height={Math.round((width * 24) / 95)}
+    />
+  );
+}
+
 /** 화면마다 다른 큰 일러스트 — Figma 내보내기 그대로 */
 export function Illust({
   name,

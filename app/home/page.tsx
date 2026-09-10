@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import WireframeLayout from "@/components/WireframeLayout";
 import MeetupCard from "@/components/ds/MeetupCard";
-import BrandMark, { BrandWordmark, Illust } from "@/components/ds/BrandMark";
+import { BrandHeaderLogo, Illust } from "@/components/ds/BrandMark";
 import AdBanner from "@/components/ds/AdBanner";
 import { prisma } from "@/lib/prisma";
 import { UID_COOKIE } from "@/lib/session";
@@ -50,10 +50,7 @@ export default async function HomePage() {
   return (
     <WireframeLayout justify="start" className="flex flex-col">
       <header className="h-[60px] mt-4 px-7 flex items-center justify-between border-b border-gray-100 bg-white">
-        <span className="flex items-center gap-4">
-          <BrandMark size={26} />
-          <BrandWordmark width={86} />
-        </span>
+        <BrandHeaderLogo width={95} />
         <span aria-hidden="true">
           <Image src="/illust/notice.svg" alt="" width={24} height={24} />
         </span>
