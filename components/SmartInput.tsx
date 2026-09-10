@@ -76,27 +76,32 @@ export default function SmartInput({
 
   return (
     <div
-      className={`w-full flex flex-col gap-2.5 ${
+      className={`w-full flex flex-col gap-4 ${
         divider ? "border-t border-gray-200 pt-[18px]" : ""
       }`}
     >
-      {label && <p className="text-[15px] text-muted">{label}</p>}
+      {label && (
+        <p className="text-[16px] font-medium leading-[1.5] text-[#777777]">{label}</p>
+      )}
 
-      <div className="flex items-stretch rounded-xl border border-gray-200">
+      {/* ds_input(1122:1733) — 테두리 1px 을 포함해 58, 안쪽 줄이 56.
+          마이크는 따로 떨어진 버튼이 아니라 칸 안 오른쪽에 놓인 24 아이콘이다.
+          (Figma 가 내보낸 코드에는 border 와 p-px 가 같이 있지만 실제 노드는 58 이라 테두리만 둔다) */}
+      <div className="flex items-center rounded-xl border border-[#F2F2F2] bg-white">
         <input
           type="text"
           value={value}
           onChange={(e) => handleSetValue(e.target.value)}
           placeholder={placeholder}
-          className="flex-1 min-w-0 h-[56px] px-4 bg-white text-[16px] text-black placeholder:text-muted focus:outline-none"
+          className="flex-1 min-w-0 h-[56px] pl-4 pr-1 bg-transparent text-[18px] font-medium text-black placeholder:text-[#AFAFAF] placeholder:font-medium focus:outline-none"
         />
         <button
           type="button"
           onClick={handleVoice}
           aria-label="말하기"
-          className="w-[56px] h-[56px] shrink-0 bg-surface flex items-center justify-center cursor-pointer border-l border-gray-200"
+          className="mr-3 shrink-0 size-6 flex items-center justify-center cursor-pointer"
         >
-          <MicIcon size={22} color="#555" />
+          <MicIcon size={24} color="#5B5B5B" />
         </button>
       </div>
 

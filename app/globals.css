@@ -9,8 +9,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-noto-sans-kr), "Apple SD Gothic Neo", "Malgun Gothic",
+    sans-serif;
 
   --color-brand: #32952d; /* 온보딩 기본 버튼 */
   --color-brand-light: #5bc236; /* 로고 */
@@ -34,7 +34,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
 }
 
 /* 시각 고르는 칸(TimePicker) — 스크롤 막대를 숨겨 눈금처럼 보이게 한다 */

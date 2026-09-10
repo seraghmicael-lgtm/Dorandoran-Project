@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 
-// UI디자인 ds_navigation_bottom — 홈 · 내 동행 · 내 정보 · 만들기.
+// UI디자인 ds_navigation_bottom(1084:1335) — 홈 · 내 동행 · 내 정보 · 만들기.
+// 칸 하나는 60 높이에 위아래 8 을 두고 아이콘(24)과 글자(12)를 4 간격으로 세로로 쌓는다.
 // 만들기만 초록 ⊕ 로 도드라진다(이 앱에서 하는 유일한 "만드는" 일이라서).
 interface BottomNavFiveProps {
   active?: "home" | "my-meetups" | "my-info" | "create";
@@ -51,7 +52,9 @@ export default function BottomNavFive({ active }: BottomNavFiveProps) {
   ];
 
   return (
-    <nav className="h-[55px] border-t border-[#E5E5E5] bg-white flex items-center justify-around px-1">
+    // 위쪽 선은 border 가 아니라 안쪽 그림자로 긋는다 — border 는 60 중 1px 을 가져가
+    // 칸이 59 로 줄지만, Figma 는 60 짜리 칸 위에 선이 얹힌 구조다.
+    <nav className="h-[60px] shrink-0 bg-white shadow-[inset_0_1px_0_#E5E5E5] flex items-stretch">
       {items.map((item) => {
         const on = active === item.key;
         const body = (
@@ -66,13 +69,13 @@ export default function BottomNavFive({ active }: BottomNavFiveProps) {
             </span>
           </>
         );
-        const cls = "flex-1 flex flex-col items-center gap-0.5 pt-1";
+        const cls = "flex-1 flex flex-col items-center justify-center gap-1 py-2";
         return item.href ? (
           <Link key={item.key} href={item.href} className={cls}>
             {body}
           </Link>
         ) : (
-          <span key={item.key} className={`${cls} opacity-60 cursor-not-allowed`}>
+          <span key={item.key} className={`${cls} cursor-not-allowed`}>
             {body}
           </span>
         );

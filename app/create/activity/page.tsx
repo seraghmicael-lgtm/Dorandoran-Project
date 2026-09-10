@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useSyncExternalStore } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import CreateStep from "@/components/ds/CreateStep";
 import PrevNext from "@/components/ds/PrevNext";
 import OptionButton from "@/components/ds/OptionButton";
@@ -20,8 +19,9 @@ import { ACTIVITY_SUGGESTIONS } from "@/lib/activitySuggestions";
 const OPTIONS = ["산책", "등산", "여행", "맛집탐방", "장보기", "커피", "병원"];
 
 export default function CreateActivityPage() {
-  const router = useRouter();
   const raw = useSyncExternalStore(subscribeDraft, draftSnapshot, noDraftOnServer);
+  // 목록에서 고를 때마다 아래 입력칸을 새로 그려 비운다
+  const [inputRound, setInputRound] = useState(0);
   let chosen: string | undefined;
   try {
     chosen = raw ? (JSON.parse(raw) as MeetupDraft).activity ?? undefined : undefined;
@@ -37,9 +37,17 @@ export default function CreateActivityPage() {
     window.history.replaceState(null, "", "/create/activity");
   }, []);
 
-  const choose = (activity: string) => {
+  // 목록에서 고르거나 아래 칸에 적은 것을 "골라둔 값"으로만 저장한다 —
+  // 화면을 넘기는 건 오직 하단 [다음]이다(고르자마자 넘어가면 되돌릴 틈이 없다).
+  const chooseOption = (activity: string) => {
     updateDraft({ activity });
-    router.push("/create/time");
+    // 목록에서 골랐으면 아래 칸에 적어둔 글자는 지운다 — 둘이 서로 다른 값을 가리키면 헷갈린다
+    setInputRound((n) => n + 1);
+  };
+
+  // 적는 도중에도 그대로 반영한다 — 다 지우면 아무것도 안 고른 상태로 되돌린다
+  const typeActivity = (text: string) => {
+    updateDraft({ activity: text.trim() || null });
   };
 
   return (
@@ -47,29 +55,38 @@ export default function CreateActivityPage() {
       step={1}
       title={"어떤 활동을\n하고 싶으세요?"}
       backHref="/home"
+      body="bare"
       // cr-01 은 이 흐름의 첫 단계라 "이전"이 없다 — 위 ‹ 를 누르면 backHref(/home)로 간다
       footer={<PrevNext backHref="/home" nextHref="/create/time" requires="activity" showPrev={false} />}
     >
-      {/* 두 칸 격자 — 홀수라 혼자 남는 마지막 칸(병원)도 나머지와 같은 너비다.
-          줄마다 flex 로 나누면 짝이 없는 칸이 padding 만큼 넓어진다. */}
-      <div className="mt-5 grid grid-cols-2 gap-3">
+      {/* card-list(1089:5113) — 좌우 16 · 위아래 16 · 간격 12 에 154 짜리 칸을 흘려 담는다.
+          ⚠️ Figma 실측: 칸 두 개(154+12+154=320)가 좌우 16 여백 안(328)에서 왼쪽으로 붙어
+          오른쪽에 8px 이 남는다. 이 화면의 다른 줄(막대·입력칸)은 전부 320 을 좌우 20 에
+          맞춰 두므로 디자인 쪽 실수로 보이지만, 값 그대로 옮겼다. 가운데로 맞추려면
+          이 줄의 px-4 를 px-5 로 바꾸면 된다. */}
+      <div className="px-4 py-4 flex flex-wrap gap-3">
         {OPTIONS.map((option) => (
           <OptionButton
             key={option}
             label={option}
-            full
+            width={154}
             selected={chosen === option}
-            onClick={() => choose(option)}
+            onClick={() => chooseOption(option)}
           />
         ))}
       </div>
 
-      <div className="mt-4">
+      {/* field(1122:1751) — 좌우 20 · 위아래 16 */}
+      <div className="px-5 py-4">
         <SmartInput
+          key={inputRound}
           label="목록에 없으면"
           placeholder="예) 장보러 가실 분 있나요"
           suggestions={ACTIVITY_SUGGESTIONS}
-          onConfirm={choose}
+          // 확인 버튼 없이 적는 그대로 담아둔다 — 넘어가는 건 하단 [다음] 하나뿐
+          showConfirmButton={false}
+          onConfirm={typeActivity}
+          onChange={typeActivity}
         />
       </div>
     </CreateStep>

@@ -14,6 +14,7 @@ export default function CreateStep({
   title,
   backHref,
   chips = true,
+  body = "padded",
   children,
   footer,
 }: {
@@ -23,6 +24,8 @@ export default function CreateStep({
   /** 상단 ‹ 가 갈 곳 — 이전 화면과 같은 주소 */
   backHref: string;
   chips?: boolean;
+  /** 본문 여백 — cr-01 처럼 블록마다 좌우 여백이 다른 화면은 "bare" 로 두고 직접 준다 */
+  body?: "padded" | "bare";
   children: React.ReactNode;
   footer: React.ReactNode;
 }) {
@@ -30,30 +33,36 @@ export default function CreateStep({
 
   return (
     <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
-      <header className="h-[60px] px-5 flex items-center border-b border-gray-100 bg-white relative">
+      {/* ds_navigation_top(1089:5108) — 60px. 좌우 8 안에 48 짜리 아이콘 버튼이 있어
+          아이콘 자체는 20px 자리에서 시작한다. */}
+      <header className="h-[60px] shrink-0 px-2 flex items-center border-b border-[#E5E5E5] bg-white relative">
         <button
           type="button"
           onClick={() => router.push(backHref)}
           aria-label="이전 화면으로"
-          className="cursor-pointer"
+          className="size-12 flex items-center justify-center cursor-pointer"
         >
           <Image src="/illust/arrow-back-ios-new.svg" alt="" width={24} height={24} />
         </button>
-        <span className="absolute inset-x-0 text-center text-[17px] font-bold text-black pointer-events-none">
+        <span className="absolute inset-x-0 text-center text-[18px] font-medium leading-[1.5] text-[#171717] pointer-events-none">
           동행 만들기
         </span>
       </header>
 
-      <div className="px-5 pt-4">
+      {/* stepper(1187:3789) — 38px 짜리 줄. 막대 묶음(320)을 가운데 두므로 좌우 20 이다. */}
+      <div className="shrink-0 px-5 py-4">
         <Stepper step={step} />
       </div>
 
-      <div className="flex-1 px-5 pt-5 flex flex-col">
-        <h1 className="text-[24px] font-bold text-black leading-[1.35] whitespace-pre-line">
+      {/* title(1089:5670) — 104px 짜리 줄. 글자는 좌우 16 에서 시작한다. */}
+      <div className="shrink-0 px-4 py-4">
+        <h1 className="text-[28px] font-bold text-black leading-[1.3] tracking-[-0.28px] whitespace-pre-line">
           {title}
         </h1>
+      </div>
 
-        {chips && <MemoryChips />}
+      <div className={`flex-1 flex flex-col ${body === "padded" ? "px-5" : ""}`}>
+        {chips && <MemoryChips step={step} />}
         {children}
       </div>
 
