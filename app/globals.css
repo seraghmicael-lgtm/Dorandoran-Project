@@ -22,6 +22,19 @@
   --color-ink: #171717; /* 만들기 흐름의 기본 버튼 */
   --color-muted: #999999; /* 부제·안내문 */
   --color-kakao: #f3d74f;
+
+  /* 홈 목록(on-06 / card-list-wrap 1083:651) — Figma 변수 그대로 */
+  --color-page-brand: #f3fbf2; /* 목록이 깔리는 바탕 */
+  --color-card-line: #f2f2f2; /* border/light — 카드 테두리 */
+  --color-sub: #777777; /* text/tertiary — 카드 보조 글씨 */
+  --color-faint: #afafaf; /* text/subtle — 아이콘·광고 부제 */
+  --color-count-ok-bg: #e5f6e3; /* ds_count 여유 (color/brand-100) */
+  --color-count-ok-ink: #20651e; /* text/primary-dark */
+  --color-count-soon-bg: #f6dfdf; /* ds_count 임박 (color/red-100) */
+  --color-count-soon-ink: #c62828; /* feedback/error-mid */
+  --color-count-full-bg: #e5e5e5; /* ds_count 마감 */
+  --color-count-full-ink: #777777; /* color/neutral-500 */
+  --color-ad-label: #b8890f; /* color/yellow-700 — 광고 라벨 */
 }
 
 @media (prefers-color-scheme: dark) {

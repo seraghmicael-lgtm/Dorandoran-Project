@@ -79,7 +79,10 @@ export default async function MyMeetupsCreatedPage() {
           )}
         </section>
 
-        <AdBanner />
+        {/* ds_card_banner 는 좌우 여백 없이 통째로 깔린다 — 목록 여백만 되돌린다 */}
+        <div className="-mx-5">
+          <AdBanner />
+        </div>
 
         {closed.length > 0 && (
           <section className="flex flex-col gap-3">

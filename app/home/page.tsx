@@ -21,6 +21,7 @@ export default async function HomePage() {
     startTime: string;
     activity: string;
     locationName: string | null;
+    duration: string | null;
     maxPeople: number;
     _count: { participants: number };
   }[] = [];
@@ -39,6 +40,7 @@ export default async function HomePage() {
         startTime: true,
         activity: true,
         locationName: true,
+        duration: true,
         maxPeople: true,
         _count: { select: { participants: true } },
       },
@@ -46,6 +48,10 @@ export default async function HomePage() {
   } catch (e) {
     console.error("동행 목록 조회 실패:", e);
   }
+
+  // 카드 세 장이 한 묶음(list). 묶음과 묶음 사이에 동네광고가 들어간다.
+  const groups: (typeof meetups)[] = [];
+  for (let i = 0; i < meetups.length; i += 3) groups.push(meetups.slice(i, i + 3));
 
   return (
     <WireframeLayout justify="start" className="flex flex-col">
@@ -58,32 +64,37 @@ export default async function HomePage() {
       </header>
 
       {meetups.length > 0 ? (
-        <div className="flex-1 px-5 pt-6 flex flex-col">
-          <p className="text-[19px] font-bold text-black flex items-center gap-1">
-            오늘
-            <span className="inline-flex items-center gap-0.5 text-accent">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11Z" stroke="currentColor" strokeWidth="2" />
-                <circle cx="12" cy="10" r="2.5" stroke="currentColor" strokeWidth="2" />
-              </svg>
-              {neighborhood}
+        /* content(1083:652) — 연둣빛 바탕 위에 카드 목록. 위 28 · 아래 40 */
+        <div className="grow bg-page-brand pt-7 pb-10">
+          {/* title(1083:355) — 좌우 16, 20px 볼드. 동네 이름만 진한 색 */}
+          <div className="flex items-center gap-1 px-4 text-[20px] font-bold leading-[1.3]">
+            <span className="text-sub">오늘</span>
+            <span className="flex items-center px-1 py-0.5">
+              <Image src="/illust/fill-gps-dark.svg" alt="" width={20} height={20} />
+              <span className="text-ink">{neighborhood}</span>
             </span>
-            마실 어떠세요?
-          </p>
+            <span className="text-sub">마실 어떠세요?</span>
+          </div>
 
-          <div className="mt-4 flex flex-col gap-3 pb-6">
-            {meetups.map((m, i) => (
-              <div key={m.id} className="contents">
-                <MeetupCard
-                  id={m.id}
-                  startTime={m.startTime}
-                  activity={m.activity}
-                  locationName={m.locationName}
-                  joined={m._count.participants}
-                  maxPeople={m.maxPeople}
-                />
-                {/* 카드 세 장마다 동네광고 한 자리 (on-06) */}
-                {i % 3 === 2 && <AdBanner />}
+          {/* card-list-wrap(1083:651) — 카드 묶음 사이에 동네광고가 통째로 낀다 */}
+          <div className="mt-4 flex flex-col gap-5">
+            {groups.map((group, gi) => (
+              <div key={gi} className="contents">
+                <div className="flex flex-col gap-5 px-4">
+                  {group.map((m) => (
+                    <MeetupCard
+                      key={m.id}
+                      id={m.id}
+                      startTime={m.startTime}
+                      activity={m.activity}
+                      locationName={m.locationName}
+                      duration={m.duration}
+                      joined={m._count.participants}
+                      maxPeople={m.maxPeople}
+                    />
+                  ))}
+                </div>
+                {gi < groups.length - 1 && <AdBanner />}
               </div>
             ))}
           </div>
