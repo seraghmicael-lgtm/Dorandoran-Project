@@ -5,9 +5,11 @@ import CreateStep from "@/components/ds/CreateStep";
 import PrevNext from "@/components/ds/PrevNext";
 import OptionButton from "@/components/ds/OptionButton";
 import SmartInput from "@/components/SmartInput";
+import VoiceSheet from "@/components/ds/VoiceSheet";
 import {
   clearDraft,
   draftSnapshot,
+  loadDraft,
   noDraftOnServer,
   subscribeDraft,
   updateDraft,
@@ -22,6 +24,7 @@ export default function CreateActivityPage() {
   const raw = useSyncExternalStore(subscribeDraft, draftSnapshot, noDraftOnServer);
   // 목록에서 고를 때마다 아래 입력칸을 새로 그려 비운다
   const [inputRound, setInputRound] = useState(0);
+  const [voiceOpen, setVoiceOpen] = useState(false);
   let chosen: string | undefined;
   try {
     chosen = raw ? (JSON.parse(raw) as MeetupDraft).activity ?? undefined : undefined;
@@ -48,6 +51,36 @@ export default function CreateActivityPage() {
   // 적는 도중에도 그대로 반영한다 — 다 지우면 아무것도 안 고른 상태로 되돌린다
   const typeActivity = (text: string) => {
     updateDraft({ activity: text.trim() || null });
+  };
+
+  // 말하기로 들은 문장은 /create/listening 이 하던 것과 똑같이 다룬다 —
+  // 한 번에 다 말씀하셔도 되고 활동만 말씀하셔도 된다. 알아들은 것만 채운다.
+  const applySpoken = async (transcript: string) => {
+    try {
+      const d = loadDraft() ?? {};
+      const res = await fetch("/api/parse-meetup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          transcript,
+          time: d.time ?? null,
+          location: d.location ?? null,
+          activity: d.activity ?? null,
+        }),
+      });
+      if (!res.ok) throw new Error("parse failed");
+      const parsed = await res.json();
+      updateDraft({
+        ...(parsed.activity ? { activity: parsed.activity } : {}),
+        ...(parsed.time ? { time: parsed.time } : {}),
+        ...(parsed.location ? { location: parsed.location } : {}),
+        transcript,
+      });
+      // 말한 값이 골라둔 값이 되므로 아래 칸에 적어둔 글자는 지운다
+      if (parsed.activity) setInputRound((n) => n + 1);
+    } catch {
+      // 못 알아들으면 고른 것 없이 그대로 둔다 — 목록이나 입력칸으로 이어서 하시면 된다
+    }
   };
 
   return (
@@ -87,8 +120,17 @@ export default function CreateActivityPage() {
           showConfirmButton={false}
           onConfirm={typeActivity}
           onChange={typeActivity}
+          // 화면을 떠나지 않는다 — 이 자리에서 시트를 올려 듣는다
+          onVoice={() => setVoiceOpen(true)}
         />
       </div>
+
+      <VoiceSheet
+        open={voiceOpen}
+        onClose={() => setVoiceOpen(false)}
+        onResult={applySpoken}
+        hint="하고 싶은 활동을 말해보세요"
+      />
     </CreateStep>
   );
 }
