@@ -9,7 +9,8 @@ import {
   subscribeDraft,
 } from "@/lib/draft";
 
-// UI디자인 CR 그룹 하단 — [이전] 흰 바탕 / [다음] 검정, 좌우 반반(ds_step_footer).
+// UI디자인 CR 그룹 하단 ds_step_footer(1122:1346) — 좌우 16 · 위 40 · 아래 20 · 사이 12.
+// [이전] 흰 바탕 / [다음] 검정(#171717), 좌우 반반. 버튼은 48 높이에 radius 12.
 // stack 은 세로로 쌓아야 하는 예외 화면을 위한 옵션 — 지금은 쓰는 화면 없음.
 export default function PrevNext({
   backHref,
@@ -55,7 +56,7 @@ export default function PrevNext({
     <button
       type="button"
       onClick={() => router.push(backHref)}
-      className={`${shape} h-[54px] rounded-lg border border-gray-300 bg-white text-black flex items-center justify-center text-[17px] font-medium cursor-pointer`}
+      className={`${shape} h-12 rounded-xl border border-[#E5E5E5] bg-white text-[#5B5B5B] flex items-center justify-center text-[16px] font-bold cursor-pointer`}
     >
       이전
     </button>
@@ -70,14 +71,14 @@ export default function PrevNext({
         if (nextHref) router.push(typeof nextHref === "function" ? nextHref(draft) : nextHref);
       }}
       disabled={!canGoNext}
-      className={`${shape} h-[54px] rounded-lg border border-transparent bg-ink text-white flex items-center justify-center text-[17px] font-bold cursor-pointer disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed`}
+      className={`${shape} h-12 rounded-xl border border-transparent bg-ink text-white flex items-center justify-center text-[16px] font-bold cursor-pointer disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed`}
     >
       다음
     </button>
   );
 
   return (
-    <div className={`px-5 pt-4 pb-6 flex gap-2.5 ${stack ? "flex-col-reverse" : ""}`}>
+    <div className={`px-4 pt-10 pb-5 flex gap-3 ${stack ? "flex-col-reverse" : ""}`}>
       {showPrev && prev}
       {next}
     </div>

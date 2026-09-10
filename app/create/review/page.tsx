@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import WireframeLayout from "@/components/WireframeLayout";
-import Field from "@/components/ds/Field";
+import StepFooter, { footerButtonClass } from "@/components/ds/StepFooter";
 import {
   MeetupDraft,
   draftSnapshot,
@@ -13,22 +13,37 @@ import {
   subscribeDraft,
 } from "@/lib/draft";
 
-// UI디자인 CR-07 갱신분(1219:3583) — 이렇게 올릴까요?
-// 필드마다 연회색 둥근 박스 하나 — 상세보기(JN-02)와 같은 값 표시 방식.
-function FieldBox({
+// UI디자인 CR-07 (1122:6341) — 이렇게 올릴까요?
+// 값 한 줄이 ds_radio 한 칸(320×79): 연회색 바탕에 초록 라벨(14) → 값(20).
+// 보조 문구는 값과 같은 줄 오른쪽에 회색 14로 붙는다. ds/Field 는 보조 문구를
+// 라벨 옆 세로선으로 붙이는 JN-02 모양이라 이 화면에서는 쓰지 않는다.
+function ReviewCard({
   label,
-  labelColor,
-  meta,
   value,
+  meta,
 }: {
   label: string;
-  labelColor?: string;
-  meta?: string;
   value: string;
+  /** 값 옆에 붙는 회색 보조 문구 — 도보 시간, 모임 조건 */
+  meta?: string;
 }) {
+  const valueText = (
+    <p className="text-[20px] font-medium leading-[1.5] text-[#171717] whitespace-pre-line">
+      {value}
+    </p>
+  );
+
   return (
-    <div className="rounded-xl bg-surface px-4 py-3">
-      <Field label={label} labelColor={labelColor} meta={meta} value={value} />
+    <div className="w-[320px] rounded-lg bg-surface px-4 py-3 flex flex-col justify-center gap-1">
+      <p className="text-[14px] font-medium leading-[1.5] text-[#32952D]">{label}</p>
+      {meta ? (
+        <div className="flex items-center gap-2">
+          {valueText}
+          <p className="shrink-0 text-[14px] font-normal leading-[1.5] text-[#777777]">{meta}</p>
+        </div>
+      ) : (
+        valueText
+      )}
     </div>
   );
 }
@@ -56,70 +71,64 @@ export default function CreateReviewPage() {
 
   return (
     <WireframeLayout justify="start" bottomNav="none" className="flex flex-col">
-      <header className="h-[60px] px-5 flex items-center border-b border-gray-100 bg-white relative">
-        <Link href="/create/message" aria-label="뒤로">
+      {/* ds_navigation_top(1122:6342) — 60px. 좌우 8 안에 48 짜리 아이콘 버튼. */}
+      <header className="h-[60px] shrink-0 px-2 flex items-center border-b border-[#E5E5E5] bg-white relative">
+        <Link
+          href="/create/message"
+          aria-label="뒤로"
+          className="size-12 flex items-center justify-center"
+        >
           <Image src="/illust/arrow-back-ios-new.svg" alt="" width={24} height={24} />
         </Link>
-        <span className="absolute inset-x-0 text-center text-[17px] font-bold text-black pointer-events-none">
+        <span className="absolute inset-x-0 text-center text-[18px] font-medium leading-[1.5] text-[#171717] pointer-events-none">
           이렇게 올릴까요?
         </span>
       </header>
 
-      <div className="flex-1 px-5 pt-7 flex flex-col">
-        <div className="flex flex-col gap-1">
-          {startClock && <span className="text-[17px] font-bold text-black">{startClock}</span>}
-          <h1 className="text-[24px] font-bold text-black">{activity}</h1>
-        </div>
+      <div className="flex-1 flex flex-col pt-7">
+        {/* top(1122:6344) — 좌우 16 · 위아래 16, 두 줄 사이 4 */}
+        <h1 className="px-4 py-4 flex flex-col gap-1 text-[28px] font-bold text-black leading-[1.3] tracking-[-0.28px]">
+          {startClock && <span>{startClock}</span>}
+          <span>{activity}</span>
+        </h1>
 
-        <div className="mt-6 flex flex-col gap-3">
+        {/* card-list(1122:6349) — 좌우 16 · 간격 12.
+            ⚠️ cr-01 과 같은 어긋남: 칸이 320 고정인데 여백이 좌우 16(=328)이라
+            오른쪽에 8px 이 남는다. 값 그대로 옮겼고, 가운데로 맞추려면 px-4 를 px-5 로. */}
+        <div className="mt-4 px-4 flex flex-col gap-3">
           {draft.startTime && (
-            <FieldBox
-              label="걸리는 시간"
-              labelColor="text-brand"
+            <ReviewCard
+              label="걸리는 시간(소요시간)"
               value={draft.duration ?? draft.startTime}
             />
           )}
           {draft.location && (
-            <FieldBox
-              label="만나는 곳"
-              labelColor="text-brand"
-              meta={walkTime}
-              value={placeName}
-            />
+            <ReviewCard label="만나는 곳" value={placeName} meta={walkTime} />
           )}
           {draft.maxPeople != null && (
-            <FieldBox
+            <ReviewCard
               label="모임인원"
-              labelColor="text-brand"
-              meta={draft.goAnyway ? "모두 안 모여도 갈게요" : "다 모여야 갈게요"}
               value={`${draft.maxPeople}명`}
+              meta={draft.goAnyway ? "모두 안 모여도 갈게요" : "다 모여야 갈게요"}
             />
           )}
-          {draft.message && (
-            <FieldBox
-              label="한마디"
-              labelColor="text-brand"
-              value={draft.message}
-            />
-          )}
+          {draft.message && <ReviewCard label="한마디" value={draft.message} />}
         </div>
       </div>
 
-      <div className="px-5 pt-5 pb-6 flex flex-col gap-2.5">
+      {/* ds_step_footer(1122:6371) */}
+      <StepFooter>
         <button
           type="button"
           onClick={() => router.push("/create/posted")}
-          className="w-full h-[54px] rounded-lg bg-ink text-white flex items-center justify-center text-[17px] font-bold cursor-pointer"
+          className={`${footerButtonClass("ink")} cursor-pointer`}
         >
           다음
         </button>
-        <Link
-          href="/create/activity"
-          className="w-full h-[54px] rounded-lg border border-gray-300 bg-white text-black flex items-center justify-center text-[17px] font-medium"
-        >
+        <Link href="/create/activity" className={footerButtonClass("ghost")}>
           고칠래요
         </Link>
-      </div>
+      </StepFooter>
     </WireframeLayout>
   );
 }

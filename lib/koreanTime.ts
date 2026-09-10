@@ -171,10 +171,12 @@ export function computeEndTime(time: string, addMinutes: number): string | null 
   return endMin === 0 ? `${endH}시` : `${endH}시 ${endMin}분`;
 }
 
-/** "오늘 오후 10시 10분 ~ 10시 40분" → "오후 10:10 ~ 10:40" (콜론 시각 표기) */
+/** "오늘 오후 10시 10분 ~ 10시 40분" → "오후 10:10 ~ 10:40" (콜론 시각 표기).
+ *  UI디자인 JN-02(1235:3038)는 정각도 "오후 3:00 ~ 4:00" 처럼 분을 두 자리로 적는다. */
 export function formatClockWithColons(timeStr: string): string {
-  let result = timeStr;
-  result = result.replace(/^오늘\s*/, "");
-  result = result.replace(/(\d{1,2})시\s*(\d{1,2})분/g, "$1:$2");
-  return result;
+  return timeStr
+    .replace(/^오늘\s*/, "")
+    .replace(/(\d{1,2})시\s*(\d{1,2})분/g, (_, h, m: string) => `${h}:${m.padStart(2, "0")}`)
+    // 분이 안 붙은 건 정각 — "3시간" 같은 소요 시간은 건드리지 않는다
+    .replace(/(\d{1,2})시(?![간\d])/g, "$1:00");
 }

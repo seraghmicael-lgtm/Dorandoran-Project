@@ -23,8 +23,10 @@ export default async function NotificationPermissionPage({
         />
       }
     >
-      <div className="mt-10 flex items-center justify-center">
-        <Illust name="bell" size={188} />
+      {/* illust(1183:2197) — 프레임 위에서 382px, 가로 가운데. on-02 와 제목·부제
+          줄 수가 같아 띄우는 값도 103px 로 같다. */}
+      <div className="mt-[103px] flex justify-center">
+        <Illust name="bell" box={160} />
       </div>
     </StepScreen>
   );

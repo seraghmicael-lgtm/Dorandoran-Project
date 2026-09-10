@@ -5,7 +5,7 @@ export default function Stepper({ step }: { step: number }) {
       {Array.from({ length: 6 }, (_, i) => (
         <span
           key={i}
-          className={`flex-1 h-[6px] rounded-full ${i < step ? "bg-accent" : "bg-gray-100"}`}
+          className={`flex-1 h-[6px] rounded-full ${i < step ? "bg-accent" : "bg-[#F2F2F2]"}`}
         />
       ))}
     </div>

@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import CreateStep from "@/components/ds/CreateStep";
+import MemoryChips from "@/components/ds/MemoryChips";
 import PrevNext from "@/components/ds/PrevNext";
 import OptionButton from "@/components/ds/OptionButton";
 import { computeEndClock, computeEndTime } from "@/lib/koreanTime";
@@ -14,7 +15,7 @@ import {
   updateDraft,
 } from "@/lib/draft";
 
-// UI디자인 cr-03 (1089:5933) — 활동은 얼마나 걸릴까요?
+// UI디자인 cr-03 (1187:4072) — 활동은 얼마나 걸릴까요?
 const OPTIONS: { label: string; minutes: number | null }[] = [
   { label: "30분 소요", minutes: 30 },
   { label: "1시간 소요", minutes: 60 },
@@ -53,6 +54,9 @@ export default function CreateDurationPage() {
       step={3}
       title={"활동은\n얼마나 걸릴까요?"}
       backHref="/create/time"
+      // 칩 줄과 목록 줄이 모두 좌우 16 이라 본문 여백은 직접 준다
+      body="bare"
+      chips={false}
       footer={
         <PrevNext
           backHref="/create/time"
@@ -61,12 +65,15 @@ export default function CreateDurationPage() {
         />
       }
     >
-      <div className="mt-6 flex flex-col gap-3">
+      {/* tag-list(1187:4086) — 좌우 16 · 위아래 16 */}
+      <MemoryChips step={3} className="px-4 py-4 flex flex-wrap gap-1" />
+
+      {/* list(1187:4081) — 좌우 16 · 위아래 16 · 칸 사이 12 */}
+      <div className="px-4 py-4 flex flex-col gap-3">
         {OPTIONS.map((opt) => (
           <OptionButton
             key={opt.label}
-            full
-            align="start"
+            variant="stack"
             label={opt.label}
             sub={
               opt.minutes == null

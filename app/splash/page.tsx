@@ -21,7 +21,7 @@ export default function SplashPage() {
           src="/illust/splash-bg.png"
           alt=""
           aria-hidden="true"
-          className="absolute left-0 right-0 bottom-0 w-full h-[300px] object-cover object-bottom"
+          className="absolute left-0 right-0 bottom-0 w-full object-cover"
         />
 
         {/* UI디자인 Frame 254(1331:3400) — 아이콘 바로 아래 워드마크. */}

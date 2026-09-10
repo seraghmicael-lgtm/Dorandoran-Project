@@ -3,7 +3,7 @@
 import { Suspense, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import StepScreen from "@/components/ds/StepScreen";
-import StepFooter from "@/components/ds/StepFooter";
+import StepFooter, { footerButtonClass } from "@/components/ds/StepFooter";
 import { Illust } from "@/components/ds/BrandMark";
 import { safeInternalPath } from "@/lib/safePath";
 
@@ -51,14 +51,14 @@ function LocationPermissionContent() {
   return (
     <StepScreen
       title={"지금 현재\n위치를 확인해요"}
-      subtitle={"걸어서 갈 수 있는 곳만\n보여드릴게요"}
+      subtitle={"걸어서 갈 수 있는 곳만 보여줘요\n위치는 오늘마실에 저장되지 않아요"}
       footer={
         <StepFooter>
           <button
             type="button"
             onClick={allow}
             disabled={loading}
-            className="w-full h-[54px] rounded-lg bg-[#32952D] text-white flex items-center justify-center text-[17px] font-bold disabled:opacity-60"
+            className={`${footerButtonClass("brand")} disabled:opacity-60`}
           >
             {loading ? "위치를 확인하고 있어요..." : "위치 허용"}
           </button>
@@ -66,16 +66,17 @@ function LocationPermissionContent() {
             type="button"
             onClick={() => router.push("/splash")}
             disabled={loading}
-            className="w-full h-[54px] rounded-lg bg-white text-black border border-gray-300 flex items-center justify-center text-[17px] font-bold disabled:opacity-60"
+            className={`${footerButtonClass("ghost")} disabled:opacity-60`}
           >
             이전
           </button>
         </StepFooter>
       }
     >
-      <div className="mt-9 flex flex-col items-center gap-7">
-        <Illust name="map" size={160} />
-        <p className="text-[14px] text-muted">위치는 오늘마실에 저장되지 않아요</p>
+      {/* illust(1187:3139) — 프레임 위에서 382px, 가로 가운데. 제목 블록(137+142)
+          바로 아래 103px 을 띄우면 그 자리가 된다. */}
+      <div className="mt-[103px] flex justify-center">
+        <Illust name="map" box={160} />
       </div>
     </StepScreen>
   );
