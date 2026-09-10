@@ -19,7 +19,8 @@ const AVATARS = ["/illust/avatar-1.svg", "/illust/avatar-2.svg", "/illust/avatar
 function statusOf(count: number, max: number, joined: boolean) {
   if (joined) return { label: "나 포함", tone: "bg-accent-soft text-accent" };
   if (count >= max) return { label: "다 찼어요", tone: "bg-gray-100 text-gray-500" };
-  if (count === max - 1) return { label: "한 자리 남았어요", tone: "bg-chip text-[#8A6D1F]" };
+  // UI디자인 ds_tag(JN-02, node 1235:3027) — 한 자리 남았을 때는 빨간 톤 ds_tag
+  if (count === max - 1) return { label: "한 자리 남았어요", tone: "bg-[#faefef] text-[#9a1f1f]" };
   return { label: "참여 가능", tone: "bg-accent-soft text-accent" };
 }
 
@@ -100,7 +101,7 @@ export default async function MeetupDetailPage({
       <div className="flex-1 px-5 pt-7 flex flex-col">
         <div className="flex items-center justify-between gap-3">
           <span className="text-[17px] font-bold text-black">{startClock}</span>
-          <span className={`px-2.5 py-1 rounded-full text-[13px] font-bold ${status.tone}`}>
+          <span className={`p-2 rounded text-[16px] font-medium ${status.tone}`}>
             {status.label}
           </span>
         </div>
