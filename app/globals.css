@@ -35,6 +35,13 @@
   --color-count-full-bg: #e5e5e5; /* ds_count 마감 */
   --color-count-full-ink: #777777; /* color/neutral-500 */
   --color-ad-label: #b8890f; /* color/yellow-700 — 광고 라벨 */
+
+  /* 자세히 보기(JN-02 1235:3022) — Figma 변수 그대로 */
+  --color-line: #e5e5e5; /* border/default — 상단 바·카드 안쪽 구분선 */
+  --color-unselected: #d1d1d1; /* text/Unselected — 아직 안 찬 자리 */
+  --color-brand-alpha-15: #74c94626; /* color/brand-alpha-15 — 개설자·여유 태그 배경 */
+  --color-tag-soon-bg: #faefef; /* color/red-50 — 임박 태그 배경 */
+  --color-tag-soon-ink: #9a1f1f; /* color/red-600 — 임박 태그 글씨 */
 }
 
 @media (prefers-color-scheme: dark) {

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { footerButtonClass } from "@/components/ds/StepFooter";
 
 // 만든 동행 카드의 취소 버튼 — 서버 컴포넌트 목록 안에서 쓰는 작은 클라이언트 조각.
 // Figma MY-03("만든 동행을 취소할까요?") → MY-04("취소되었어요") 두 장을 순서대로 띄운다.
@@ -37,7 +38,7 @@ export default function CancelCreatedButton({
       <button
         type="button"
         onClick={() => setStage("confirm")}
-        className="w-full h-[54px] rounded-lg border border-gray-300 bg-white text-black flex items-center justify-center text-[17px] font-medium cursor-pointer"
+        className={`${footerButtonClass("ghost")} cursor-pointer`}
       >
         만든 동행 취소하기
       </button>

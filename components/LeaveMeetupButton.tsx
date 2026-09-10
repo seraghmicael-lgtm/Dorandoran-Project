@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { footerButtonClass } from "@/components/ds/StepFooter";
 
 // JN-02 의 "참여 취소하기" — 상세 화면 하단. 되돌릴 수 없으니 한 번 묻는다.
 export default function LeaveMeetupButton({ meetupId }: { meetupId: string }) {
@@ -28,7 +29,7 @@ export default function LeaveMeetupButton({ meetupId }: { meetupId: string }) {
       <button
         type="button"
         onClick={() => setStage("confirm")}
-        className="w-full h-[54px] rounded-lg border border-gray-300 bg-white text-black flex items-center justify-center text-[17px] font-medium cursor-pointer"
+        className={`${footerButtonClass("ghost")} cursor-pointer`}
       >
         참여 취소하기
       </button>

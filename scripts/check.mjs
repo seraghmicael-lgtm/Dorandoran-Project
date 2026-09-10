@@ -516,7 +516,8 @@ try {
 
     // 참여자 목록이 한 명만 늘어난다(개설자 + 참여자 1)
     const after = await html(`/meetup/${meetup.id}`);
-    ok(/참여자 <span[^>]*>2</.test(after), "참여자 수가 2 (중복 안 쌓임)");
+    // JN-02(1235:3071)는 "참여자"와 숫자가 4px 떨어진 별개 span 이다 — 옛 markup(공백)도 통과시킨다
+    ok(/참여자(<\/span>| )<span[^>]*>2</.test(after), "참여자 수가 2 (중복 안 쌓임)");
 
     ok((await html(`/meetup/${meetup.id}/complete`)).includes("참여가 완료됐어요"), "참여 완료 화면");
   }
