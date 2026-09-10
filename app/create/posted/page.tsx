@@ -169,8 +169,13 @@ export default function CreatePostedPage() {
   }
 
   // ---- 성공(및 idle) 상태 — UI디자인 CR-08 (1123:2000) ----
-  // 프레임 360×800: 상단바 60 · content 636 · ds_step_footer 108(바닥 고정).
-  // content 안의 세 덩어리는 Figma 좌표 그대로 절대배치한다(97 / 247 / 450).
+  // 프레임 360×800: 상단바 60 · content 632 · ds_step_footer 108(바닥 고정).
+  // Figma 좌표(97 / 247 / 450)는 "산책하러 같이 가요"처럼 제목이 한 줄일 때의 값이다.
+  // 절대배치로 못 박으면 제목이 두 줄로 넘어가는 순간 카드 아래가 잘려 [다음] 버튼과
+  // 맞붙는다 — 실제로 대부분의 동행은 뒤에 "같이 하실 분"이 붙어 두 줄이 된다.
+  // 그래서 세 덩어리를 흐름대로 쌓고, 안내문과 카드 사이의 97 만 늘었다 줄었다 하게
+  // 둔다. 한 줄짜리 카드에서는 정확히 Figma 좌표가 나오고, 카드가 길어지면 그 틈이
+  // 대신 줄어들어 카드는 늘 제자리(아래에서 14)에 온전히 보인다.
   const clock = meetup.startTime.replace(/^오늘\s*/, "").split(" ~ ")[0];
   const [place, walk] = meetup.locationName.split(" · ");
 
@@ -190,10 +195,10 @@ export default function CreatePostedPage() {
         </span>
       </header>
 
-      {/* content(1123:2057) — 636 높이, 넘치는 건 잘라낸다 */}
-      <div className="flex-1 relative overflow-hidden">
-        {/* illust(1123:2059) — 149.425 박스 가운데에 125.517×107.586 그림 */}
-        <div className="absolute left-[105.29px] top-[97px] size-[149.425px] flex items-center justify-center">
+      {/* content(1123:2057) — 상단바와 푸터 사이를 채운다 */}
+      <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+        {/* illust(1123:2059) — content 위에서 97, 149.425 박스 가운데에 125.517×107.586 그림 */}
+        <div className="mt-[97px] mx-auto shrink-0 size-[149.425px] flex items-center justify-center">
           <Image
             src="/illust/posted-illust.svg"
             alt=""
@@ -201,12 +206,13 @@ export default function CreatePostedPage() {
             width={126}
             height={108}
             className="w-[125.517px] h-[107.586px]"
-            priority
+            loading="eager"
           />
         </div>
 
-        {/* Frame 186(1123:2060) — 좌우 16, 두 덩어리 사이 16 */}
-        <div className="absolute left-4 right-4 top-[247px] flex flex-col gap-4 text-center">
+        {/* Frame 186(1123:2060) — 좌우 16, 두 덩어리 사이 16.
+            illust 박스 바닥(246.425)에 이어 붙으면 곧 Figma 의 247 이다 */}
+        <div className="mt-[0.575px] shrink-0 px-4 flex flex-col gap-4 text-center">
           <p className="text-[28px] font-bold leading-[1.3] tracking-[-0.28px] text-[#171717]">
             올렸어요
           </p>
@@ -216,8 +222,12 @@ export default function CreatePostedPage() {
           </p>
         </div>
 
-        {/* Frame 206(1123:2161) — 좌우 20, 안내문과 카드 사이 8 */}
-        <div className="absolute left-0 top-[450px] w-[360px] px-5 flex flex-col gap-2">
+        {/* 안내문과 카드 사이의 빈 곳 — 한 줄 카드에서 97(Figma 353→450).
+            카드가 길어지면 여기가 줄어 카드를 밀어내지 않는다 */}
+        <div className="flex-1" />
+
+        {/* Frame 206(1123:2161) — 좌우 20, 안내문과 카드 사이 8, 푸터까지 14 */}
+        <div className="shrink-0 px-5 pb-[14px] flex flex-col gap-2">
           <div className="px-1 flex items-center">
             <p className="text-[16px] font-medium leading-[1.5] text-[#777777]">
               홈에는 이렇게 보여요
@@ -225,13 +235,13 @@ export default function CreatePostedPage() {
           </div>
 
           {/* ds_card(1123:2123) — 패딩 16 · 라운드 12 · 연한 테두리 + 옅은 그림자 */}
-          <div className="rounded-xl border border-[#F2F2F2] bg-white p-4 shadow-[0_2px_6px_rgba(0,0,0,0.08)] flex flex-col gap-3">
+          <div className="rounded-xl border border-card-line bg-white p-4 shadow-[0_2px_6px_rgba(0,0,0,0.08)] flex flex-col gap-3">
             <div className="flex flex-col gap-[2px]">
               <p className="text-[16px] font-bold leading-[1.5] text-black">{clock}</p>
               <p className="text-[20px] font-bold leading-[1.3] text-black">{meetup.activity}</p>
             </div>
 
-            <div className="flex flex-col gap-[2px] text-[12px] font-medium leading-[1.5] text-[#777777]">
+            <div className="flex flex-col gap-[2px] text-[12px] font-medium leading-[1.5] text-sub">
               {postedDuration && (
                 <CardMetaRow icon="/illust/fill-time.svg" trailing={<span>{postedDuration}</span>}>
                   <span>예상 시간</span>
