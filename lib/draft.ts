@@ -76,7 +76,8 @@ const CHIP_STEPS = [1, 2, 3, 4, 5] as const;
 
 /**
  * 메모리풍선에 걸 칩 목록 (Figma 941:980 순서: 할일 → 시간 → 모임시간 → 장소 → 인원).
- * 소요시간 칩은 "1시간 동안" (UI디자인 cr-04). 선택지 라벨의 "소요"는 떼고 붙인다.
+ * 소요시간 칩은 고른 라벨 그대로 "1시간 소요" — cr-04(1187:4521)·cr-05(1187:4560) 둘 다
+ * 그렇게 걸려 있다.
  * 아직 안 정한 항목은 빼고, 하나도 없으면 빈 배열 — 화면은 아무것도 안 그린다.
  *
  * beforeStep 을 주면 그 단계 "앞"에서 정한 것만 건다. 지금 화면에서 고르는 중인 값은
@@ -90,7 +91,7 @@ export function memoryChips(
   const values = [
     d?.activity,
     d?.time,
-    d?.duration ? `${d.duration.replace(" 소요", "")} 동안` : null,
+    d?.duration,
     d?.location,
     typeof d?.maxPeople === "number" ? `${d.maxPeople}명` : null,
   ];

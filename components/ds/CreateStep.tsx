@@ -12,6 +12,7 @@ import Stepper from "@/components/ds/Stepper";
 export default function CreateStep({
   step,
   title,
+  desc,
   backHref,
   chips = true,
   body = "padded",
@@ -21,6 +22,8 @@ export default function CreateStep({
   step: number;
   /** 줄바꿈은 디자인에 박혀 있어 \n 을 그대로 살린다 */
   title: string;
+  /** 제목 바로 아래 안내문(cr-04 1187:4449) — 제목과 같은 묶음 안이라 사이가 10 이다 */
+  desc?: React.ReactNode;
   /** 상단 ‹ 가 갈 곳 — 이전 화면과 같은 주소 */
   backHref: string;
   chips?: boolean;
@@ -54,11 +57,17 @@ export default function CreateStep({
         <Stepper step={step} />
       </div>
 
-      {/* title(1089:5670) — 104px 짜리 줄. 글자는 좌우 16 에서 시작한다. */}
-      <div className="shrink-0 px-4 py-4">
+      {/* title(1089:5670) — 104px 짜리 줄. 글자는 좌우 16 에서 시작한다.
+          안내문이 있으면 같은 묶음 안에 10 을 띄우고 붙는다(cr-04 1187:4445). */}
+      <div className="shrink-0 px-4 py-4 flex flex-col gap-2.5">
         <h1 className="text-[28px] font-bold text-black leading-[1.3] tracking-[-0.28px] whitespace-pre-line">
           {title}
         </h1>
+        {desc && (
+          <p className="text-[16px] font-medium leading-[1.5] text-[#777777] whitespace-pre-line">
+            {desc}
+          </p>
+        )}
       </div>
 
       <div className={`flex-1 flex flex-col ${body === "padded" ? "px-5" : ""}`}>
