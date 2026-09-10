@@ -42,8 +42,9 @@ export default function PushDemo() {
 
   return (
     <>
-      {/* 화면 오른쪽 위 바깥의 프로토타입 조작판 — 실제 UI가 아니다 */}
-      <div className="fixed right-2 top-16 z-40 flex flex-col gap-2">
+      {/* 화면 오른쪽 위 바깥의 프로토타입 조작판 — 실제 UI가 아니다.
+          창이 좁아지면(md 미만) 360 프레임 위로 겹쳐 앉으므로 아예 감춘다 */}
+      <div className="fixed right-2 top-16 z-40 hidden md:flex flex-col gap-2">
         <div className="flex gap-1">
           <button
             type="button"
