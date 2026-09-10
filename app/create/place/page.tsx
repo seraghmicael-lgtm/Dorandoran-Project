@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import CreateStep from "@/components/ds/CreateStep";
+import MemoryChips from "@/components/ds/MemoryChips";
 import PrevNext from "@/components/ds/PrevNext";
 import SmartInput from "@/components/SmartInput";
 import GoogleMap from "@/components/GoogleMap";
@@ -16,9 +17,13 @@ import {
   PlaceHit,
 } from "@/lib/places";
 
-// UI디자인 cr-04 (1089:7455) — 어디서 만날까요?
+// UI디자인 cr-04 (1187:4440) — 어디서 만날까요?
 // 미리 박아둔 목록이 아니라 지도 + 검색이다. 어느 동네에서 열든 실제로 만날 수 있는
 // 곳을 고르게 하려면 고정 목록으로는 안 된다.
+//
+// 줄 순서와 자리(field 1187:4450, 좌우 16 기준):
+//   칩(200) → 검색칸 58(262) → 9 → [이 장소 찾기] 48 → 13 → 지도 265 → 찾은 곳 카드(655)
+// 줄마다 좌우 여백이 다르지 않고 전부 16 이므로 body="bare" 로 두고 블록마다 px-4 를 준다.
 export default function CreatePlacePage() {
   const router = useRouter();
 
@@ -31,10 +36,13 @@ export default function CreatePlacePage() {
   const [searching, setSearching] = useState(false);
   // 타이핑할 때 뜨는 후보 — 지금 계신 곳 둘레의 진짜 지명을 받아둔다
   const [nearby, setNearby] = useState<string[]>([]);
-  // "이 장소 찾기" 버튼을 검색칸 안이 아니라 화면 하단에 고정으로 띄우려고 입력값을 여기서도 들고 있는다
+  // [이 장소 찾기]가 검색칸 밖에 따로 있는 버튼이라 입력값을 여기서도 들고 있는다
   const [query, setQuery] = useState("");
   // 말하기는 이 화면 안에서 — 아래에서 올라오는 시트로 듣는다(cr-04)
   const [voiceOpen, setVoiceOpen] = useState(false);
+  // 빈 채로 [이 장소 찾기]를 누르면 커서를 검색칸으로 보낸다 — 눌러도 아무 일 없는 버튼은 안 된다
+  const fieldRef = useRef<HTMLDivElement>(null);
+  const focusInput = () => fieldRef.current?.querySelector("input")?.focus();
 
   useEffect(() => {
     getCurrentOrigin().then(setOrigin);
@@ -94,19 +102,24 @@ export default function CreatePlacePage() {
   return (
     <CreateStep
       step={4}
-      title="어디서 만날까요?"
+      title={"어디서\n만날까요?"}
+      // title(1187:4449) — 제목과 한 묶음이라 16px/#777 로 제목 바로 밑에 붙는다
+      desc={
+        origin === null
+          ? "’도란공원 정문’처럼\n만날 곳을 적어주세요"
+          : "’도란공원’처럼 쓰거나 말하면\n지도에서 찾아드릴게요"
+      }
       backHref="/create/duration"
+      body="bare"
+      chips={false}
       footer={<PrevNext backHref="/create/duration" nextHref="/create/people" requires="location" />}
     >
-      {/* cr-04 — 안내문은 검색칸이 아니라 제목 바로 아래에 온다 */}
-      <p className="mt-2 text-[15px] text-muted leading-relaxed whitespace-pre-line">
-        {origin === null
-          ? "’도란공원 정문’처럼 만날 곳을 적어주세요"
-          : "’도란공원’처럼 쓰거나 말하면\n지도에서 찾아드릴게요"}
-      </p>
+      {/* tag-list(1187:4460) — 좌우 16 · 위아래 16 */}
+      <MemoryChips step={4} className="px-4 py-4 flex flex-wrap gap-1" />
 
-      <div className="mt-4 flex flex-col">
-        {/* 검색칸을 안내문 바로 밑에 둔다 — 이 화면의 첫 할 일이 "어디를 찾을지 말하기"다 */}
+      {/* field(1187:4450) — 세 줄의 자리가 못 박혀 있다: 검색칸 0(58) · 버튼 67(48) · 지도 128(265).
+          고른 간격이 아니라 9 · 13 이라 gap 대신 그 값을 그대로 준다. */}
+      <div ref={fieldRef} className="px-4 flex flex-col">
         <SmartInput
           placeholder="예) 도란공원"
           pending={searching}
@@ -117,53 +130,51 @@ export default function CreatePlacePage() {
           onVoice={() => setVoiceOpen(true)}
         />
 
-        {/* 지도·검색결과가 아무리 길어져도 스크롤과 무관하게 화면 하단(다음 버튼 바로 위)에 고정 */}
-        {query.trim() && (
-          <>
-            {/* 버튼이 화면에 고정되면 흐름에서 빠지므로, 밑 내용이 버튼에 가리지 않게 자리를 비워둔다 */}
-            <div className="mt-3 h-[50px]" />
-            <div className="fixed inset-x-0 bottom-[94px] z-20 flex justify-center px-5">
-              <button
-                type="button"
-                onClick={() => search(query)}
-                disabled={searching}
-                className="w-full max-w-[320px] h-[50px] rounded-lg bg-ink text-white text-[16px] font-bold cursor-pointer shadow-lg disabled:opacity-60 disabled:cursor-default"
-              >
-                {searching ? "찾고 있어요..." : origin === null ? "이걸로 할게요" : "이 장소 찾기"}
-              </button>
-            </div>
-          </>
-        )}
+        {/* ds_button(1187:4459) — 328×48 · radius 12 · #171717.
+            디자인에 흐린 상태가 없다. 적은 게 없을 때도 검정 그대로 두고,
+            누르면 아무 일도 안 하는 대신 검색칸으로 커서를 보낸다. */}
+        <button
+          type="button"
+          onClick={() => (query.trim() ? search(query) : focusInput())}
+          disabled={searching}
+          className="mt-[9px] w-full h-12 rounded-xl bg-ink text-white text-[16px] font-bold leading-[1.4] cursor-pointer disabled:opacity-60 disabled:cursor-default"
+        >
+          {searching ? "찾고 있어요..." : origin === null ? "이걸로 할게요" : "이 장소 찾기"}
+        </button>
 
-        <div className="h-4" />
-
+        {/* card-list(1187:4457) — ds_map 320×265 · radius 12.
+            ⚠️ Figma 실측: 지도만 320 이라 위 두 줄(328)보다 오른쪽이 8 짧다. 값 그대로 옮겼다. */}
         {pin ? (
           <GoogleMap
             lat={pin.lat}
             lng={pin.lng}
             origin={origin ?? undefined}
-            height="h-[300px]"
-            className="rounded-xl"
+            width="w-[320px]"
+            height="h-[265px]"
+            className="mt-[13px] rounded-xl"
           />
         ) : (
-          <div className="h-[300px] rounded-xl bg-surface flex items-center justify-center text-[15px] text-muted text-center px-6">
+          <div className="mt-[13px] w-[320px] h-[265px] rounded-xl bg-surface flex items-center justify-center text-[16px] font-medium text-[#777777] text-center px-6 leading-[1.5] whitespace-pre-line">
             {origin === undefined
               ? "지도를 준비하고 있어요..."
-              : "위치를 몰라서 지도는 못 보여드려요. 위 칸에 만날 곳을 적어주세요."}
+              : "위치를 몰라서 지도는 못 보여드려요.\n위 칸에 만날 곳을 적어주세요."}
           </div>
         )}
+      </div>
 
-        {/* 찾은 장소 — 이미 확정됐다. 하단 [다음]을 누르면 그대로 넘어간다 */}
-        {result?.place && (
-          <>
-            <div className="h-2.5" />
-            <div className="rounded-xl bg-surface px-4 py-4 flex flex-col gap-0.5">
-              <span className="text-[19px] font-bold text-black">{result.place.name}</span>
-              {result.place.address && (
-                <span className="text-[15px] text-muted">{result.place.address}</span>
-              )}
+      {/* 찾은 장소(1187:4511 ds_radio) — 좌우 16 · 위아래 16 자리에 흰 카드 하나.
+          이미 확정된 상태라 하단 [다음]을 누르면 그대로 넘어간다. */}
+      {result?.place && (
+        <div className="px-4 py-4">
+          <div className="rounded-lg border border-[#E5E5E5] bg-white px-4 py-4 flex flex-col gap-1">
+            <span className="text-[18px] font-bold leading-[1.5] text-[#171717]">
+              {result.place.name}
+            </span>
+            {/* 주소와 거리는 Figma 에서 한 덩어리(1187:4513)라 두 줄 사이가 벌어지지 않는다 */}
+            <div className="flex flex-col text-[14px] font-medium leading-[1.5] text-[#777777]">
+              {result.place.address && <span>{result.place.address}</span>}
               <div className="flex items-center justify-between gap-2">
-                <span className="text-[15px] text-muted">
+                <span>
                   {result.place.distanceM < 1000
                     ? `여기서 ${result.place.distanceM}m`
                     : `여기서 ${(result.place.distanceM / 1000).toFixed(1)}km`}
@@ -173,36 +184,34 @@ export default function CreatePlacePage() {
                   href={directionsUrl(result.place)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[15px] font-bold text-accent underline-offset-2 hover:underline shrink-0"
+                  className="font-bold text-accent underline-offset-2 hover:underline shrink-0"
                 >
                   길찾기 &gt;
                 </a>
               </div>
             </div>
-          </>
-        )}
+          </div>
+        </div>
+      )}
 
-        {/* 못 찾았을 때 — 막다른 길을 만들지 않는다 */}
-        {result && !result.place && (
-          <>
-            <div className="h-2.5" />
-            <div className="rounded-xl bg-surface px-4 py-4 flex flex-col gap-2">
-              <p className="text-[15px] text-black">
-                <span className="font-bold">{result.query}</span> 은(는) 걸어서 갈 만한 곳(5km 안)에서
-                못 찾았어요.
-              </p>
-              <button
-                type="button"
-                onClick={() => choose(result.query, null)}
-                className="w-full h-[50px] rounded-lg border border-gray-300 bg-white text-[16px] font-bold text-black cursor-pointer"
-              >
-                적은 그대로 쓸게요
-              </button>
-            </div>
-          </>
-        )}
-
-      </div>
+      {/* 못 찾았을 때 — 막다른 길을 만들지 않는다. 자리와 생김새는 위 카드와 같다. */}
+      {result && !result.place && (
+        <div className="px-4 py-4">
+          <div className="rounded-lg border border-[#E5E5E5] bg-white px-4 py-4 flex flex-col gap-3">
+            <p className="text-[14px] font-medium leading-[1.5] text-[#777777]">
+              <span className="font-bold text-[#171717]">{result.query}</span> 은(는) 걸어서 갈 만한
+              곳(5km 안)에서 못 찾았어요.
+            </p>
+            <button
+              type="button"
+              onClick={() => choose(result.query, null)}
+              className="w-full h-12 rounded-xl border border-[#E5E5E5] bg-white text-[16px] font-bold leading-[1.4] text-[#5B5B5B] cursor-pointer"
+            >
+              적은 그대로 쓸게요
+            </button>
+          </div>
+        </div>
+      )}
 
       <VoiceSheet
         open={voiceOpen}
